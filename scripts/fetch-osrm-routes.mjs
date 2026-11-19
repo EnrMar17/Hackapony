@@ -125,9 +125,94 @@ async function bridge(id, path) {
   return out;
 }
 
+const bearingDeg = (a, b) => ((Math.atan2((b[0] - a[0]) * 104500, (b[1] - a[1]) * 111000) * 180) / Math.PI + 360) % 360;
+
+// Regreso "espejo" para líneas con un solo sentido en OSM: waypoints cada `step` m sobre la ida al
+// revés, con el rumbo de regreso, para que OSRM tome la misma calle o su paralela en sentido contrario.
+// Validado contra las 11 líneas con ida y vuelta en OSM: coincide ~75% (mediana) con el regreso real y
+// su longitud queda en ~1.0x; el camino más corto solo coincidía ~15%.
+// Se arma tramo por tramo (puntos cada MIRROR_STEP_M) con el rumbo contrario: OSRM respeta los sentidos
+// de OSM, así que en calles de un solo sentido toma la paralela o la otra calzada. Si un tramo da un
+// rodeo (más de DETOUR_RATIO veces lo que mide la ida entre esos puntos), se descarta ese punto y se
+// une con el siguiente: así no quedan ganchos ni espigones por un punto que cayó en la calle equivocada.
+const MIRROR_STEP_M = 500;
+const MIRROR_RADIUS_M = 90;
+const MIRROR_TOL = 45;
+const DETOUR_RATIO = 1.6;
+const DETOUR_SLACK_M = 250;
+const HINT_MAX_M = 400;
+
+async function mirrorLeg([a, ba], [b, bb], forwardM) {
+  const url =
+    `${OSRM}/${a[0]},${a[1]};${b[0]},${b[1]}?overview=full&geometries=geojson&steps=false&continue_straight=true` +
+    `&bearings=${Math.round(ba)},${MIRROR_TOL};${Math.round(bb)},${MIRROR_TOL}&radiuses=${MIRROR_RADIUS_M};${MIRROR_RADIUS_M}`;
+  try {
+    const data = await getJson(url);
+    if (data.code !== 'Ok' || !data.routes?.[0]) return null;
+    const r = data.routes[0];
+    return { coords: r.geometry.coordinates, ok: r.distance <= forwardM * DETOUR_RATIO + DETOUR_SLACK_M, distance: r.distance };
+  } catch {
+    return null;
+  }
+}
+
+async function mirrorReturn(id, forward, hint) {
+  const back = [...forward].reverse();
+  const acc = [0];
+  for (let i = 1; i < back.length; i++) acc.push(acc[i - 1] + dist(back[i - 1], back[i]));
+  const wp = [];
+  let last = -Infinity;
+  for (let i = 0; i < back.length - 1; i++) {
+    if (acc[i] - last >= MIRROR_STEP_M) {
+      wp.push({ p: back[i], b: bearingDeg(back[i], back[Math.min(back.length - 1, i + 3)]), at: acc[i] });
+      last = acc[i];
+    }
+  }
+  wp.push({ p: back.at(-1), b: bearingDeg(back.at(-2), back.at(-1)), at: acc.at(-1) });
+  // Con guía (calles del regreso según una relación antigua), cada punto intermedio se mueve a ella.
+  if (hint.length) {
+    for (let k = 1; k < wp.length - 1; k++) {
+      let best = wp[k].p;
+      let bestD = HINT_MAX_M;
+      for (const h of hint) {
+        const dd = dist(wp[k].p, h);
+        if (dd < bestD) {
+          bestD = dd;
+          best = h;
+        }
+      }
+      wp[k].p = best;
+    }
+  }
+  const out = [];
+  let skipped = 0;
+  for (let i = 0; i < wp.length - 1; ) {
+    let leg = null;
+    let j = i + 1;
+    // Probar el siguiente punto; si da rodeo, saltarlo (hasta 3) y unir con el que sigue.
+    for (; j < Math.min(wp.length, i + 4); j++) {
+      const r = await mirrorLeg([wp[i].p, wp[i].b], [wp[j].p, wp[j].b], wp[j].at - wp[i].at);
+      if (r && (r.ok || !leg || r.distance < leg.distance)) leg = r;
+      if (r?.ok) break;
+      skipped++;
+    }
+    if (j >= Math.min(wp.length, i + 4)) j = Math.min(wp.length - 1, i + 3);
+    if (leg) out.push(...leg.coords);
+    else out.push(...(await joinGap(id, wp[i].p, wp[j].p)));
+    i = j;
+  }
+  if (skipped) console.log(`  ${id}: regreso espejo, ${skipped} punto(s) descartado(s) por rodeo`);
+  return out;
+}
+
 async function trace(id, entry) {
   let raw;
-  if (entry.path) {
+  if (entry.path && entry.returnReverse) {
+    raw = await bridge(id, close(entry.path));
+  } else if (entry.path && entry.returnMirror) {
+    const forward = await bridge(id, entry.path);
+    raw = [...forward, ...(await mirrorReturn(id, forward, entry.returnHint ?? []))];
+  } else if (entry.path) {
     raw = await bridge(id, close(entry.path));
   } else {
     if (!Array.isArray(entry.waypoints) || entry.waypoints.length < 3) {
@@ -137,8 +222,13 @@ async function trace(id, entry) {
     for (const w of entry.waypoints) snapped.push(await snap(w));
     raw = await osrmLine(id, close(snapped));
   }
-  const cleaned = dropSpurs(raw);
+  let cleaned = dropSpurs(raw);
   cleaned[cleaned.length - 1] = cleaned[0]; // garantiza circuito cerrado exacto
+  if (entry.returnReverse) {
+    // Ida y vuelta por las mismas calles: la vuelta es la ida al revés. Va después de quitar
+    // espigones, porque un regreso exacto sobre la ida se vería como un espigón gigante.
+    cleaned = [...cleaned, ...[...cleaned].reverse().slice(1)];
+  }
   const line = simplify(cleaned, SIMPLIFY_M).map(([x, y]) => [r5(x), r5(y)]);
   line[line.length - 1] = line[0];
   return {
