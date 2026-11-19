@@ -1,5 +1,3 @@
-import type { ReportType } from "@/lib/types";
-
 /** Mezcla un color #rrggbb con blanco. 0 = igual, 1 = blanco. */
 function lighten(hex: string, amount: number): string {
   const n = hex.replace("#", "");
@@ -33,16 +31,8 @@ export function routeCode(id: string): string {
   return `${family.charAt(0)}${token ?? ""}`;
 }
 
-/**
- * Una sola paleta para los tipos de reporte: botones, lista y mapa.
- * El azul no se usa aquí: es solo de la ubicación del usuario.
- * (Kike la añade a constants.ts; cuando exista, importar de allí y borrar esta.)
- */
-export const REPORT_COLORS: Record<ReportType, string> = {
-  full: "#dc2626",
-  passing: "#0891b2",
-  incident: "#d97706",
-};
+/** Una sola paleta para los tipos de reporte (botones, lista y mapa): viene de constants.ts. */
+export { REPORT_COLORS } from "@/lib/constants";
 
 /** Color del punto del usuario. Solo se usa para "tú". */
 export const USER_COLOR = "#2563eb";
