@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { POLL_INTERVAL_MS, RATE_LIMIT_MS, REPORT_TTL_MS } from "@/lib/constants";
+import { CONFIRM_LIFE_CAP, POLL_INTERVAL_MS, RATE_LIMIT_MS, REPORT_TTL_MS } from "@/lib/constants";
 import { syncClock, toLocalIso } from "@/lib/supabase/clock";
 import { getSupabase } from "@/lib/supabase/client";
 import { ensureSession } from "@/lib/supabase/session";
@@ -12,6 +12,7 @@ import type {
   NewReport,
   OccupancyLevel,
   Report,
+  ReportRefinement,
   ReportType,
   ReportsState,
   RouteId,
@@ -32,9 +33,11 @@ export type ReportRow = {
   confirms: number;
   resolved: boolean;
   created_at: string;
+  units: number | null;
 };
 
-const WINDOW_MS = Math.max(...Object.values(REPORT_TTL_MS));
+// Un reporte confirmado vive hasta CONFIRM_LIFE_CAP veces su vigencia base: la ventana de carga debe cubrirlo.
+const WINDOW_MS = Math.max(...Object.values(REPORT_TTL_MS)) * CONFIRM_LIFE_CAP;
 const TMP = "tmp-";
 
 export function fromRow(r: ReportRow): Report {
@@ -52,6 +55,7 @@ export function fromRow(r: ReportRow): Report {
     is_simulated: r.is_simulated,
     user_id: r.user_id,
     created_at: toLocalIso(r.created_at),
+    units: r.units ?? null,
   };
 }
 
@@ -93,6 +97,11 @@ export function useReports(): ReportsState {
   const lastSent = useRef(0);
   const userIdRef = useRef<string | null>(null);
   const myVotes = useRef(new Map<string, VoteKind>());
+  const reportsRef = useRef<Report[]>([]);
+
+  useEffect(() => {
+    reportsRef.current = reports;
+  }, [reports]);
 
   /** Reemplaza la lista con lo del servidor, conservando los reportes optimistas pendientes. */
   const applyFetched = useCallback((list: Report[]) => {
@@ -164,8 +173,9 @@ export function useReports(): ReportsState {
             setOnline(true);
             void refresh(); // cubre lo ocurrido entre la carga inicial y la suscripción
           } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+            // Solo se activa el sondeo de respaldo. `online` lo decide si el sondeo logra leer los reportes:
+            // si hay internet, los datos siguen al día y no debe parpadear el aviso de conexión.
             setLive(false);
-            setOnline(false);
           }
         });
     })();
@@ -175,6 +185,18 @@ export function useReports(): ReportsState {
       if (channel) void supabase.removeChannel(channel);
     };
   }, [applyFetched, refresh]);
+
+  // Respuesta inmediata cuando el navegador pierde o recupera la red.
+  useEffect(() => {
+    const goOffline = () => setOnline(false);
+    const goOnline = () => void refresh();
+    window.addEventListener("offline", goOffline);
+    window.addEventListener("online", goOnline);
+    return () => {
+      window.removeEventListener("offline", goOffline);
+      window.removeEventListener("online", goOnline);
+    };
+  }, [refresh]);
 
   // Respaldo: si el canal no está activo, consulta cada 3 s.
   useEffect(() => {
@@ -212,6 +234,7 @@ export function useReports(): ReportsState {
       lat: input.lat,
       incident_kind: input.incident_kind ?? null,
       occupancy: input.occupancy ?? null,
+      units: input.units ?? null,
       confirms: 0,
       resolved: false,
       is_simulated: false,
@@ -230,6 +253,7 @@ export function useReports(): ReportsState {
         lat: input.lat,
         incident_kind: input.incident_kind ?? null,
         occupancy: input.occupancy ?? null,
+        units: input.units ?? null,
       })
       .select()
       .single();
@@ -253,6 +277,8 @@ export function useReports(): ReportsState {
       if (previous === kind) return;
       const userId = await ensureSession();
       userIdRef.current = userId;
+      // Evita sumar un +1 falso en pantalla: el servidor tampoco deja confirmar el propio reporte.
+      if (reportsRef.current.some((r) => r.id === reportId && r.user_id === userId)) throw new Error("OWN_REPORT");
 
       myVotes.current.set(reportId, kind);
       setReports((prev) =>
@@ -294,5 +320,33 @@ export function useReports(): ReportsState {
     [refresh],
   );
 
-  return { reports, loading, error, online, sendReport, vote, undo };
+  const refine = useCallback(
+    async (reportId: string, patch: ReportRefinement) => {
+      const supabase = getSupabase();
+      if (!supabase) throw new Error("OFFLINE");
+      if (patch.units === undefined && patch.occupancy === undefined) return;
+      await ensureSession();
+
+      setReports((prev) =>
+        prev.map((r) =>
+          r.id !== reportId ? r : { ...r, units: patch.units ?? r.units, occupancy: patch.occupancy ?? r.occupancy },
+        ),
+      );
+
+      // Solo el autor, solo en sus primeros 60 s y solo units/occupancy (migración 0004).
+      const { data, error: refineError } = await supabase.rpc("refine_report", {
+        p_id: reportId,
+        p_units: patch.units ?? null,
+        p_occupancy: patch.occupancy ?? null,
+      });
+      if (refineError || !data) {
+        void refresh();
+        throw new Error(refineError?.message.includes("REFINE_DENIED") ? "REFINE_DENIED" : "REFINE_FAILED");
+      }
+      setReports((prev) => upsert(prev, fromRow(data as ReportRow)));
+    },
+    [refresh],
+  );
+
+  return { reports, loading, error, online, sendReport, vote, undo, refine };
 }
