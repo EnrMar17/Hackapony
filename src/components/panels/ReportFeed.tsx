@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, CircleCheck, Route as RouteIcon } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Check, ChevronDown, CircleCheck, Route as RouteIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive, timeAgo } from "@/lib/geo";
 import type { Report, ReportType, Route, RouteId } from "@/lib/types";
@@ -41,6 +41,108 @@ interface FiltersProps {
   routes: Route[];
 }
 
+/**
+ * Filtro por ruta con lista propia (no el <select> nativo, cuya lista dibuja el sistema y no sigue el diseño).
+ * Se despliega dentro del panel, así no lo recorta el scroll.
+ */
+function RouteFilter({
+  routes,
+  value,
+  onChange,
+}: {
+  routes: Route[];
+  value: RouteId | "all";
+  onChange: (id: RouteId | "all") => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const listId = useId();
+  const listRef = useRef<HTMLDivElement>(null);
+  const current = routes.find((r) => r.id === value);
+
+  // Al abrir, foco en la opción elegida; Escape cierra.
+  useEffect(() => {
+    if (!open) return;
+    listRef.current?.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus();
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  function choose(id: RouteId | "all") {
+    onChange(id);
+    setOpen(false);
+  }
+
+  const option =
+    "flex min-h-12 w-full items-center gap-3 rounded-full px-4 text-left text-sm font-medium transition-colors duration-300 ease-out hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring aria-pressed:bg-foreground aria-pressed:font-semibold aria-pressed:text-background";
+
+  return (
+    <div>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={listId}
+        onClick={() => setOpen((o) => !o)}
+        className={cn(
+          "flex min-h-12 w-full items-center gap-2.5 rounded-full bg-foreground/5 px-4 text-left text-sm font-semibold",
+          "transition-colors duration-300 ease-out hover:bg-foreground/10",
+          "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+        )}
+      >
+        <span className="sr-only">Filtrar por ruta: </span>
+        {current ? (
+          <span aria-hidden className="size-3 shrink-0 rounded-full" style={{ backgroundColor: current.color }} />
+        ) : (
+          <RouteIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+        )}
+        <span className="min-w-0 flex-1 break-words">{current ? current.name : "Todas las rutas"}</span>
+        <ChevronDown
+          aria-hidden
+          className={cn(
+            "size-4 shrink-0 text-muted-foreground transition-transform duration-300 ease-out",
+            open && "rotate-180",
+          )}
+        />
+      </button>
+
+      {open && (
+        <div
+          ref={listRef}
+          id={listId}
+          role="group"
+          aria-label="Elegir ruta"
+          className="mt-2 max-h-64 space-y-1 overflow-y-auto overscroll-contain rounded-3xl bg-foreground/5 p-1.5 animate-in fade-in slide-in-from-top-1 duration-300"
+        >
+          <button type="button" aria-pressed={value === "all"} onClick={() => choose("all")} className={option}>
+            <RouteIcon aria-hidden className="size-4 shrink-0" />
+            <span className="min-w-0 flex-1">Todas las rutas</span>
+            {value === "all" && <Check aria-hidden className="size-4 shrink-0" strokeWidth={3} />}
+          </button>
+          {routes.map((r) => (
+            <button
+              key={r.id}
+              type="button"
+              aria-pressed={value === r.id}
+              onClick={() => choose(r.id)}
+              className={option}
+            >
+              <span
+                aria-hidden
+                className="size-3 shrink-0 rounded-full ring-2 ring-background"
+                style={{ backgroundColor: r.color }}
+              />
+              <span className="min-w-0 flex-1 break-words">{r.name}</span>
+              {value === r.id && <Check aria-hidden className="size-4 shrink-0" strokeWidth={3} />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** Clasifica los reportes por tipo (con contador) y por ruta. */
 function FeedFilters({ type, onType, routeId, onRoute, counts, routes }: FiltersProps) {
   return (
@@ -64,38 +166,7 @@ function FeedFilters({ type, onType, routeId, onRoute, counts, routes }: Filters
           </button>
         ))}
       </div>
-      {routes.length > 1 && (
-        // Mismo formato que los chips: fondo suave, esquinas amplias y flecha propia (sin el estilo nativo).
-        <label className="relative block">
-          <span className="sr-only">Filtrar por ruta</span>
-          <RouteIcon
-            aria-hidden
-            className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-          <select
-            value={routeId}
-            onChange={(e) => onRoute(e.target.value as RouteId | "all")}
-            className={cn(
-              "min-h-12 w-full cursor-pointer appearance-none rounded-full bg-foreground/5 pr-10 pl-10 text-sm font-semibold text-foreground",
-              "transition-colors duration-300 ease-out hover:bg-foreground/10",
-              "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
-              // La lista que abre el navegador: colores del tema (en oscuro no sale blanca).
-              "[&>option]:bg-background [&>option]:font-medium [&>option]:text-foreground",
-            )}
-          >
-            <option value="all">Todas las rutas</option>
-            {routes.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            aria-hidden
-            className="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-        </label>
-      )}
+      {routes.length > 1 && <RouteFilter routes={routes} value={routeId} onChange={onRoute} />}
     </div>
   );
 }
