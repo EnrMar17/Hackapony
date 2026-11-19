@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import { RATE_LIMIT_MS, REPORT_BUTTONS } from "@/lib/constants";
 import type { GeolocationState, IncidentKind, NearestStopResult, ReportType } from "@/lib/types";
+import { DESKTOP_QUERY } from "@/components/panels/useIsDesktop";
 import { onReportCooldownReset } from "./cooldown";
 import { IncidentPicker } from "./IncidentPicker";
 import { LocationChip } from "./LocationChip";
@@ -60,14 +61,17 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
     };
   }, []);
 
-  // Al tener GPS, abre una sola vez la parada más cercana, sin pisar lo que el usuario ya eligió.
+  // Al tener GPS, elige una sola vez la parada más cercana, sin pisar lo que el usuario ya eligió.
+  // En celular la hoja arranca cerrada para dejar ver el mapa: la parada queda lista para cuando la abra.
   const nearestId = geo?.status === "granted" ? (nearestStop?.stop.id ?? null) : null;
   const autoOpened = useRef(false);
   useEffect(() => {
     if (autoOpened.current || !nearestId) return;
     autoOpened.current = true;
     const { selectedStop, selectedReport } = useUi.getState();
-    if (!selectedStop && !selectedReport) selectStop(nearestId);
+    if (selectedStop || selectedReport) return;
+    selectStop(nearestId);
+    if (!window.matchMedia(DESKTOP_QUERY).matches) useUi.getState().setSheetOpen(false);
   }, [nearestId, selectStop]);
 
   // "Deshacer" borra el reporte: el servidor ya permite reportar, así que el cooldown se reinicia.
