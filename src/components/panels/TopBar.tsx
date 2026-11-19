@@ -4,6 +4,7 @@ import { Check, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import type { Route } from "@/lib/types";
+import { Onboarding } from "./Onboarding";
 
 export interface TopBarProps {
   routes: Route[];
@@ -36,8 +37,13 @@ export function TopBar({ routes, online }: TopBarProps) {
   const selectRoute = useUi((s) => s.selectRoute);
 
   return (
-    <div className="flex items-center gap-2 px-safe pt-safe pb-2">
-      <div role="group" aria-label="Filtrar por ruta" className="flex min-w-0 gap-2 overflow-x-auto">
+    // La franja completa deja pasar los toques al mapa; solo los chips y el contador los reciben.
+    <div className="pointer-events-none! flex items-center gap-2 px-safe pt-safe pb-2 lg:pt-4 lg:pr-4 lg:pl-[432px]">
+      <div
+        role="group"
+        aria-label="Filtrar por ruta"
+        className="pointer-events-auto flex min-w-0 gap-2 overflow-x-auto"
+      >
         {routes.map((r) => {
           const pressed = selected === r.id;
           return (
@@ -69,10 +75,12 @@ export function TopBar({ routes, online }: TopBarProps) {
         })}
       </div>
 
-      <p className="glass ml-auto flex min-h-12 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-medium shadow-md">
+      <p className="glass pointer-events-auto ml-auto flex min-h-12 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-medium shadow-md">
         <Users aria-hidden className="size-4 text-seguro" />
         <span className="tabular-nums">{online}</span> en línea
       </p>
+
+      <Onboarding />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Inbox } from "lucide-react";
+import { ChevronDown, Inbox, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import type { CityBundle, Report, Vehicle, VoteKind } from "@/lib/types";
@@ -9,6 +9,7 @@ import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
 import { StopDetail } from "./StopDetail";
+import { useIsDesktop } from "./useIsDesktop";
 
 export interface BottomSheetProps {
   bundle: CityBundle;
@@ -30,14 +31,18 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
   const selectStop = useUi((s) => s.selectStop);
   const selectedReport = useUi((s) => s.selectedReport);
   const selectReport = useUi((s) => s.selectReport);
+  // En escritorio el panel es una columna fija a la izquierda, siempre visible.
+  const desktop = useIsDesktop();
+  const visible = open || desktop;
+  const hasSelection = Boolean(selectedStop || selectedReport);
 
-  // Reloj para "hace N min"; solo corre con el panel abierto.
+  // Reloj para "hace N min"; solo corre con el panel visible.
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
-    if (!open) return;
+    if (!visible) return;
     const id = window.setInterval(() => setNow(Date.now()), CLOCK_MS);
     return () => window.clearInterval(id);
-  }, [open]);
+  }, [visible]);
 
   function close() {
     selectStop(null);
@@ -51,7 +56,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
   }
 
   return (
-    <div className="pointer-events-none! flex flex-col items-end">
+    <div className="pointer-events-none! flex flex-col items-end lg:fixed lg:inset-y-4 lg:left-4 lg:w-[400px] lg:items-stretch">
       {!open && (
         <button
           type="button"
@@ -59,7 +64,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
           aria-expanded={false}
           aria-controls="bottom-sheet"
           className={cn(
-            "glass pointer-events-auto mr-3 mb-2 flex min-h-12 items-center gap-2 rounded-full px-4 text-sm font-semibold shadow-md",
+            "glass pointer-events-auto mr-3 mb-2 flex min-h-12 items-center gap-2 rounded-full px-4 text-sm font-semibold shadow-md lg:hidden",
             "transition-transform duration-300 ease-out active:scale-95",
             "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
           )}
@@ -73,26 +78,32 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
       {/* Abre y cierra con grid-rows 0fr → 1fr: sin ocupar espacio cerrado y sin saltos. */}
       <div
         className={cn(
-          "grid w-full transition-[grid-template-rows,opacity] duration-500 ease-out",
-          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+          "grid w-full transition-[grid-template-rows,opacity] duration-500 ease-out lg:h-full",
+          visible ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         )}
       >
-        <div className="min-h-0 overflow-hidden">
+        <div className="min-h-0 overflow-hidden lg:h-full">
           <section
             id="bottom-sheet"
             aria-label="Detalle"
-            inert={!open}
-            className="glass pointer-events-auto mx-2 mb-2 flex max-h-[55dvh] flex-col rounded-3xl shadow-[0_-8px_24px_rgb(15_23_42/0.12)]"
+            inert={!visible}
+            className="glass pointer-events-auto mx-2 mb-2 flex max-h-[55dvh] flex-col rounded-3xl shadow-[0_-8px_24px_rgb(15_23_42/0.12)] lg:m-0 lg:h-full lg:max-h-none lg:shadow-xl"
           >
-            <div className="flex items-center justify-between px-4 pt-2">
-              <span aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/15" />
+            <div className="flex min-h-14 items-center justify-between px-4 pt-2 lg:pt-3">
+              <span aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/15 lg:hidden" />
+              <p className="hidden text-base font-bold lg:block">Ruta Segura · en vivo</p>
+              {/* En escritorio el panel no se cierra: el botón solo limpia la parada o el reporte elegido. */}
               <button
                 type="button"
                 onClick={close}
-                className="-mr-2 flex size-12 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
+                className={cn(
+                  "-mr-2 flex size-12 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+                  !hasSelection && "lg:hidden",
+                )}
               >
-                <ChevronDown aria-hidden className="size-5" />
-                <span className="sr-only">Cerrar panel</span>
+                <ChevronDown aria-hidden className="size-5 lg:hidden" />
+                <X aria-hidden className="hidden size-5 lg:block" />
+                <span className="sr-only">{desktop ? "Cerrar detalle" : "Cerrar panel"}</span>
               </button>
             </div>
 
