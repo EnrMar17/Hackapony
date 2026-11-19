@@ -1,11 +1,12 @@
 "use client";
 
-import { Accessibility, Clock, Lightbulb, LightbulbOff, Umbrella, type LucideIcon } from "lucide-react";
+import { Accessibility, Clock, Lightbulb, LightbulbOff, Share2, Umbrella, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { etaToStop, stopSafety } from "@/lib/geo";
+import { etaToStop, isActive, stopSafety, timeAgo } from "@/lib/geo";
 import type { CityBundle, Report, Stop, Vehicle } from "@/lib/types";
-import { PanelError, PanelLoading } from "./PanelState";
-import { SAFETY_LOOK } from "./reportMeta";
+import { ConfidenceBadge } from "./ConfidenceBadge";
+import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
+import { reportLook, reportTitle, SAFETY_LOOK } from "./reportMeta";
 
 export interface StopDetailProps {
   bundle: CityBundle;
@@ -37,6 +38,12 @@ function Attribute({ ok, icon: Icon, yes, no }: { ok: boolean; icon: LucideIcon;
   );
 }
 
+/** Texto para WhatsApp: "Parada <nombre> · <ruta> · <origen>/<ciudad>?ruta=<id>&parada=<id>". CityApp abre ese enlace. */
+function shareText(city: string, stop: Stop, routeName: string, routeId: string): string {
+  const url = `${window.location.origin}/${city}?ruta=${encodeURIComponent(routeId)}&parada=${encodeURIComponent(stop.id)}`;
+  return `Parada ${stop.name} · ${routeName} · ${url}`;
+}
+
 export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }: StopDetailProps) {
   if (loading) return <PanelLoading rows={3} />;
   if (error) return <PanelError text="No pudimos cargar la parada." />;
@@ -47,6 +54,9 @@ export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }
   const route = bundle.routes.find((r) => r.id === stop.route_id);
   const safety = stopSafety(stop, reports);
   const look = SAFETY_LOOK[safety.level];
+  const stopReports = reports
+    .filter((r) => r.stop_id === stop.id && isActive(r))
+    .sort((a, b) => b.created_at.localeCompare(a.created_at));
   const eta = formatEta(route && vehicles ? etaToStop(route, stop, vehicles) : null);
 
   return (
@@ -86,11 +96,58 @@ export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }
         <p className="text-sm text-muted-foreground">{safety.reasons.join(" · ")}</p>
       )}
 
+      {/* Reportes vigentes de esta parada; si no hay, se dice en lugar de dejar un hueco. */}
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold text-muted-foreground">En esta parada</h3>
+        {stopReports.length === 0 ? (
+          <PanelMessage text="Sin reportes recientes en esta parada." />
+        ) : (
+          <ul className="space-y-2">
+            {stopReports.slice(0, 5).map((r) => {
+              const look = reportLook(r);
+              return (
+                <li key={r.id} className="flex min-h-12 items-center gap-3 rounded-2xl bg-foreground/5 px-3 py-2">
+                  <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full", look.className)}>
+                    <look.icon aria-hidden className="size-4" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm leading-snug font-semibold break-words">{reportTitle(r)}</span>
+                    <span className="block text-xs text-muted-foreground">
+                      <time dateTime={r.created_at}>{timeAgo(r.created_at)}</time>
+                    </span>
+                    <ConfidenceBadge report={r} className="mt-0.5" />
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+
       <ul className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-3">
         <Attribute ok={stop.has_light} icon={stop.has_light ? Lightbulb : LightbulbOff} yes="Con luz" no="Sin luz" />
         <Attribute ok={stop.has_ramp} icon={Accessibility} yes="Con rampa" no="Sin rampa" />
         <Attribute ok={stop.has_roof} icon={Umbrella} yes="Con techo" no="Sin techo" />
       </ul>
+
+      {route && (
+        <button
+          type="button"
+          onClick={() => {
+            const text = shareText(bundle.city, stop, route.name, route.id);
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+          }}
+          className={cn(
+            "flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-foreground/15 px-3 text-sm font-semibold",
+            "transition-colors duration-300 ease-out hover:bg-foreground/5 active:bg-foreground/10",
+            "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+          )}
+        >
+          <Share2 aria-hidden className="size-4 shrink-0 text-seguro-ink" />
+          Compartir esta parada
+          <span className="sr-only"> por WhatsApp (se abre en otra pestaña)</span>
+        </button>
+      )}
     </section>
   );
 }

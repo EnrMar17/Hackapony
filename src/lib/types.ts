@@ -156,3 +156,49 @@ export interface GeolocationState {
   status: GeoStatus;
   request: () => void;
 }
+
+// ---- Modo "¿A dónde vas?" y unidades (contrato compartido) ----
+
+export interface Destination {
+  point: LngLat;
+  label: string;
+}
+
+export interface TripLeg {
+  point: LngLat;
+  stop: Stop | null;
+  /** Metros a pie hasta (o desde) ese punto. */
+  walkM: number;
+}
+
+export interface TripOption {
+  route_id: RouteId;
+  /** Dónde sube. */
+  board: TripLeg;
+  /** Dónde baja. */
+  alight: TripLeg;
+  rideM: number;
+  /** Rango de minutos de viaje. */
+  rideMinMin: number;
+  rideMaxMin: number;
+  /** Estado actual de la ruta. */
+  status: RouteStatus;
+  /** Razones: incidencias, unidad llena, parada sin luz o rampa. */
+  alerts: string[];
+  /** Próxima unidad en la parada de subida. */
+  nextUnitSec: number | null;
+  /** Tramo de la ruta entre subida y bajada, para dibujarlo. */
+  segment: LngLat[];
+}
+
+export interface NearRoute {
+  route: Route;
+  distanceM: number;
+  /** Avance (0 a 1) del punto más cercano de la ruta. */
+  progress: number;
+}
+
+export interface UnitEta {
+  vehicle: Vehicle;
+  etaSec: number;
+}

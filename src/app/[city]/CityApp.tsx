@@ -107,7 +107,15 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
         {admin && <SimulatorPanel sim={sim} stops={bundle.stops} sendReport={sendReport} />}
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 *:pointer-events-auto">
-        <BottomSheet bundle={bundle} reports={reports} vehicles={vehicles} onVote={onVote} loading={loading} error={error} />
+        <BottomSheet
+          bundle={bundle}
+          reports={reports}
+          vehicles={vehicles}
+          onVote={onVote}
+          loading={loading}
+          error={error}
+          userPosition={geo.position}
+        />
         <ReportBar onReport={onReport} geo={geo} nearestStop={nearest} />
       </div>
     </main>
