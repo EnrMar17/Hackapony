@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CircleCheck } from "lucide-react";
 import { toast } from "sonner";
 import { INCIDENT_CHIPS, REPORT_BUTTONS } from "@/lib/constants";
 import type { IncidentKind, Report, ReportRefinement, ReportType } from "@/lib/types";
@@ -8,7 +9,7 @@ import { resetReportCooldown } from "./cooldown";
 import { INCIDENT_STYLE } from "./IncidentPicker";
 
 /** Tiempo que el usuario tiene para deshacer. */
-export const UNDO_WINDOW_MS = 5_000;
+export const UNDO_WINDOW_MS = 7_000;
 /** Con chips para afinar el reporte, el toast dura un poco más para dar tiempo de elegir (refine acepta 60 s). */
 const REFINE_WINDOW_MS = 9_000;
 
@@ -73,9 +74,9 @@ const REFINE_OPTIONS: Partial<Record<ReportType, { question: string; options: { 
     ],
   },
   full: {
-    question: "¿Qué tan llena?",
+    question: "¿Cuánto espacio queda?",
     options: [
-      { label: "Llena", patch: { occupancy: "medium" } },
+      { label: "Aún cabe alguien", patch: { occupancy: "medium" } },
       { label: "No cabe nadie", patch: { occupancy: "full" } },
     ],
   },
@@ -138,16 +139,25 @@ export function notifyReportSent(
 ): string | number {
   const kindChips = report.type === "incident" && onRefineKind;
   const refineChips = Boolean(onRefine && REFINE_OPTIONS[report.type]);
-  const description = kindChips ? (
+  const detail = kindChips ? (
     <IncidentChips report={report} onPick={onRefineKind} />
   ) : refineChips && onRefine ? (
     <RefineChips report={report} onRefine={onRefine} />
   ) : (
     describe(report)
   );
-  return toast.success("Reporte enviado", {
+  return toast.success("¡Gracias por tu reporte!", {
     id: `report-${report.id}`,
-    description,
+    icon: <CircleCheck aria-hidden className="size-8 text-green-600 dark:text-green-400" strokeWidth={2.25} />,
+    classNames: { icon: "size-8! mr-1!" },
+    description: (
+      <>
+        {detail}
+        <span className="mt-2 block text-xs">
+          Otras personas podrán confirmarlo y elegir otra opción para su viaje.
+        </span>
+      </>
+    ),
     duration: kindChips || refineChips ? REFINE_WINDOW_MS : UNDO_WINDOW_MS,
     action: {
       label: "Deshacer",

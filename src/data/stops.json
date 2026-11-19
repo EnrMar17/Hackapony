@@ -1890,5 +1890,16 @@
     "has_ramp": false,
     "has_roof": true,
     "progress": 0.9583
+  },
+  {
+    "id": "g1-22",
+    "route_id": "GRIS-1",
+    "name": "Avenida Camelinas · Las Américas (sentido contrario)",
+    "lng": -101.1504,
+    "lat": 19.6908,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false,
+    "progress": 0.973
   }
 ]

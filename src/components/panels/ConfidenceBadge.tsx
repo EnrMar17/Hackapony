@@ -26,7 +26,7 @@ export function ConfidenceBadge({ report, className }: { report: Report; classNa
       <Icon aria-hidden className="size-3.5 shrink-0" />
       {confirmed
         ? `Confirmado (${report.confirms} ${report.confirms === 1 ? "persona" : "personas"})`
-        : "Sin confirmar"}
+        : "Informado por 1 persona · sin confirmar"}
     </span>
   );
 }

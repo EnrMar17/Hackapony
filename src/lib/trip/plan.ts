@@ -10,16 +10,22 @@ const WALK_M_PER_MIN = 80; // ~4.8 km/h
 const MIN_RIDE_M = 400; // menos que esto conviene caminarlo
 const MAX_SPAN = 0.95; // más de 95% del circuito = casi dar la vuelta completa
 const MIN_TRIP_M = 300; // origen y destino casi iguales: no hay viaje
+const SAME_SPOT = 0.01; // una pasada del trazo y una parada a menos de 1% del circuito son el mismo lugar
 const STOP_MATCH = 0.05; // una parada "es de" ese punto si su sentido queda a menos de 5% del circuito
 const NAME_STOP_M = 400; // solo se nombra una parada si está a menos de esto del punto; si no, "este punto de la ruta"
 const REPORT_NEAR_M = 150;
 const MAX_ALERTS = 4;
+const NEAR_ENOUGH_M = 120; // más cerca que esto no hace falta decir nada
 const DEFAULT_WAIT_MIN = 10; // si no hay unidades, se supone una espera larga
 const STATUS_PENALTY_MIN = { green: 0, yellow: 4, red: 10 } as const;
 const CROWDED_PENALTY_MIN = 3;
 const MAX_VIA = 4;
 /** Radios de búsqueda a pie, de lo cercano a lo lejano. */
 const WALK_STEPS_M = [TRIP_WALK_MAX_M, 1000, 1500, 2500];
+/** Siempre se consideran paradas hasta esta distancia: a veces caminar un poco evita dar toda la vuelta al circuito. */
+const EXTENDED_WALK_M = 1500;
+/** Caminar más de TRIP_WALK_MAX_M pesa 50 % más: lo cercano gana a igual tiempo. */
+const walkCostMin = (m: number) => (Math.min(m, TRIP_WALK_MAX_M) + Math.max(0, m - TRIP_WALK_MAX_M) * 1.5) / WALK_M_PER_MIN;
 
 /** "850 m" o "1.2 km". */
 const fmtM = (m: number) => (m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(1)} km`);
@@ -46,9 +52,36 @@ const circularGap = (a: number, b: number) => {
   return Math.min(d, 1 - d);
 };
 
-/** Un extremo del viaje: punto de la ruta, parada de ese sentido más cercana (si hay) y metros a pie. */
-function leg(route: Route, routeStops: Stop[], progress: number, user: LngLat): TripLeg {
-  const point = pointAtProgress(route, progress);
+/** Un lugar donde subir o bajar: avance del circuito, punto exacto y la parada de ese sentido (si es una). */
+interface Spot {
+  p: number;
+  at: LngLat;
+  stop: Stop | null;
+}
+
+/**
+ * Lugares donde subir o bajar cerca de `point`. Cada parada cuenta con SU sentido (`progress`), así la parada de
+ * enfrente sirve para el otro sentido de la calle; las pasadas del trazo sin parada cerca también valen.
+ */
+function spotsNear(route: Route, routeStops: Stop[], point: LngLat, reachM: number): Spot[] {
+  const spots: Spot[] = [];
+  for (const s of routeStops) {
+    if (typeof s.progress === "number" && meters(point, [s.lng, s.lat]) <= reachM) {
+      spots.push({ p: s.progress, at: [s.lng, s.lat], stop: s });
+    }
+  }
+  for (const p of passProgresses(route, point, reachM)) {
+    if (spots.some((x) => circularGap(x.p, p) <= SAME_SPOT)) continue; // ya lo cubre una parada de ese sentido
+    spots.push({ p, at: pointAtProgress(route, p), stop: null });
+  }
+  return spots;
+}
+
+/** Un extremo del viaje: punto (la parada, si es una), parada de ese sentido y metros a pie. */
+function leg(route: Route, routeStops: Stop[], spot: Spot, user: LngLat): TripLeg {
+  if (spot.stop) return { point: spot.at, stop: spot.stop, walkM: Math.round(meters(user, spot.at)) };
+  const progress = spot.p;
+  const point = spot.at;
   let stop: Stop | null = null;
   let best = Infinity;
   for (const s of routeStops) {
@@ -136,39 +169,43 @@ function planWithin({ routes, stops, reports, vehicles, from, to, now = Date.now
   for (const route of routes) {
     const { totalM } = routeGeometry(route);
     // Cada pasada del circuito cerca de ti y cerca del destino es una forma posible de subir y de bajar.
-    const boards = passProgresses(route, from, walkMaxM);
-    const alights = passProgresses(route, to, walkMaxM);
+    const reachM = Math.max(walkMaxM, EXTENDED_WALK_M);
+    const routeStops = stops.filter((s) => s.route_id === route.id);
+    const boards = spotsNear(route, routeStops, from, reachM);
+    const alights = spotsNear(route, routeStops, to, reachM);
 
-    let best: { b: number; a: number; span: number; rideM: number; cost: number } | null = null;
+    let best: { b: Spot; a: Spot; span: number; rideM: number; cost: number } | null = null;
     for (const b of boards) {
       for (const a of alights) {
-        const span = positiveMod(a - b, 1); // SIEMPRE hacia adelante: las combis no regresan
+        const span = positiveMod(a.p - b.p, 1); // SIEMPRE hacia adelante: las combis no regresan
         const rideM = span * totalM;
         if (rideM < MIN_RIDE_M || span > MAX_SPAN) continue;
-        const walkM = meters(from, pointAtProgress(route, b)) + meters(pointAtProgress(route, a), to);
-        const cost = walkM / WALK_M_PER_MIN + rideM / mps / 60;
+        const cost = walkCostMin(meters(from, b.at)) + walkCostMin(meters(a.at, to)) + rideM / mps / 60;
         if (!best || cost < best.cost) best = { b, a, span, rideM, cost };
       }
     }
     if (!best) continue;
 
-    const routeStops = stops.filter((s) => s.route_id === route.id);
     const board = leg(route, routeStops, best.b, from);
     const alight = leg(route, routeStops, best.a, to);
     const status = routeStatus(route.id, reports, now);
-    const nextUnitSec = etaToProgress(route, best.b, vehicles, speed);
+    const nextUnitSec = etaToProgress(route, best.b.p, vehicles, speed);
     const crowded = board.stop !== null && loadAhead(route, routeStops, board.stop, reports, now);
-    const alerts = findings(route, routeStops, reports, best.b, best.span, now);
+    const alerts = findings(route, routeStops, reports, best.b.p, best.span, now);
     if (crowded) alerts.unshift("Probablemente llena al subir");
     // Sin una ruta cercana a los dos puntos: se dice claro cuánto hay que caminar.
     if (alight.walkM > TRIP_WALK_MAX_M) alerts.unshift(`Te deja a ${fmtM(alight.walkM)} de tu destino: el resto es a pie`);
     if (board.walkM > TRIP_WALK_MAX_M) alerts.unshift(`Hay que caminar ${fmtM(board.walkM)} para subir`);
+    // Cerca pero no justo en tu punto: se dice que la ruta cubre el tramo y a cuánto queda la parada.
+    if (alight.walkM > NEAR_ENOUGH_M && alight.walkM <= TRIP_WALK_MAX_M) alerts.unshift(`Cubre tu tramo: la parada para bajar queda a ${fmtM(alight.walkM)} de tu destino`);
+    if (board.walkM > NEAR_ENOUGH_M && board.walkM <= TRIP_WALK_MAX_M) alerts.unshift(`Cubre tu tramo: la parada para subir queda a ${fmtM(board.walkM)}`);
 
     const rideMin = best.rideM / mps / 60;
     const rideMinMin = Math.max(1, Math.round(rideMin * 0.8));
     const waitMin = nextUnitSec === null ? DEFAULT_WAIT_MIN : nextUnitSec / 60;
     const cost =
-      (board.walkM + alight.walkM) / WALK_M_PER_MIN +
+      walkCostMin(board.walkM) +
+      walkCostMin(alight.walkM) +
       waitMin * 0.5 +
       rideMin +
       STATUS_PENALTY_MIN[status.level] +
@@ -186,8 +223,8 @@ function planWithin({ routes, stops, reports, vehicles, from, to, now = Date.now
         status,
         alerts: alerts.slice(0, MAX_ALERTS),
         nextUnitSec,
-        segment: sliceRoute(route, best.b, best.a),
-        via: roadsAlong(routeStops, best.b, best.span),
+        segment: sliceRoute(route, best.b.p, best.a.p),
+        via: roadsAlong(routeStops, best.b.p, best.span),
       },
     });
   }

@@ -22,11 +22,14 @@ export function VehicleLayer({
   arrowReady,
   dark,
   highlightId,
+  fullIds = [],
 }: {
   vehicles: Vehicle[];
   arrowReady: boolean;
   dark: boolean;
   highlightId: string | null;
+  /** Unidades que van llenas (según un aviso): anillo y etiqueta rojos. */
+  fullIds?: string[];
 }) {
   const { current: map } = useMap();
 
@@ -77,6 +80,19 @@ export function VehicleLayer({
           "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 3,
           "circle-stroke-opacity": 0.9,
+        }}
+      />
+      {/* Unidad que va llena: anillo rojo debajo de la cápsula. */}
+      <Layer
+        id="vehicles-full-ring"
+        type="circle"
+        filter={["in", ["get", "id"], ["literal", fullIds]]}
+        paint={{
+          "circle-radius": 21,
+          "circle-color": "#dc2626",
+          "circle-opacity": 0.28,
+          "circle-stroke-color": "#dc2626",
+          "circle-stroke-width": 3,
         }}
       />
       {/* En modo oscuro, un halo claro para que la combi no se pierda sobre el mapa negro. */}
@@ -146,6 +162,20 @@ export function VehicleLayer({
           }}
         />
       )}
+      <Layer
+        id="vehicles-full-label"
+        type="symbol"
+        filter={["in", ["get", "id"], ["literal", fullIds]]}
+        layout={{
+          "text-field": "Llena",
+          "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
+          "text-size": 12,
+          "text-anchor": "bottom",
+          "text-offset": [0, -1.9],
+          "text-allow-overlap": true,
+        }}
+        paint={{ "text-color": "#ffffff", "text-halo-color": "#dc2626", "text-halo-width": 4 }}
+      />
     </Source>
   );
 }
