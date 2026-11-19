@@ -21,9 +21,9 @@ export interface ReportBarProps {
 
 /** Ícono y color por tipo. El texto siempre sale de REPORT_BUTTONS. */
 const BUTTON_STYLE: Record<ReportType, { icon: LucideIcon; className: string }> = {
-  full: { icon: Users, className: "bg-peligro text-peligro-foreground" },
-  passing: { icon: BusFront, className: "bg-info text-info-foreground" },
-  incident: { icon: TriangleAlert, className: "bg-precaucion text-precaucion-foreground" },
+  full: { icon: Users, className: "bg-report-full text-report-full-foreground" },
+  passing: { icon: BusFront, className: "bg-report-passing text-report-passing-foreground" },
+  incident: { icon: TriangleAlert, className: "bg-report-incident text-report-incident-foreground" },
 };
 
 const TICK_MS = 250;

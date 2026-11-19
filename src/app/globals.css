@@ -141,6 +141,13 @@
   --seguro-foreground: #ffffff;
   --info: #2563eb;
   --info-foreground: #ffffff;
+  /* Paleta única de reportes (botones, lista y mapa). El azul queda solo para tu ubicación. */
+  --report-full: #dc2626;
+  --report-full-foreground: #ffffff;
+  --report-passing: #0e7490;
+  --report-passing-foreground: #ffffff;
+  --report-incident: #d97706;
+  --report-incident-foreground: #0f172a;
   --accesibilidad: #0d9488; /* siempre con ícono ♿ */
   --accesibilidad-foreground: #ffffff;
 
@@ -173,6 +180,12 @@
   --color-seguro-foreground: var(--seguro-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  --color-report-full: var(--report-full);
+  --color-report-full-foreground: var(--report-full-foreground);
+  --color-report-passing: var(--report-passing);
+  --color-report-passing-foreground: var(--report-passing-foreground);
+  --color-report-incident: var(--report-incident);
+  --color-report-incident-foreground: var(--report-incident-foreground);
   --color-accesibilidad: var(--accesibilidad);
   --color-accesibilidad-foreground: var(--accesibilidad-foreground);
   --color-ruta-gris-1: var(--ruta-gris-1);

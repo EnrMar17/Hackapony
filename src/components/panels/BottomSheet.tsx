@@ -5,7 +5,8 @@ import { ChevronDown, FlaskConical, Inbox, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive } from "@/lib/geo";
 import { useUi } from "@/store/ui";
-import type { CityBundle, Report, Vehicle, VoteKind } from "@/lib/types";
+import type { CityBundle, LngLat, Report, Vehicle, VoteKind } from "@/lib/types";
+import { LiveClock } from "./LiveClock";
 import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
@@ -25,11 +26,21 @@ export interface BottomSheetProps {
   onVote?: (reportId: string, kind: VoteKind) => void;
   loading?: boolean;
   error?: string | null;
+  /** Para ordenar el estado de rutas: primero las que pasan cerca de ti. */
+  userPosition?: LngLat | null;
 }
 
 const CLOCK_MS = 30_000;
 
-export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false, error = null }: BottomSheetProps) {
+export function BottomSheet({
+  bundle,
+  reports,
+  vehicles,
+  onVote,
+  loading = false,
+  error = null,
+  userPosition,
+}: BottomSheetProps) {
   const open = useUi((s) => s.sheetOpen);
   const setOpen = useUi((s) => s.setSheetOpen);
   const selectedStop = useUi((s) => s.selectedStop);
@@ -104,7 +115,10 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
           >
             <div className="flex min-h-14 items-center justify-between px-4 pt-2 lg:pt-3">
               <span aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/15 lg:hidden" />
-              <p className="hidden text-base font-bold lg:block">Ruta Segura · en vivo</p>
+              <div className="hidden lg:block">
+                <p className="text-base font-bold">Ruta Segura · en vivo</p>
+                <LiveClock className="text-xs text-muted-foreground" />
+              </div>
               {/* En escritorio el panel no se cierra: el botón solo limpia la parada o el reporte elegido. */}
               <button
                 type="button"
@@ -121,6 +135,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
             </div>
 
             <div className="space-y-5 overflow-y-auto overscroll-contain px-4 pb-4">
+              <LiveClock className="block text-xs text-muted-foreground lg:hidden" />
               {selectedReport && (
                 <ReportDetail
                   key={selectedReport}
@@ -150,7 +165,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
                 </p>
               )}
               <AccessibleFilter />
-              <RouteStatusCard routes={bundle.routes} reports={reports} loading={loading} error={error} />
+              <RouteStatusCard routes={bundle.routes} reports={reports} loading={loading} error={error} userPosition={userPosition} />
               <ReportFeed
                 reports={reports}
                 routes={bundle.routes}

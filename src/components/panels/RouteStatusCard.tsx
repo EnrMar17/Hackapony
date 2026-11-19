@@ -1,9 +1,10 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { isActive, routeStatus } from "@/lib/geo";
+import { isActive, routeStatus, routesNear } from "@/lib/geo";
+import { ROUTE_NEAR_M } from "@/lib/constants";
 import { useUi } from "@/store/ui";
-import type { Report, Route, RouteStatus } from "@/lib/types";
+import type { LngLat, Report, Route, RouteStatus } from "@/lib/types";
 import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
 import { SAFETY_LOOK } from "./reportMeta";
 import { MAX_INLINE_ROUTES } from "./routeMeta";
@@ -13,6 +14,8 @@ export interface RouteStatusCardProps {
   reports: Report[];
   loading?: boolean;
   error?: string | null;
+  /** Con ella, las rutas que pasan cerca de ti salen primero. */
+  userPosition?: LngLat | null;
 }
 
 interface RouteWithStatus {
@@ -20,26 +23,19 @@ interface RouteWithStatus {
   status: RouteStatus;
 }
 
-/** Una ruta: nombre completo (puede ocupar dos líneas) y su estado; si no cabe, el estado baja de renglón. */
+/** Una ruta: nombre a la izquierda y su estado SIEMPRE a la derecha, en todas las filas. */
 function RouteRow({ route, status }: RouteWithStatus) {
   const look = SAFETY_LOOK[status.level];
-
-  // En rojo se dice en una frase: "Hay problemas en Gris 1" (más claro que "Servicio con problemas").
-  if (status.level === "red") {
-    return (
-      <li className="flex min-h-12 items-center gap-2 rounded-2xl bg-peligro/10 px-3 py-2 text-sm font-semibold text-peligro-ink">
-        <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-full", look.className)}>
-          <look.icon aria-hidden className="size-3.5" />
-        </span>
-        <span aria-hidden className="size-3 shrink-0 rounded-full" style={{ backgroundColor: route.color }} />
-        <span className="min-w-0 break-words">Hay problemas en {route.name}</span>
-      </li>
-    );
-  }
+  const label = status.level === "red" ? "Con problemas" : status.label;
 
   return (
-    <li className="flex min-h-12 flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-2xl bg-foreground/5 px-3 py-2">
-      <span className="flex min-w-0 flex-1 basis-40 items-center gap-2 text-sm font-semibold">
+    <li
+      className={cn(
+        "flex min-h-12 items-center justify-between gap-3 rounded-2xl px-3 py-2",
+        status.level === "red" ? "bg-peligro/10" : "bg-foreground/5",
+      )}
+    >
+      <span className="flex min-w-0 flex-1 items-center gap-2 text-sm font-semibold">
         <span aria-hidden className="size-3 shrink-0 rounded-full" style={{ backgroundColor: route.color }} />
         <span className="min-w-0 break-words">{route.name}</span>
       </span>
@@ -47,22 +43,28 @@ function RouteRow({ route, status }: RouteWithStatus) {
         className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold", look.className)}
       >
         <look.icon aria-hidden className="size-3.5" />
-        {status.label}
+        {label}
       </span>
     </li>
   );
 }
 
-export function RouteStatusCard({ routes, reports, loading, error }: RouteStatusCardProps) {
+export function RouteStatusCard({ routes, reports, loading, error, userPosition }: RouteStatusCardProps) {
   const selectedRoute = useUi((s) => s.selectedRoute);
 
   const withStatus: RouteWithStatus[] = routes.map((route) => ({ route, status: routeStatus(route.id, reports) }));
   const many = routes.length > MAX_INLINE_ROUTES;
-  // Con muchas rutas solo se listan las activas: con reportes vigentes, con avisos o la elegida. Nunca las 23.
-  const withReports = new Set(reports.filter((r) => isActive(r)).map((r) => r.route_id));
-  const activeRoutes = withStatus.filter(
-    (r) => withReports.has(r.route.id) || r.status.level !== "green" || r.route.id === selectedRoute,
+
+  // Relevancia, no familia: la elegida, las que pasan cerca de ti, las que tienen avisos y las demás con reportes.
+  const near = new Map(
+    userPosition ? routesNear(routes, userPosition, ROUTE_NEAR_M).map((n) => [n.route.id, n.distanceM]) : [],
   );
+  const withReports = new Set(reports.filter((r) => isActive(r)).map((r) => r.route_id));
+  const rank = (r: RouteWithStatus) =>
+    r.route.id === selectedRoute ? 0 : near.has(r.route.id) ? 1 : r.status.level !== "green" ? 2 : 3;
+  const activeRoutes = withStatus
+    .filter((r) => near.has(r.route.id) || withReports.has(r.route.id) || r.status.level !== "green" || r.route.id === selectedRoute)
+    .sort((a, b) => rank(a) - rank(b) || (near.get(a.route.id) ?? Infinity) - (near.get(b.route.id) ?? Infinity));
   const quiet = routes.length - activeRoutes.length;
   const issues = withStatus.filter((r) => r.status.level !== "green").length;
 

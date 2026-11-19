@@ -4,6 +4,7 @@ import { CONFIRMED_MIN_CONFIRMS, CONFIRM_LIFE_BONUS, CONFIRM_LIFE_CAP, REPORT_TT
 import { VEHICLE_SPEED_MS } from "@/lib/simulator/config";
 import type {
   LngLat,
+  NearRoute,
   NearestStopResult,
   Report,
   ReportConfidence,
@@ -13,6 +14,7 @@ import type {
   SnapResult,
   Stop,
   StopSafety,
+  UnitEta,
   Vehicle,
 } from "@/lib/types";
 import { passProgresses, positiveMod, routeGeometry } from "./routeGeometry";
@@ -214,4 +216,68 @@ export function timeAgo(iso: string, now = Date.now()): string {
   if (s < 60) return "hace un momento";
   const m = Math.round(s / 60);
   return m < 60 ? `hace ${m} min` : `hace ${Math.round(m / 60)} h`;
+}
+
+// ───────────── Rutas cerca de un punto y unidades ─────────────
+
+/** Rutas a menos de `radiusM` de un punto, de la más cercana a la más lejana. */
+export function routesNear(routes: Route[], point: LngLat, radiusM: number): NearRoute[] {
+  return routes
+    .map((route) => {
+      const snap = snapToRoute(route, point);
+      return { route, distanceM: snap.distanceM, progress: snap.progress };
+    })
+    .filter((r) => r.distanceM <= radiusM)
+    .sort((a, b) => a.distanceM - b.distanceM);
+}
+
+/** "Unidad N" a partir del id de la unidad (`GRIS-1-0` → "Unidad 1"). */
+export function unitLabel(vehicle: Vehicle): string {
+  const index = /(\d+)$/.exec(vehicle.id);
+  return index ? `Unidad ${Number(index[1]) + 1}` : "Unidad";
+}
+
+/** Las `n` próximas unidades de la ruta a esa parada, con su ETA en segundos, de la más pronta a la más tardada. */
+export function nextUnits(route: Route, stop: Stop, vehicles: Vehicle[], n: number, speed = 1): UnitEta[] {
+  const { totalM } = routeGeometry(route);
+  const mps = VEHICLE_SPEED_MS * speed;
+  const passes = stopProgresses(route, stop);
+  return vehicles
+    .filter((v) => v.route_id === route.id)
+    .map((vehicle) => ({
+      vehicle,
+      etaSec: Math.round(Math.min(...passes.map((p) => (positiveMod(p - vehicle.progress, 1) * totalM) / mps))),
+    }))
+    .sort((a, b) => a.etaSec - b.etaSec)
+    .slice(0, n);
+}
+
+const LOAD_AHEAD_STOPS = 3;
+const LOAD_AHEAD_WINDOW_MS = 10 * 60_000;
+
+/**
+ * "Probablemente llena": hay un "unidad llena" confirmado y vigente en una de las 3 paradas anteriores a `stop`
+ * de la misma ruta, de los últimos 10 min. `routeStops` son las paradas de esa ruta (en cualquier orden).
+ */
+export function loadAhead(route: Route, routeStops: Stop[], stop: Stop, reports: Report[], now = Date.now()): boolean {
+  const ordered = routeStops
+    .filter((s) => s.route_id === route.id)
+    .map((s) => ({ s, progress: snapToRoute(route, [s.lng, s.lat]).progress }))
+    .sort((a, b) => a.progress - b.progress);
+  const at = ordered.findIndex((o) => o.s.id === stop.id);
+  if (at < 0 || ordered.length < 2) return false;
+  const before = new Set<string>();
+  for (let k = 1; k <= Math.min(LOAD_AHEAD_STOPS, ordered.length - 1); k++) {
+    before.add(ordered[(at - k + ordered.length) % ordered.length].s.id);
+  }
+  return reports.some(
+    (r) =>
+      r.type === "full" &&
+      r.route_id === route.id &&
+      r.stop_id !== null &&
+      before.has(r.stop_id) &&
+      reportConfidence(r) === "confirmed" &&
+      isActive(r, now) &&
+      now - new Date(r.created_at).getTime() <= LOAD_AHEAD_WINDOW_MS,
+  );
 }

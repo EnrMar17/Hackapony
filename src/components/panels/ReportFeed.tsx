@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { ChevronDown, CircleCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive, timeAgo } from "@/lib/geo";
-import type { Report, Route } from "@/lib/types";
+import type { Report, ReportType, Route, RouteId } from "@/lib/types";
 import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
 import { ConfidenceBadge } from "./ConfidenceBadge";
 import { reportLook, reportTitle } from "./reportMeta";
@@ -21,6 +22,68 @@ export interface ReportFeedProps {
 }
 
 const MAX_ITEMS = 20;
+
+type TypeFilter = ReportType | "all";
+
+const TYPE_CHIPS: { value: TypeFilter; label: string }[] = [
+  { value: "all", label: "Todos" },
+  { value: "full", label: "Llena" },
+  { value: "passing", label: "Pasando" },
+  { value: "incident", label: "Incidencias" },
+];
+
+interface FiltersProps {
+  type: TypeFilter;
+  onType: (t: TypeFilter) => void;
+  routeId: RouteId | "all";
+  onRoute: (id: RouteId | "all") => void;
+  counts: Record<TypeFilter, number>;
+  routes: Route[];
+}
+
+/** Clasifica los reportes por tipo (con contador) y por ruta. */
+function FeedFilters({ type, onType, routeId, onRoute, counts, routes }: FiltersProps) {
+  return (
+    <div className="space-y-2">
+      <div role="group" aria-label="Filtrar reportes por tipo" className="flex flex-wrap gap-2">
+        {TYPE_CHIPS.map((c) => (
+          <button
+            key={c.value}
+            type="button"
+            aria-pressed={type === c.value}
+            onClick={() => onType(c.value)}
+            className={cn(
+              "flex min-h-12 items-center gap-1.5 rounded-full bg-foreground/5 px-4 text-sm font-semibold",
+              "transition-colors duration-300 ease-out hover:bg-foreground/10 active:scale-95",
+              "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+              "aria-pressed:bg-foreground aria-pressed:text-background",
+            )}
+          >
+            {c.label}
+            <span className="tabular-nums opacity-70">{counts[c.value]}</span>
+          </button>
+        ))}
+      </div>
+      {routes.length > 1 && (
+        <label className="block">
+          <span className="sr-only">Filtrar por ruta</span>
+          <select
+            value={routeId}
+            onChange={(e) => onRoute(e.target.value as RouteId | "all")}
+            className="min-h-12 w-full rounded-2xl bg-foreground/5 px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
+          >
+            <option value="all">Todas las rutas</option>
+            {routes.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+    </div>
+  );
+}
 
 /** Separa los vigentes (isActive) de los vencidos o resueltos; ambos del más nuevo al más viejo. */
 export function splitByActive(reports: Report[], now: number): { active: Report[]; past: Report[] } {
@@ -80,7 +143,20 @@ function FeedItem({ report: r, routes, now, selected, onSelect, past }: ItemProp
 }
 
 export function ReportFeed({ reports, routes, now, selectedId, onSelect, loading, error }: ReportFeedProps) {
-  const { active, past } = splitByActive(reports, now);
+  const [type, setType] = useState<TypeFilter>("all");
+  const [routeId, setRouteId] = useState<RouteId | "all">("all");
+
+  const byRoute = routeId === "all" ? reports : reports.filter((r) => r.route_id === routeId);
+  const counts: Record<TypeFilter, number> = { all: 0, full: 0, passing: 0, incident: 0 };
+  for (const r of byRoute) {
+    if (!isActive(r, now)) continue;
+    counts.all += 1;
+    counts[r.type] += 1;
+  }
+  const filtered = type === "all" ? byRoute : byRoute.filter((r) => r.type === type);
+  const { active, past } = splitByActive(filtered, now);
+  const filtering = type !== "all" || routeId !== "all";
+  const reportRoutes = routes.filter((r) => reports.some((x) => x.route_id === r.id));
 
   return (
     <section aria-labelledby="feed-title" className="space-y-2">
@@ -93,8 +169,17 @@ export function ReportFeed({ reports, routes, now, selectedId, onSelect, loading
         <PanelError text="No pudimos cargar los reportes. Revisa tu conexión." />
       ) : (
         <>
+          {reports.length > 0 && (
+            <FeedFilters type={type} onType={setType} routeId={routeId} onRoute={setRouteId} counts={counts} routes={reportRoutes} />
+          )}
           {active.length === 0 ? (
-            <PanelMessage text="Todo tranquilo por ahora. Si ves algo, repórtalo con un toque." />
+            <PanelMessage
+              text={
+                filtering
+                  ? "No hay reportes vigentes con este filtro."
+                  : "Todo tranquilo por ahora. Si ves algo, repórtalo con un toque."
+              }
+            />
           ) : (
             <ul className="space-y-2">
               {active.slice(0, MAX_ITEMS).map((r) => (
