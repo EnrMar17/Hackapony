@@ -110,7 +110,8 @@ export interface RouteStatus {
  */
 export interface SimConfig {
   playing: boolean;
-  speed: 1 | 2 | 5;
+  /** Multiplicador de la velocidad base (1 = BASE_SPEED_KMH). Se elige en km/h desde el panel. */
+  speed: number;
   /** Date.now() en el momento del último cambio. */
   anchorWallMs: number;
   /** Tiempo del simulador (ms) en ese momento. */

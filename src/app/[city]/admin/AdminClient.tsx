@@ -14,6 +14,10 @@ import {
 } from "@/lib/insights";
 import type { SafetyLevel } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useSimConfig } from "@/hooks/useSimConfig";
+import { SimSpeedControls } from "@/components/simulator/SimulatorPanel";
+import { logout } from "./actions";
+import { ADMIN_TITLE } from "./LoginForm";
 import { PanelError, PanelLoading, PanelMessage } from "@/components/panels/PanelState";
 
 /** Cuántas horas de historial se consultan: las incidencias duran horas (hasta el doble con confirmaciones). */
@@ -52,6 +56,7 @@ function InsightCard({ insight }: { insight: Insight }) {
 export function AdminClient({ city }: { city: string }) {
   const bundle = useMemo(() => getCityBundle(city), [city]);
   const history = useReportHistory(HISTORY_HOURS);
+  const sim = useSimConfig();
   const [now, setNow] = useState(0);
 
   useEffect(() => {
@@ -93,8 +98,14 @@ export function AdminClient({ city }: { city: string }) {
             <ArrowLeft aria-hidden className="size-4" />
             Volver al mapa
           </Link>
-          <h1 className="text-2xl font-semibold">Panel del operador</h1>
+          <h1 className="text-2xl font-semibold">{ADMIN_TITLE}</h1>
+          <p className="text-sm text-muted-foreground">Panel de sugerencias para la comisión organizadora</p>
         </div>
+        <form action={logout}>
+          <button type="submit" className="inline-flex min-h-12 items-center rounded-lg border px-4 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
+            Cerrar sesión
+          </button>
+        </form>
         <button
           type="button"
           onClick={history.refresh}
@@ -109,6 +120,13 @@ export function AdminClient({ city }: { city: string }) {
         <Info aria-hidden className="mt-0.5 size-4 shrink-0" />
         {DEMO_DATA_NOTICE}
       </p>
+
+      <section aria-labelledby="simulador" className="space-y-3 rounded-2xl bg-white p-4 text-slate-900 shadow-sm ring-1 ring-black/5">
+        <h2 id="simulador" className="text-lg font-semibold">
+          Simulador de unidades
+        </h2>
+        <SimSpeedControls sim={sim} />
+      </section>
 
       {history.error ? (
         <PanelError text={history.error} />

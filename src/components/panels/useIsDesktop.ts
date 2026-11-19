@@ -3,15 +3,15 @@
 import { useSyncExternalStore } from "react";
 
 /** Mismo corte que el prefijo `lg:` de Tailwind (64rem = 1024 px). */
-const QUERY = "(min-width: 64rem)";
+export const DESKTOP_QUERY = "(min-width: 64rem)";
 
 function subscribe(fn: () => void) {
-  const mql = window.matchMedia(QUERY);
+  const mql = window.matchMedia(DESKTOP_QUERY);
   mql.addEventListener("change", fn);
   return () => mql.removeEventListener("change", fn);
 }
 
-const getSnapshot = () => window.matchMedia(QUERY).matches;
+const getSnapshot = () => window.matchMedia(DESKTOP_QUERY).matches;
 // En el servidor se asume móvil (mobile-first).
 const getServerSnapshot = () => false;
 

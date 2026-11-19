@@ -12,7 +12,9 @@ import { getSupabase } from "@/lib/supabase/client";
 import { localToServerMs, serverToLocalMs, syncClock } from "@/lib/supabase/clock";
 import type { SimConfig, SimControls } from "@/lib/types";
 
-const SPEEDS: readonly number[] = [1, 2, 5];
+/** Rango válido del multiplicador (≈4 a 216 km/h). Fuera de él se ignora el mensaje. */
+const MIN_SPEED = 0.1;
+const MAX_SPEED = 5;
 
 /** Fuera del componente: las llamadas impuras no se permiten durante el render. */
 const nowMs = () => Date.now();
@@ -29,10 +31,10 @@ function toWire(c: SimConfig): SimConfig {
 function fromWire(payload: unknown): SimConfig | null {
   if (typeof payload !== "object" || payload === null) return null;
   const { playing, speed, anchorWallMs, anchorSimMs } = payload as Record<string, unknown>;
-  if (typeof playing !== "boolean" || typeof speed !== "number" || !SPEEDS.includes(speed)) return null;
+  if (typeof playing !== "boolean" || typeof speed !== "number" || !(speed >= MIN_SPEED && speed <= MAX_SPEED)) return null;
   if (typeof anchorWallMs !== "number" || !Number.isFinite(anchorWallMs)) return null;
   if (typeof anchorSimMs !== "number" || !Number.isFinite(anchorSimMs)) return null;
-  return { playing, speed: speed as SimConfig["speed"], anchorWallMs: serverToLocalMs(anchorWallMs), anchorSimMs };
+  return { playing, speed, anchorWallMs: serverToLocalMs(anchorWallMs), anchorSimMs };
 }
 
 export function useSimConfig(): SimControls {
@@ -100,7 +102,7 @@ export function useSimConfig(): SimControls {
   }, []);
 
   const setPlaying = useCallback((playing: boolean) => update({ playing }), [update]);
-  const setSpeed = useCallback((speed: SimConfig["speed"]) => update({ speed }), [update]);
+  const setSpeed = useCallback((speed: SimConfig["speed"]) => update({ speed: Math.min(MAX_SPEED, Math.max(MIN_SPEED, speed)) }), [update]);
 
   return { ...config, setPlaying, setSpeed };
 }

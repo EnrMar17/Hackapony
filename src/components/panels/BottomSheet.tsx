@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronDown, Inbox, Navigation, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive, nearestStop } from "@/lib/geo";
@@ -64,6 +64,7 @@ export function BottomSheet({
   const setTripOpen = useUi((s) => s.setTripOpen);
   const selectedReport = useUi((s) => s.selectedReport);
   const selectReport = useUi((s) => s.selectReport);
+  const selectedTrip = useUi((s) => s.selectedTrip);
   // En escritorio el panel es una columna fija a la izquierda, siempre visible.
   const desktop = useIsDesktop();
   const visible = open || desktop;
@@ -81,6 +82,15 @@ export function BottomSheet({
     const id = window.setInterval(() => setNow(Date.now()), CLOCK_MS);
     return () => window.clearInterval(id);
   }, [visible]);
+
+  // En celular la hoja tapa el mapa: en "¿A dónde vas?", cuando ya hay un viaje elegido (al escoger el destino se elige
+  // solo, o al tocar otra opción) se cierra para ver el recorrido. Sin viaje (falta ubicación o no hay ruta) sigue abierta.
+  const lastTrip = useRef(selectedTrip);
+  useEffect(() => {
+    const prev = lastTrip.current;
+    lastTrip.current = selectedTrip;
+    if (!desktop && selectedTrip && selectedTrip !== prev) setOpen(false);
+  }, [selectedTrip, desktop, setOpen]);
 
   const activeCount = reports.filter((r) => isActive(r, now)).length;
 
