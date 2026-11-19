@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { RATE_LIMIT_MS, REPORT_BUTTONS } from "@/lib/constants";
 import type { GeolocationState, IncidentKind, NearestStopResult, ReportType } from "@/lib/types";
 import { IncidentPicker } from "./IncidentPicker";
+import { LocationChip } from "./LocationChip";
 
 export interface ReportBarProps {
   onReport: (type: ReportType, incidentKind?: IncidentKind) => void;
@@ -31,7 +32,7 @@ function vibrate() {
   }
 }
 
-export function ReportBar({ onReport, disabled }: ReportBarProps) {
+export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarProps) {
   // Cooldown local: CityApp no nos pasa el estado del límite, así que lo llevamos aquí.
   // `round` cambia en cada reporte y reinicia el reloj del efecto.
   const [round, setRound] = useState(0);
@@ -89,6 +90,10 @@ export function ReportBar({ onReport, disabled }: ReportBarProps) {
       <p role="status" aria-live="polite" className="sr-only">
         {coolingDown ? `Reporte listo. Podrás reportar de nuevo en ${Math.ceil(RATE_LIMIT_MS / 1000)} s.` : ""}
       </p>
+
+      <div className="mb-2">
+        <LocationChip geo={geo} nearestStop={nearestStop} />
+      </div>
 
       {pickerOpen && !blocked && (
         <IncidentPicker
