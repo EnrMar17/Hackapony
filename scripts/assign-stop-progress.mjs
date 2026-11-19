@@ -15,6 +15,7 @@ const ROUTES = "src/data/routes.json";
 const M_PER_DEG_LAT = 111_000;
 const M_PER_DEG_LNG = 104_500;
 const write = process.argv.includes("--write");
+const force = process.argv.includes("--force"); // escribe aunque haya paradas sin orden (se revisan a mano)
 /** Rutas cuyas paradas, a partir de este número de orden, están en el sentido de vuelta. */
 const RETURN_FROM = { "GRIS-1": 15 };
 /** Rutas de paradas colocadas a mano (no a intervalos iguales). */
@@ -96,7 +97,10 @@ for (const f of routes) {
     s.progress = Math.round(chosen * 1e4) / 1e4;
     // Dentro de un mismo sentido el avance solo crece; si retrocede, el orden no cuadra.
     if (!isReturn) {
-      if (chosen < prev - 1e-6) routeBad++;
+      if (chosen < prev - 1e-6) {
+        routeBad++;
+        console.log(`  aviso: ${s.id} retrocede (${chosen.toFixed(3)} < ${prev.toFixed(3)}); pasadas: ${passes.map((x) => x.toFixed(3)).join(" | ")}`);
+      }
       prev = chosen;
     }
   });
@@ -106,7 +110,7 @@ for (const f of routes) {
 }
 console.log(`Total: ${stops.length} paradas, ${withTwo} con 2 sentidos, ${problems} problemas`);
 
-if (write && problems === 0) {
+if (write && (problems === 0 || force)) {
   await writeFile(STOPS, JSON.stringify(stops, null, 2) + "\n");
   console.log("stops.json actualizado con `progress`.");
 } else if (write) {
