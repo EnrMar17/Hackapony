@@ -18,7 +18,7 @@ import type {
   VoteKind,
 } from "@/lib/types";
 
-type ReportRow = {
+export type ReportRow = {
   id: string;
   user_id: string | null;
   route_id: string | null;
@@ -37,7 +37,7 @@ type ReportRow = {
 const WINDOW_MS = Math.max(...Object.values(REPORT_TTL_MS));
 const TMP = "tmp-";
 
-function fromRow(r: ReportRow): Report {
+export function fromRow(r: ReportRow): Report {
   return {
     id: r.id,
     type: r.type,
@@ -272,7 +272,8 @@ export function useReports(): ReportsState {
         if (previous) myVotes.current.set(reportId, previous);
         else myVotes.current.delete(reportId);
         void refresh();
-        throw new Error("VOTE_FAILED");
+        // El servidor no deja confirmar el propio reporte (migración 0003).
+        throw new Error(voteError.message.includes("OWN_REPORT") ? "OWN_REPORT" : "VOTE_FAILED");
       }
     },
     [refresh],
