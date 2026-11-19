@@ -16,6 +16,8 @@ import { TransitMap } from "@/components/map/TransitMap";
 import { BottomSheet } from "@/components/panels/BottomSheet";
 import { TopBar } from "@/components/panels/TopBar";
 import { ReportBar } from "@/components/report/ReportBar";
+import { voteErrorMessage } from "@/components/report/messages";
+import { notifyReportFailed } from "@/components/report/notifyReportFailed";
 import { notifyReportSent } from "@/components/report/notifyReportSent";
 import { SimulatorPanel } from "@/components/simulator/SimulatorPanel";
 import { Splash } from "@/components/splash/Splash";
@@ -90,12 +92,14 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
         undo(report.id).catch(() => toast.error("No se pudo deshacer"));
       });
     } catch (e) {
-      toast.error(e instanceof Error && e.message === "RATE_LIMIT" ? "Espera 15 s para reportar de nuevo" : "No se pudo enviar");
+      notifyReportFailed(e, () => {
+        void onReport(type, incident_kind);
+      });
     }
   }
 
   function onVote(reportId: string, kind: VoteKind) {
-    vote(reportId, kind).catch(() => toast.error("No se pudo registrar tu voto"));
+    vote(reportId, kind).catch((e: unknown) => toast.error(voteErrorMessage(e)));
   }
 
   return (
@@ -116,6 +120,7 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
           loading={loading}
           error={error}
           userPosition={geo.position}
+          simSpeed={sim.speed}
         />
         <ReportBar onReport={onReport} geo={geo} nearestStop={nearest} />
       </div>

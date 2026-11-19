@@ -43,6 +43,8 @@ export function nearestStop(stops: Stop[], point: LngLat, routeId?: RouteId): Ne
 
 /** Avances (0 a 1) con los que el circuito pasa por la parada; si no pasa de cerca, el del punto más cercano. */
 function stopProgresses(route: Route, stop: Stop): number[] {
+  // Una parada sirve a UN sentido: si lo conocemos, solo cuenta esa pasada del circuito.
+  if (typeof stop.progress === "number") return [stop.progress];
   const point: LngLat = [stop.lng, stop.lat];
   const passes = passProgresses(route, point);
   return passes.length > 0 ? passes : [snapToRoute(route, point).progress];
@@ -183,7 +185,7 @@ function etaFromPassings(route: Route, stop: Stop, reports: Report[], speed: num
   for (const r of reports) {
     if (r.type !== "passing" || r.route_id !== route.id || !isActive(r, now)) continue;
     const ageSec = Math.max(0, (now - new Date(r.created_at).getTime()) / 1000);
-    for (const from of stopProgresses(route, { ...stop, lng: r.lng, lat: r.lat })) {
+    for (const from of stopProgresses(route, { ...stop, progress: undefined, lng: r.lng, lat: r.lat })) {
       for (const to of stopAt) {
         const eta = (positiveMod(to - from, 1) * totalM) / mps - ageSec;
         if (eta >= 0 && (best === null || eta < best)) best = eta;
@@ -262,7 +264,7 @@ const LOAD_AHEAD_WINDOW_MS = 10 * 60_000;
 export function loadAhead(route: Route, routeStops: Stop[], stop: Stop, reports: Report[], now = Date.now()): boolean {
   const ordered = routeStops
     .filter((s) => s.route_id === route.id)
-    .map((s) => ({ s, progress: snapToRoute(route, [s.lng, s.lat]).progress }))
+    .map((s) => ({ s, progress: s.progress ?? snapToRoute(route, [s.lng, s.lat]).progress }))
     .sort((a, b) => a.progress - b.progress);
   const at = ordered.findIndex((o) => o.s.id === stop.id);
   if (at < 0 || ordered.length < 2) return false;
@@ -280,4 +282,13 @@ export function loadAhead(route: Route, routeStops: Stop[], stop: Stop, reports:
       isActive(r, now) &&
       now - new Date(r.created_at).getTime() <= LOAD_AHEAD_WINDOW_MS,
   );
+}
+
+/** Segundos hasta que llega a un punto del circuito (`progress`, 0 a 1) la unidad más próxima, o null si no hay. */
+export function etaToProgress(route: Route, progress: number, vehicles: Vehicle[], speed = 1): number | null {
+  const mine = vehicles.filter((v) => v.route_id === route.id);
+  if (mine.length === 0) return null;
+  const { totalM } = routeGeometry(route);
+  const mps = VEHICLE_SPEED_MS * speed;
+  return Math.round(Math.min(...mine.map((v) => (positiveMod(progress - v.progress, 1) * totalM) / mps)));
 }

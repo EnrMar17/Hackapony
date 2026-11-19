@@ -28,6 +28,8 @@ export interface BottomSheetProps {
   error?: string | null;
   /** Para ordenar el estado de rutas: primero las que pasan cerca de ti. */
   userPosition?: LngLat | null;
+  /** Multiplicador del simulador, para el ETA de la parada. */
+  simSpeed?: number;
 }
 
 const CLOCK_MS = 30_000;
@@ -40,6 +42,7 @@ export function BottomSheet({
   loading = false,
   error = null,
   userPosition,
+  simSpeed = 1,
 }: BottomSheetProps) {
   const open = useUi((s) => s.sheetOpen);
   const setOpen = useUi((s) => s.setSheetOpen);
@@ -154,6 +157,7 @@ export function BottomSheet({
                   stopId={selectedStop}
                   reports={reports}
                   vehicles={vehicles}
+                  simSpeed={simSpeed}
                   loading={loading}
                   error={error}
                 />
