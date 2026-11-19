@@ -7,7 +7,8 @@ import { useUi } from "@/store/ui";
 import type { Route } from "@/lib/types";
 import { useDeviceOnline } from "./connection";
 import { formatSince, useLastReportsUpdate } from "./liveSync";
-import { Onboarding, openOnboarding } from "./Onboarding";
+import { HelpDialog } from "./HelpDialog";
+import { Onboarding } from "./Onboarding";
 import { RoutePicker } from "./RoutePicker";
 import { MAX_INLINE_ROUTES, readableText } from "./routeMeta";
 
@@ -22,6 +23,7 @@ export function TopBar({ routes, online, connected }: TopBarProps) {
   const selected = useUi((s) => s.selectedRoute);
   const selectRoute = useUi((s) => s.selectRoute);
   const deviceOnline = useDeviceOnline();
+  const [helpOpen, setHelpOpen] = useState(false);
   // Sin red del dispositivo no hay conexión; con red, manda lo que diga useReports si CityApp lo pasa.
   const isOnline = deviceOnline && (connected ?? true);
   const lastUpdate = useLastReportsUpdate();
@@ -83,11 +85,12 @@ export function TopBar({ routes, online, connected }: TopBarProps) {
 
       <button
         type="button"
-        onClick={openOnboarding}
+        onClick={() => setHelpOpen(true)}
+        aria-haspopup="dialog"
         className="glass pointer-events-auto ml-auto flex size-12 shrink-0 items-center justify-center rounded-full shadow-md transition-transform duration-300 ease-out active:scale-95 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
       >
         <CircleHelp aria-hidden className="size-5" />
-        <span className="sr-only">Cómo funciona</span>
+        <span className="sr-only">Ayuda: qué significa cada cosa</span>
       </button>
 
       <p className="glass pointer-events-auto flex min-h-12 shrink-0 flex-col items-start justify-center rounded-3xl px-3 py-1 text-xs font-medium shadow-md">
@@ -119,6 +122,7 @@ export function TopBar({ routes, online, connected }: TopBarProps) {
         </p>
       )}
 
+      <HelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
       <Onboarding />
     </div>
   );

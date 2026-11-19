@@ -12,7 +12,6 @@ import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
 import { StopDetail } from "./StopDetail";
 import { AccessibleFilter } from "./AccessibleFilter";
-import { Legend } from "./Legend";
 import { ThemePicker } from "./ThemePicker";
 import { markReportsUpdated } from "./liveSync";
 import { useIsDesktop } from "./useIsDesktop";
@@ -183,7 +182,6 @@ export function BottomSheet({
                 loading={loading}
                 error={error}
               />
-              <Legend />
               <ThemePicker />
             </div>
           </section>
