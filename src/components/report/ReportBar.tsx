@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BusFront, TriangleAlert, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUi } from "@/store/ui";
 import { RATE_LIMIT_MS, REPORT_BUTTONS } from "@/lib/constants";
 import type { GeolocationState, IncidentKind, NearestStopResult, ReportType } from "@/lib/types";
 import { onReportCooldownReset } from "./cooldown";
@@ -41,6 +42,17 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerId = useId();
   const closePicker = useCallback(() => setPickerOpen(false), []);
+  const selectStop = useUi((s) => s.selectStop);
+
+  // Al tener GPS, abre una sola vez la parada más cercana, sin pisar lo que el usuario ya eligió.
+  const nearestId = geo?.status === "granted" ? (nearestStop?.stop.id ?? null) : null;
+  const autoOpened = useRef(false);
+  useEffect(() => {
+    if (autoOpened.current || !nearestId) return;
+    autoOpened.current = true;
+    const { selectedStop, selectedReport } = useUi.getState();
+    if (!selectedStop && !selectedReport) selectStop(nearestId);
+  }, [nearestId, selectStop]);
 
   // "Deshacer" borra el reporte: el servidor ya permite reportar, así que el cooldown se reinicia.
   useEffect(
@@ -103,7 +115,7 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
       </p>
 
       <div className="mb-2">
-        <LocationChip geo={geo} nearestStop={nearestStop} />
+        <LocationChip geo={geo} nearestStop={nearestStop} onOpenStop={selectStop} />
       </div>
 
       {pickerOpen && !blocked && (
