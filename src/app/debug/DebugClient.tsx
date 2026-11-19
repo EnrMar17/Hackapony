@@ -27,7 +27,7 @@ const btn =
 
 export function DebugClient() {
   const session = useSession();
-  const { reports, loading, error, online, sendReport, vote, undo } = useReports();
+  const { reports, loading, error, online, sendReport, vote, undo, refine } = useReports();
   const presence = usePresenceCount();
 
   const [route, setRoute] = useState<RouteId>(ROUTE_IDS[0]);
@@ -140,7 +140,8 @@ export function DebugClient() {
                 </div>
                 <p className="text-neutral-700">
                   {r.route_id ?? "sin ruta"}
-                  {r.incident_kind ? ` · ${r.incident_kind}` : ""} · +{r.confirms}
+                  {r.incident_kind ? ` · ${r.incident_kind}` : ""}
+                  {r.units ? ` · ${r.units} unidad${r.units > 1 ? "es" : ""}` : ""} · +{r.confirms}
                   {r.resolved ? " · resuelto" : ""}
                   {r.is_simulated ? " · simulado" : ""}
                   {mine ? " · mío" : ""}
@@ -158,6 +159,16 @@ export function DebugClient() {
                       <button type="button" className={btn} onClick={() => void run(() => undo(r.id))}>
                         Deshacer
                       </button>
+                    )}
+                    {mine && refine && (
+                      <>
+                        <button type="button" className={btn} onClick={() => void run(() => refine(r.id, { units: 2 }))}>
+                          2 unidades
+                        </button>
+                        <button type="button" className={btn} onClick={() => void run(() => refine(r.id, { occupancy: "full" }))}>
+                          Llena
+                        </button>
+                      </>
                     )}
                   </div>
                 )}
