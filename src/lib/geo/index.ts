@@ -14,7 +14,7 @@ import type {
   StopSafety,
   Vehicle,
 } from "@/lib/types";
-import { positiveMod, routeGeometry } from "./routeGeometry";
+import { passProgresses, positiveMod, routeGeometry } from "./routeGeometry";
 
 /** Punto de la ruta más cercano a `point`, su distancia y su avance (0 a 1) en el circuito. */
 export function snapToRoute(route: Route, point: LngLat): SnapResult {
@@ -47,9 +47,14 @@ export function etaToStop(route: Route, stop: Stop, vehicles: Vehicle[], speed =
   const mine = vehicles.filter((v) => v.route_id === route.id);
   if (mine.length === 0) return null;
   const { totalM } = routeGeometry(route);
-  const stopProgress = snapToRoute(route, [stop.lng, stop.lat]).progress;
+  // El circuito puede pasar por la parada más de una vez (ida y vuelta por la misma calle).
+  const point: LngLat = [stop.lng, stop.lat];
+  const passes = passProgresses(route, point);
+  const stopProgresses = passes.length > 0 ? passes : [snapToRoute(route, point).progress];
   const mps = VEHICLE_SPEED_MS * speed;
-  const waits = mine.map((v) => (positiveMod(stopProgress - v.progress, 1) * totalM) / mps);
+  const waits = mine.flatMap((v) =>
+    stopProgresses.map((p) => (positiveMod(p - v.progress, 1) * totalM) / mps),
+  );
   return Math.round(Math.min(...waits));
 }
 

@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import along from "@turf/along";
-import { positiveMod, routeGeometry } from "@/lib/geo/routeGeometry";
+import { pointAtDistance, positiveMod, routeGeometry } from "@/lib/geo/routeGeometry";
 import type { LngLat, Route, SimConfig, Vehicle } from "@/lib/types";
-import { BEARING_LOOKAHEAD_M, TICK_MS, VEHICLES_PER_ROUTE, VEHICLE_SPEED_MS } from "./config";
+import { BEARING_LOOKAHEAD_M, TICK_MS, VEHICLE_SPEED_MS, vehicleCount } from "./config";
 
 /**
  * Reloj del simulador. Es función de la configuración compartida (con su anclaje), así todos los
@@ -32,13 +31,12 @@ function bearingDeg(from: LngLat, to: LngLat): number {
 /** Posición de todas las unidades en el instante de simulación `t` (ms). Función pura del reloj. */
 export function vehiclesAt(routes: Route[], t: number): Vehicle[] {
   return routes.flatMap((route) => {
-    const { line, totalM } = routeGeometry(route);
-    const count = VEHICLES_PER_ROUTE[route.id];
+    const { totalM } = routeGeometry(route);
+    const count = vehicleCount(totalM);
     return Array.from({ length: count }, (_, i) => {
       const dist = positiveMod(VEHICLE_SPEED_MS * (t / 1000) + (i * totalM) / count, totalM);
-      const here = along(line, dist, { units: "meters" }).geometry.coordinates as LngLat;
-      const ahead = along(line, (dist + BEARING_LOOKAHEAD_M) % totalM, { units: "meters" }).geometry
-        .coordinates as LngLat;
+      const here = pointAtDistance(route, dist);
+      const ahead = pointAtDistance(route, dist + BEARING_LOOKAHEAD_M);
       return {
         id: `${route.id}-${i}`,
         route_id: route.id,

@@ -1,27 +1,42 @@
 // Traza las rutas como circuito cerrado con OSRM y las guarda como GeoJSON.
-// Uso: node scripts/fetch-osrm-routes.mjs [entrada.json] [salida.json]
-// Entrada: { "GRIS-1": { "waypoints": [[lng, lat], ...] }, "NARANJA-1": { "path": [[lng, lat], ...] } }
+// Uso: node scripts/fetch-osrm-routes.mjs [entrada.json] [salida.json] [ID ...]
+// Entrada: { "GRIS-1": { "waypoints": [[lng, lat], ...] }, "NARANJA-1": { "path": [[lng, lat] | null, ...] } }
 //   waypoints: pocos puntos; OSRM traza el camino entre ellos.
-//   path: polilínea densa (p. ej. de OSM); los huecos grandes se unen con OSRM.
+//   path: polilínea densa (p. ej. de OSM). Un `null` marca un hueco que se une con OSRM;
+//         los saltos de más de GAP_M sin marcar también se unen.
+// Con IDs al final solo se vuelven a trazar esas rutas; las demás se conservan de la salida actual.
 // Salida:  FeatureCollection con un LineString cerrado por ruta (properties.id).
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 
-const ROUTE_IDS = ['GRIS-1', 'NARANJA-1'];
 const OSRM = 'https://router.project-osrm.org/route/v1/driving';
 const NEAREST = 'https://router.project-osrm.org/nearest/v1/driving';
 const SPUR_MAX_M = 150; // espigón: ida y vuelta corta sobre el mismo punto
 const SPUR_NEAR_M = 12;
-const GAP_M = 500; // hueco que se une con OSRM en modo path (los tramos rectos de OSM pueden medir 100-300 m)
+const GAP_M = 500; // salto sin marcar que se une con OSRM (los tramos rectos de OSM pueden medir 100-300 m)
+const SIMPLIFY_M = 4; // tolerancia al simplificar la línea final
+const CALL_DELAY_MS = 120; // cortesía con el servidor público de OSRM
 const input = process.argv[2] ?? 'scripts/waypoints.json';
 const output = process.argv[3] ?? 'src/data/routes.json';
+const only = process.argv.slice(4);
 
 const dist = (a, b) => Math.hypot((a[0] - b[0]) * 104500, (a[1] - b[1]) * 111000);
+const r5 = (n) => Math.round(n * 1e5) / 1e5;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function getJson(url) {
+  await sleep(CALL_DELAY_MS);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch(url);
+    if (res.ok) return res.json();
+    await sleep(1500 * (attempt + 1));
+  }
+  throw new Error(`OSRM no respondió: ${url.slice(0, 80)}`);
+}
 
 // Pega cada punto a la calle más cercana para evitar desvíos a calles laterales.
 async function snap([lng, lat]) {
-  const res = await fetch(`${NEAREST}/${lng},${lat}?number=1`);
-  const data = await res.json();
+  const data = await getJson(`${NEAREST}/${lng},${lat}?number=1`);
   return data.code === 'Ok' ? data.waypoints[0].location : [lng, lat];
 }
 
@@ -41,29 +56,71 @@ function dropSpurs(line) {
   return out;
 }
 
+// Douglas-Peucker iterativo (en metros) para que routes.json pese poco.
+function simplify(line, tolM) {
+  const keep = new Uint8Array(line.length);
+  keep[0] = keep[line.length - 1] = 1;
+  const stack = [[0, line.length - 1]];
+  while (stack.length) {
+    const [a, b] = stack.pop();
+    let worst = 0;
+    let idx = -1;
+    const [ax, ay] = line[a];
+    const [bx, by] = line[b];
+    const sx = (bx - ax) * 104500;
+    const sy = (by - ay) * 111000;
+    const len = Math.hypot(sx, sy) || 1e-9;
+    for (let i = a + 1; i < b; i++) {
+      const wx = (line[i][0] - ax) * 104500;
+      const wy = (line[i][1] - ay) * 111000;
+      const t = Math.max(0, Math.min(1, (wx * sx + wy * sy) / (len * len)));
+      const d = Math.hypot(wx - t * sx, wy - t * sy);
+      if (d > worst) {
+        worst = d;
+        idx = i;
+      }
+    }
+    if (idx > 0 && worst > tolM) {
+      keep[idx] = 1;
+      stack.push([a, idx], [idx, b]);
+    }
+  }
+  return line.filter((_, i) => keep[i]);
+}
+
 function close(points) {
-  const [a, b] = [points[0], points[points.length - 1]];
-  return a[0] === b[0] && a[1] === b[1] ? points : [...points, a];
+  const real = points.filter(Boolean);
+  const [a, b] = [real[0], real.at(-1)];
+  return a[0] === b[0] && a[1] === b[1] ? points : [...points, null, a];
 }
 
 async function osrmLine(id, pts) {
   const coords = pts.map(([lng, lat]) => `${lng},${lat}`).join(';');
-  const res = await fetch(`${OSRM}/${coords}?overview=full&geometries=geojson&steps=false`);
-  if (!res.ok) throw new Error(`${id}: OSRM respondió ${res.status}`);
-  const data = await res.json();
-  if (data.code !== 'Ok' || !data.routes?.[0]) {
-    throw new Error(`${id}: OSRM no encontró ruta (${data.code})`);
-  }
+  const data = await getJson(`${OSRM}/${coords}?overview=full&geometries=geojson&steps=false`);
+  if (data.code !== 'Ok' || !data.routes?.[0]) throw new Error(`${id}: OSRM no encontró ruta (${data.code})`);
   return data.routes[0].geometry.coordinates;
 }
 
+async function joinGap(id, from, to) {
+  try {
+    return await osrmLine(id, [await snap(from), await snap(to)]);
+  } catch {
+    console.warn(`  aviso ${id}: hueco de ${Math.round(dist(from, to))} m sin ruta, queda en línea recta`);
+    return [];
+  }
+}
+
 async function bridge(id, path) {
-  const out = [path[0]];
-  for (let i = 1; i < path.length; i++) {
-    if (dist(path[i - 1], path[i]) > GAP_M) {
-      out.push(...(await osrmLine(id, [await snap(path[i - 1]), await snap(path[i])])));
+  const out = [];
+  let gap = false;
+  for (const p of path) {
+    if (p === null) {
+      gap = true;
+      continue;
     }
-    out.push(path[i]);
+    if (out.length && (gap || dist(out.at(-1), p) > GAP_M)) out.push(...(await joinGap(id, out.at(-1), p)));
+    gap = false;
+    out.push(p);
   }
   return out;
 }
@@ -80,8 +137,10 @@ async function trace(id, entry) {
     for (const w of entry.waypoints) snapped.push(await snap(w));
     raw = await osrmLine(id, close(snapped));
   }
-  const line = dropSpurs(raw);
-  line[line.length - 1] = line[0]; // garantiza circuito cerrado exacto
+  const cleaned = dropSpurs(raw);
+  cleaned[cleaned.length - 1] = cleaned[0]; // garantiza circuito cerrado exacto
+  const line = simplify(cleaned, SIMPLIFY_M).map(([x, y]) => [r5(x), r5(y)]);
+  line[line.length - 1] = line[0];
   return {
     type: 'Feature',
     properties: { id, lengthM: Math.round(line.slice(1).reduce((s, p, i) => s + dist(line[i], p), 0)) },
@@ -90,12 +149,22 @@ async function trace(id, entry) {
 }
 
 const config = JSON.parse(await readFile(input, 'utf8'));
-const features = [];
-for (const id of ROUTE_IDS) {
-  if (!config[id]) throw new Error(`Falta ${id} en ${input}`);
-  features.push(await trace(id, config[id]));
-  console.log(`${id}: ${features.at(-1).geometry.coordinates.length} puntos, ${features.at(-1).properties.lengthM} m`);
+let previous = [];
+try {
+  previous = JSON.parse(await readFile(output, 'utf8')).features;
+} catch {
+  previous = [];
 }
+const ids = only.length ? only : Object.keys(config);
+const traced = new Map(previous.map((f) => [f.properties.id, f]));
+for (const id of ids) {
+  if (!config[id]) throw new Error(`Falta ${id} en ${input}`);
+  const feature = await trace(id, config[id]);
+  traced.set(id, feature);
+  console.log(`${id}: ${feature.geometry.coordinates.length} puntos, ${(feature.properties.lengthM / 1000).toFixed(1)} km`);
+}
+const order = Object.keys(config);
+const features = [...traced.values()].sort((a, b) => order.indexOf(a.properties.id) - order.indexOf(b.properties.id));
 await mkdir(dirname(output), { recursive: true });
 await writeFile(output, JSON.stringify({ type: 'FeatureCollection', features }));
 console.log(`Guardado en ${output}`);
