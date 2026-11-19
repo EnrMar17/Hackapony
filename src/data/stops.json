@@ -552,7 +552,7 @@
   {
     "id": "gris-3-furamo-10",
     "route_id": "GRIS-3-FURAMO",
-    "name": "Parada",
+    "name": "Tenencia Morelos",
     "lng": -101.22663,
     "lat": 19.72103,
     "has_light": true,
@@ -712,7 +712,7 @@
   {
     "id": "gris-3-oxxo-11",
     "route_id": "GRIS-3-OXXO",
-    "name": "Avenida Francisco I. Madero Poniente",
+    "name": "Avenida Francisco I. Madero Poniente (2)",
     "lng": -101.2133,
     "lat": 19.70211,
     "has_light": true,
@@ -1072,7 +1072,7 @@
   {
     "id": "naranja-2-10",
     "route_id": "NARANJA-2",
-    "name": "Avenida Morelos Norte · Doctor Miguel Silva González",
+    "name": "Avenida Morelos Norte · Doctor Miguel Silva González (2)",
     "lng": -101.18838,
     "lat": 19.71988,
     "has_light": true,
@@ -1232,7 +1232,7 @@
   {
     "id": "naranja-3-directo-02",
     "route_id": "NARANJA-3-DIRECTO",
-    "name": "Parada",
+    "name": "Tarímbaro",
     "lng": -101.18203,
     "lat": 19.75938,
     "has_light": true,
@@ -1312,7 +1312,7 @@
   {
     "id": "naranja-3-directo-10",
     "route_id": "NARANJA-3-DIRECTO",
-    "name": "Parada",
+    "name": "Tarímbaro (2)",
     "lng": -101.1671,
     "lat": 19.75854,
     "has_light": true,
@@ -1322,7 +1322,7 @@
   {
     "id": "naranja-3-directo-11",
     "route_id": "NARANJA-3-DIRECTO",
-    "name": "Parada",
+    "name": "Tarímbaro (3)",
     "lng": -101.18225,
     "lat": 19.7644,
     "has_light": true,
@@ -1412,7 +1412,7 @@
   {
     "id": "naranja-3-centro-08",
     "route_id": "NARANJA-3-CENTRO",
-    "name": "Parada",
+    "name": "Tarímbaro",
     "lng": -101.16507,
     "lat": 19.75848,
     "has_light": false,
@@ -1532,7 +1532,7 @@
   {
     "id": "naranja-3-erandeni-09",
     "route_id": "NARANJA-3-ERANDENI",
-    "name": "Parada",
+    "name": "Virrey Antonio de Mendoza · Félix Ireta",
     "lng": -101.19101,
     "lat": 19.68327,
     "has_light": true,
@@ -1682,7 +1682,7 @@
   {
     "id": "naranja-3-metropolis-12",
     "route_id": "NARANJA-3-METROPOLIS",
-    "name": "Carretera Municipal: Torreon Nuevo - Erandeni - Entronque MEX 43",
+    "name": "Carretera Municipal: Torreon Nuevo - Erandeni - Entronque MEX 43 (2)",
     "lng": -101.18377,
     "lat": 19.75241,
     "has_light": false,
