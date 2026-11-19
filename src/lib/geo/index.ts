@@ -304,11 +304,13 @@ const circularGap = (a: number, b: number) => {
 };
 
 /**
- * Unidades que, según un aviso vigente de "Unidad llena", van llenas. Se ubica cuál unidad estaba en el lugar
- * del aviso cuando se mandó (retrocediendo lo que ha avanzado desde entonces) y esa es la que se marca.
+ * Unidades señaladas por un aviso vigente del tipo `type` ("full": va llena; "passing": la vieron pasar). Se ubica
+ * cuál unidad estaba en el lugar del aviso cuando se mandó (retrocediendo lo que ha avanzado desde entonces) y esa
+ * es la que se marca, así la marca la sigue por el mapa mientras el aviso esté vigente.
  * Devuelve id de unidad → aviso (si hay varios, el confirmado o el más reciente).
  */
-export function fullVehicles(
+export function reportedVehicles(
+  type: "full" | "passing",
   routes: Route[],
   stops: Stop[],
   vehicles: Vehicle[],
@@ -319,7 +321,7 @@ export function fullVehicles(
   const out = new Map<string, Report>();
   const stopById = new Map(stops.map((s) => [s.id, s]));
   for (const r of reports) {
-    if (r.type !== "full" || !r.route_id || !isActive(r, now)) continue;
+    if (r.type !== type || !r.route_id || !isActive(r, now)) continue;
     const route = routes.find((x) => x.id === r.route_id);
     if (!route) continue;
     const own = r.stop_id ? stopById.get(r.stop_id) : undefined;
@@ -345,3 +347,23 @@ export function fullVehicles(
   }
   return out;
 }
+
+/** Unidades que, según un aviso vigente de "Unidad llena", van llenas. */
+export const fullVehicles = (
+  routes: Route[],
+  stops: Stop[],
+  vehicles: Vehicle[],
+  reports: Report[],
+  speed = 1,
+  now = Date.now(),
+): Map<string, Report> => reportedVehicles("full", routes, stops, vehicles, reports, speed, now);
+
+/** Unidades que alguien reportó "pasando aquí" hace poco (el aviso dura 5 min). */
+export const passingVehicles = (
+  routes: Route[],
+  stops: Stop[],
+  vehicles: Vehicle[],
+  reports: Report[],
+  speed = 1,
+  now = Date.now(),
+): Map<string, Report> => reportedVehicles("passing", routes, stops, vehicles, reports, speed, now);

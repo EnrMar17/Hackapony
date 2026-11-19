@@ -5,9 +5,11 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { etaRange, fullVehicles, isActive, nextUnits, stopSafety, timeAgo, type EtaRange } from "@/lib/geo";
 import type { CityBundle, Report, Stop, Vehicle } from "@/lib/types";
+import type { StopWaitingState } from "@/hooks/useStopWaiting";
 import { ConfidenceBadge } from "./ConfidenceBadge";
 import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
 import { reportLook, reportTitle, SAFETY_LOOK } from "./reportMeta";
+import { WaitingHere } from "./WaitingHere";
 
 export interface StopDetailProps {
   bundle: CityBundle;
@@ -23,6 +25,8 @@ export interface StopDetailProps {
   distanceM?: number | null;
   /** Nota bajo el detalle, p. ej. "Activa tu ubicación…". */
   hint?: string;
+  /** "Esperando aquí": sin él no se muestra. */
+  waiting?: StopWaitingState;
   loading?: boolean;
   error?: string | null;
 }
@@ -64,6 +68,7 @@ export function StopDetail({
   label,
   distanceM,
   hint,
+  waiting,
   loading,
   error,
 }: StopDetailProps) {
@@ -149,6 +154,7 @@ export function StopDetail({
         </p>
       )}
       {hint && <p className="px-1 text-xs text-muted-foreground">{hint}</p>}
+      {waiting && <WaitingHere stopId={stop.id} waiting={waiting} />}
 
       {safety.reasons.length > 0 && (
         <p className="text-sm text-muted-foreground">{safety.reasons.join(" · ")}</p>

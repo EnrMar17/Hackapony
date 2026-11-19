@@ -22,6 +22,10 @@ export function reportErrorMessage(e: unknown): string {
   switch (code(e)) {
     case "RATE_LIMIT":
       return "Espera 15 s para reportar de nuevo";
+    case "STOP_DUPLICATE":
+      return "Ya reportaste eso en esta parada hace un momento";
+    case "STOP_LIMIT":
+      return "Esta parada ya tiene muchos reportes de eso · gracias, ya se enteraron";
     case "OFFLINE":
       return "Sin conexión · no se pudo enviar";
     default:

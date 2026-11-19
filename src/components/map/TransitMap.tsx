@@ -15,7 +15,7 @@ import { REPORT_CLUSTER_LAYER, REPORT_LAYER, ReportLayer } from "./ReportLayer";
 import { ReportPopup } from "./ReportPopup";
 import { ROUTE_LINE_LAYER, RouteLayers } from "./RouteLayers";
 import { STOP_LAYERS, StopLayer } from "./StopLayer";
-import { fullVehicles } from "@/lib/geo";
+import { fullVehicles, passingVehicles } from "@/lib/geo";
 import { StopEtaChip } from "./StopEtaChip";
 import { DestinationBar } from "./DestinationBar";
 import { TripLayer } from "./TripLayer";
@@ -110,10 +110,23 @@ export function TransitMap({
     [bundle, vehicles, selectedStopId, simSpeed],
   );
   // Unidades que van llenas según los avisos vigentes.
-  const fullIds = useMemo(
-    () => [...fullVehicles(bundle.routes, bundle.stops, vehicles, reports, simSpeed).keys()],
+  const fullMap = useMemo(
+    () => fullVehicles(bundle.routes, bundle.stops, vehicles, reports, simSpeed),
     [bundle.routes, bundle.stops, vehicles, reports, simSpeed],
   );
+  // Y las que alguien vio pasar hace poco.
+  const passingMap = useMemo(
+    () => passingVehicles(bundle.routes, bundle.stops, vehicles, reports, simSpeed),
+    [bundle.routes, bundle.stops, vehicles, reports, simSpeed],
+  );
+  const fullIds = useMemo(() => [...fullMap.keys()], [fullMap]);
+  const passingIds = useMemo(() => [...passingMap.keys()].filter((id) => !fullMap.has(id)), [passingMap, fullMap]);
+  // Cuándo se avisó de cada unidad señalada: la capa hace pulsar unos segundos a las recién avisadas.
+  const reportedAt = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const [id, r] of [...passingMap, ...fullMap]) out[id] = new Date(r.created_at).getTime();
+    return out;
+  }, [fullMap, passingMap]);
   // En modo denso solo se ven las unidades de la ruta elegida, o las de la ruta de la parada elegida.
   const stopRouteId = incoming?.route.id ?? null;
   // La ruta en la que se enfoca el mapa: la del viaje elegido o la que eliges arriba.
@@ -263,7 +276,7 @@ export function TransitMap({
         <TripLayer trip={trip} destination={destination} dark={dark} />
         <StopLayer stops={bundle.stops} reports={reports} dense={dense} dark={dark} />
         <ReportLayer reports={mapReports} iconsReady={imagesReady} dark={dark} />
-        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} dark={dark} highlightId={incoming?.vehicleId ?? null} fullIds={fullIds} />
+        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} dark={dark} highlightId={incoming?.vehicleId ?? null} fullIds={fullIds} passingIds={passingIds} reportedAt={reportedAt} />
         <StopEtaChip incoming={incoming} />
         <UserLocation position={userPosition} accuracyM={userAccuracyM} />
         {selectedReport && <ReportPopup report={selectedReport} onClose={() => selectReport(null)} />}

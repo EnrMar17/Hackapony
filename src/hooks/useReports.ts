@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { CONFIRM_LIFE_CAP, POLL_INTERVAL_MS, RATE_LIMIT_MS, REPORT_TTL_MS } from "@/lib/constants";
-import { syncClock, toLocalIso } from "@/lib/supabase/clock";
+import { correctedNowMs, syncClock, toLocalIso } from "@/lib/supabase/clock";
 import { getSupabase } from "@/lib/supabase/client";
 import { ensureSession } from "@/lib/supabase/session";
 import type {
@@ -76,7 +76,8 @@ function tmpId(): string {
 async function fetchReports(): Promise<Report[]> {
   const supabase = getSupabase();
   if (!supabase) throw new Error("NO_SUPABASE");
-  const since = new Date(Date.now() - WINDOW_MS).toISOString();
+  // Con la hora del servidor: si el reloj del dispositivo va adelantado, la ventana no puede caer en el futuro.
+  const since = new Date(correctedNowMs() - WINDOW_MS).toISOString();
   const { data, error } = await supabase
     .from("reports")
     .select("*")
@@ -267,6 +268,9 @@ export function useReports(): ReportsStateLive {
     if (insertError || !data) {
       setReports((prev) => prev.filter((r) => r.id !== optimisticId));
       if (insertError?.message.includes("RATE_LIMIT")) throw new Error("RATE_LIMIT");
+      for (const code of ["STOP_DUPLICATE", "STOP_LIMIT"]) {
+        if (insertError?.message.includes(code)) throw new Error(code);
+      }
       lastSent.current = 0;
       throw new Error("SEND_FAILED");
     }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Raleway } from "next/font/google";
 import { AppToaster } from "@/components/panels/AppToaster";
+import { ClockSkewDialog } from "@/components/panels/ClockSkewDialog";
 import { THEME_COLORS, THEME_INIT_SCRIPT } from "@/components/panels/themeScript";
 import "./globals.css";
 
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         {children}
         <AppToaster />
+        <ClockSkewDialog />
       </body>
     </html>
   );
