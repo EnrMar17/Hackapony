@@ -1,6 +1,8 @@
 // Contrato compartido. Solo Tony lo modifica. `supabase/migrations/0001_init.sql` debe coincidir con estos enums.
 
-export type RouteId = "GRIS-1" | "NARANJA-1";
+import type { CatalogRouteId } from "@/data/routeCatalog";
+
+export type RouteId = CatalogRouteId;
 export type ReportType = "full" | "passing" | "incident";
 export type IncidentKind = "accessibility" | "lighting" | "safety" | "other";
 export type OccupancyLevel = "low" | "medium" | "full";

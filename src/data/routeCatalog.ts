@@ -2,7 +2,7 @@
 // `ROUTE_IDS`, `ROUTE_NAMES` y `ROUTE_COLORS` de aquí. Sin imports: es un archivo hoja.
 // Para el seed de Supabase: `node scripts/print-routes-sql.mjs`.
 export const ROUTE_CATALOG = [
-  { id: "GRIS-1", name: "Gris 1", color: "#64748b", family: "gris" },
+  { id: "GRIS-1", name: "Gris 1", color: "#475569", family: "gris" },
   { id: "GRIS-2", name: "Gris 2", color: "#334155", family: "gris" },
   { id: "GRIS-3-FURAMO", name: "Gris 3 Furamo", color: "#94a3b8", family: "gris" },
   { id: "GRIS-3-OXXO", name: "Gris 3 Oxxo", color: "#78716c", family: "gris" },

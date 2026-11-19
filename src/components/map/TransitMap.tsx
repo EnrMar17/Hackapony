@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ROUTE_IDS } from "@/lib/constants";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ALL_ROUTES_ENABLED, DEFAULT_ROUTE_IDS, ROUTE_IDS } from "@/lib/constants";
 import type { CityBundle, LngLat, Report, Route, RouteId, Vehicle } from "@/lib/types";
 import { useUi } from "@/store/ui";
 import { addArrowImage } from "./arrowIcon";
@@ -51,6 +51,24 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
   const selectedReportId = useUi((s) => s.selectedReport);
   const selectedReport = reports.find((r) => r.id === selectedReportId) ?? null;
   const selectedStopId = useUi((s) => s.selectedStop);
+  const showAll = useUi((s) => s.showAllRoutes) && ALL_ROUTES_ENABLED;
+  const setShowAll = useUi((s) => s.setShowAllRoutes);
+  // Modo denso: más rutas que las 2 del reto. Las unidades solo se ven de la ruta elegida.
+  const dense = bundle.routes.length > DEFAULT_ROUTE_IDS.length;
+  const mapVehicles = useMemo(
+    () => (dense ? vehicles.filter((v) => v.route_id === selectedRoute) : vehicles),
+    [dense, vehicles, selectedRoute],
+  );
+
+  // Se vuelve a encuadrar cuando cambia el conjunto de rutas (por ejemplo al pulsar "Ver todas").
+  useEffect(() => {
+    if (!loaded) return;
+    mapRef.current?.fitBounds(routesBounds(bundle.routes), {
+      padding: { top: 96, bottom: 260, left: 28, right: 28 },
+      maxZoom: 14,
+      duration: 600,
+    });
+  }, [loaded, bundle.routes]);
 
   // Al elegir una parada, el mapa la acerca (por encima del panel inferior).
   useEffect(() => {
@@ -99,20 +117,15 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
         onLoad={() => {
           if (mapRef.current) {
             setArrowReady(addArrowImage(mapRef.current));
-            mapRef.current.fitBounds(routesBounds(bundle.routes), {
-              padding: { top: 96, bottom: 260, left: 28, right: 28 },
-              maxZoom: 14,
-              duration: 0,
-            });
           }
           setLoaded(true);
         }}
         onError={() => setFailed(true)}
         style={{ width: "100%", height: "100%" }}
       >
-        <RouteLayers routes={bundle.routes} selected={selectedRoute} />
-        <StopLayer stops={bundle.stops} reports={reports} />
-        <VehicleLayer vehicles={vehicles} arrowReady={arrowReady} />
+        <RouteLayers routes={bundle.routes} selected={selectedRoute} dense={dense} />
+        <StopLayer stops={bundle.stops} reports={reports} dense={dense} />
+        <VehicleLayer vehicles={mapVehicles} arrowReady={arrowReady} />
         <ReportLayer reports={reports} />
         <UserLocation position={userPosition} />
         <StopEtaChip bundle={bundle} vehicles={vehicles} speed={simSpeed} />
@@ -133,6 +146,23 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
       >
         ◎
       </button>
+      {ALL_ROUTES_ENABLED && (
+        <div className="absolute right-3 top-36 flex max-w-56 flex-col items-end gap-2">
+          <button
+            type="button"
+            onClick={() => setShowAll(!showAll)}
+            aria-pressed={showAll}
+            className="min-h-12 rounded-full bg-white px-4 text-sm font-semibold shadow"
+          >
+            {showAll ? "Solo Gris 1 y Naranja 1" : `Ver todas las rutas (${ROUTE_IDS.length})`}
+          </button>
+          {dense && !selectedRoute && (
+            <p className="rounded-xl bg-white/95 px-3 py-2 text-xs text-slate-700 shadow">
+              Toca una línea para ver sus paradas y unidades.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

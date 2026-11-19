@@ -1,4 +1,5 @@
 // Constantes compartidas. Solo Tony las modifica.
+import { ROUTE_CATALOG } from "@/data/routeCatalog";
 import type { IncidentKind, LngLat, ReportType, RouteId } from "./types";
 
 export const DEFAULT_CITY = "morelia";
@@ -17,17 +18,21 @@ export const INCIDENT_CHIPS = [
   { kind: "other", label: "Otro" },
 ] as const satisfies readonly { kind: IncidentKind; label: string }[];
 
-export const ROUTE_IDS = ["GRIS-1", "NARANJA-1"] as const satisfies readonly RouteId[];
+// Ids, nombres y colores salen de `src/data/routeCatalog.ts` (única fuente).
+export const ROUTE_IDS: readonly RouteId[] = ROUTE_CATALOG.map((r) => r.id);
 
-export const ROUTE_NAMES: Record<RouteId, string> = {
-  "GRIS-1": "Gris 1",
-  "NARANJA-1": "Naranja 1",
-};
+export const ROUTE_NAMES = Object.fromEntries(ROUTE_CATALOG.map((r) => [r.id, r.name])) as Record<RouteId, string>;
 
-export const ROUTE_COLORS: Record<RouteId, string> = {
-  "GRIS-1": "#475569", // más oscuro que el mapa base para que no se confunda con las calles
-  "NARANJA-1": "#f97316",
-};
+export const ROUTE_COLORS = Object.fromEntries(ROUTE_CATALOG.map((r) => [r.id, r.color])) as Record<RouteId, string>;
+
+/** Las 2 rutas que se muestran por defecto (las del reto). Las demás se ven con "Ver todas las rutas". */
+export const DEFAULT_ROUTE_IDS: readonly RouteId[] = ["GRIS-1", "NARANJA-1"];
+
+/**
+ * Activa el botón "Ver todas las rutas". Apagado hasta que la base de datos tenga las rutas nuevas
+ * (si no, un reporte en una ruta nueva falla por la llave foránea). Se enciende con NEXT_PUBLIC_ALL_ROUTES=1.
+ */
+export const ALL_ROUTES_ENABLED = process.env.NEXT_PUBLIC_ALL_ROUTES === "1";
 
 export const RATE_LIMIT_MS = 15_000;
 

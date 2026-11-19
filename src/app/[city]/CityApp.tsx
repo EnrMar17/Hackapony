@@ -7,7 +7,7 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { usePresenceCount } from "@/hooks/usePresenceCount";
 import { useReports } from "@/hooks/useReports";
 import { useSimConfig } from "@/hooks/useSimConfig";
-import { PRIVACY_SNAP_M, ROUTE_IDS } from "@/lib/constants";
+import { ALL_ROUTES_ENABLED, DEFAULT_ROUTE_IDS, PRIVACY_SNAP_M, ROUTE_IDS } from "@/lib/constants";
 import { nearestStop } from "@/lib/geo";
 import { useVehicles } from "@/lib/simulator";
 import type { IncidentKind, ReportType, RouteId, VoteKind } from "@/lib/types";
@@ -30,16 +30,38 @@ interface CityAppProps {
 }
 
 export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps) {
-  const bundle = useMemo(() => getCityBundle(city), [city]);
+  const fullBundle = useMemo(() => getCityBundle(city), [city]);
+  const showAll = useUi((s) => s.showAllRoutes) && ALL_ROUTES_ENABLED;
+  // Por defecto solo las 2 rutas del reto: con todas el mapa se satura y no se entiende.
+  const bundle = useMemo(
+    () =>
+      showAll
+        ? fullBundle
+        : {
+            ...fullBundle,
+            routes: fullBundle.routes.filter((r) => DEFAULT_ROUTE_IDS.includes(r.id)),
+            stops: fullBundle.stops.filter((s) => DEFAULT_ROUTE_IDS.includes(s.route_id)),
+          },
+    [fullBundle, showAll],
+  );
 
   useEffect(() => {
-    const { selectRoute, selectStop } = useUi.getState();
-    if (initialRoute && ROUTE_IDS.includes(initialRoute as RouteId)) selectRoute(initialRoute as RouteId);
-    if (initialStop && bundle.stops.some((s) => s.id === initialStop)) selectStop(initialStop);
-  }, [bundle.stops, initialRoute, initialStop]);
+    const { selectRoute, selectStop, setShowAllRoutes } = useUi.getState();
+    const route = initialRoute as RouteId | undefined;
+    const stop = initialStop ? fullBundle.stops.find((s) => s.id === initialStop) : undefined;
+    // Un enlace a una ruta fuera de las 2 por defecto abre el modo "todas".
+    const hidden = [route, stop?.route_id].some((id) => id && !DEFAULT_ROUTE_IDS.includes(id));
+    if (hidden && ALL_ROUTES_ENABLED) setShowAllRoutes(true);
+    if (route && ROUTE_IDS.includes(route) && (!hidden || ALL_ROUTES_ENABLED)) selectRoute(route);
+    if (stop && (!hidden || ALL_ROUTES_ENABLED)) selectStop(stop.id);
+  }, [fullBundle.stops, initialRoute, initialStop]);
   const sim = useSimConfig();
   const vehicles = useVehicles(bundle.routes, sim);
-  const { reports, loading, error, sendReport, vote, undo } = useReports();
+  const { reports: allReports, loading, error, sendReport, vote, undo } = useReports();
+  const reports = useMemo(
+    () => (showAll ? allReports : allReports.filter((r) => !r.route_id || DEFAULT_ROUTE_IDS.includes(r.route_id))),
+    [allReports, showAll],
+  );
   const geo = useGeolocation();
   const online = usePresenceCount();
   // Sin GPS no hay "parada más cercana": el chip muestra el estado del permiso.

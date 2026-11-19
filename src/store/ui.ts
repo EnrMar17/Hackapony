@@ -9,12 +9,15 @@ interface UiState {
   simAdmin: boolean;
   /** Filtro: solo paradas con rampa, luz y techo. */
   onlyAccessible: boolean;
+  /** Muestra todas las rutas del catálogo en vez de solo las 2 por defecto. */
+  showAllRoutes: boolean;
   selectRoute: (id: RouteId | null) => void;
   selectStop: (id: string | null) => void;
   selectReport: (id: string | null) => void;
   setSheetOpen: (open: boolean) => void;
   setSimAdmin: (on: boolean) => void;
   setOnlyAccessible: (on: boolean) => void;
+  setShowAllRoutes: (on: boolean) => void;
 }
 
 export const useUi = create<UiState>((set) => ({
@@ -24,10 +27,13 @@ export const useUi = create<UiState>((set) => ({
   sheetOpen: false,
   simAdmin: false,
   onlyAccessible: false,
+  showAllRoutes: false,
   selectRoute: (id) => set({ selectedRoute: id }),
   selectStop: (id) => set({ selectedStop: id, sheetOpen: id !== null }),
   selectReport: (id) => set({ selectedReport: id, sheetOpen: id !== null }),
   setSheetOpen: (open) => set({ sheetOpen: open }),
   setSimAdmin: (on) => set({ simAdmin: on }),
   setOnlyAccessible: (on) => set({ onlyAccessible: on }),
+  // Al volver a las 2 rutas se limpia una selección que ya no sería visible.
+  setShowAllRoutes: (on) => set((s) => ({ showAllRoutes: on, selectedRoute: on ? s.selectedRoute : null })),
 }));

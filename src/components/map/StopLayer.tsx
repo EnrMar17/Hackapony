@@ -15,9 +15,11 @@ export const STOP_LAYERS = [STOP_LAYER, STOP_OK_LAYER];
  * Paradas con color de semáforo. Las que no tienen novedades (verde) son pequeñas y solo se ven al acercar:
  * lo que llama la atención son las que tienen un problema. Con una ruta seleccionada solo se ven sus paradas.
  */
-export function StopLayer({ stops, reports }: { stops: Stop[]; reports: Report[] }) {
+export function StopLayer({ stops, reports, dense }: { stops: Stop[]; reports: Report[]; dense: boolean }) {
   const selectedRoute = useUi((s) => s.selectedRoute);
   const onlyAccessible = useUi((s) => s.onlyAccessible);
+  // Con muchas rutas y ninguna elegida, las paradas solo aparecen muy de cerca.
+  const far = dense && !selectedRoute;
 
   const data = useMemo<FeatureCollection>(
     () => ({
@@ -39,7 +41,7 @@ export function StopLayer({ stops, reports }: { stops: Stop[]; reports: Report[]
       <Layer
         id={STOP_OK_LAYER}
         type="circle"
-        minzoom={13.5}
+        minzoom={far ? 14.5 : 13.5}
         filter={["==", ["get", "level"], "green"]}
         paint={{
           "circle-radius": ["interpolate", ["linear"], ["zoom"], 13.5, 3, 16, 6],
@@ -51,7 +53,7 @@ export function StopLayer({ stops, reports }: { stops: Stop[]; reports: Report[]
       <Layer
         id={STOP_LAYER}
         type="circle"
-        minzoom={10.5}
+        minzoom={far ? 14 : 10.5}
         filter={["!=", ["get", "level"], "green"]}
         paint={{
           "circle-radius": [
