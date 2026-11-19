@@ -3,11 +3,15 @@
 
 import { timeAgo } from "@/lib/geo";
 import { useUi } from "@/store/ui";
-import type { CityBundle, Report } from "@/lib/types";
+import type { CityBundle, Report, Vehicle, VoteKind } from "@/lib/types";
 
 export interface BottomSheetProps {
   bundle: CityBundle;
   reports: Report[];
+  /** Opcional mientras CityApp no la pase: sin ella el ETA muestra "Sin datos". */
+  vehicles?: Vehicle[];
+  /** Opcional: sin ella los botones de voto quedan deshabilitados. */
+  onVote?: (reportId: string, kind: VoteKind) => void;
 }
 
 export function BottomSheet({ reports }: BottomSheetProps) {

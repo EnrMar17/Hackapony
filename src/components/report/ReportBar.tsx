@@ -4,12 +4,16 @@ import { useCallback, useEffect, useId, useState } from "react";
 import { BusFront, TriangleAlert, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RATE_LIMIT_MS, REPORT_BUTTONS } from "@/lib/constants";
-import type { IncidentKind, ReportType } from "@/lib/types";
+import type { GeolocationState, IncidentKind, NearestStopResult, ReportType } from "@/lib/types";
 import { IncidentPicker } from "./IncidentPicker";
 
 export interface ReportBarProps {
   onReport: (type: ReportType, incidentKind?: IncidentKind) => void;
   disabled?: boolean;
+  /** Opcional mientras CityApp no la pase: sin ella se asume "sin ubicación". */
+  geo?: GeolocationState;
+  /** Parada más cercana a la posición del usuario, o null si no hay. */
+  nearestStop?: NearestStopResult | null;
 }
 
 /** Ícono y color por tipo. El texto siempre sale de REPORT_BUTTONS. */
