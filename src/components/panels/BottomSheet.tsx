@@ -12,8 +12,6 @@ import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
 import { StopDetail } from "./StopDetail";
 import { AccessibleFilter } from "./AccessibleFilter";
-import { Legend } from "./Legend";
-import { ThemePicker } from "./ThemePicker";
 import { markReportsUpdated } from "./liveSync";
 import { useIsDesktop } from "./useIsDesktop";
 
@@ -22,14 +20,16 @@ export interface BottomSheetProps {
   reports: Report[];
   /** Opcional mientras CityApp no la pase: sin ella el ETA muestra "Sin datos". */
   vehicles?: Vehicle[];
+  /** Velocidad del simulador (sim.speed): la ETA debe coincidir con el globo del mapa a 2x o 5x. */
+  simSpeed?: number;
   /** Opcional: sin ella los botones de voto quedan deshabilitados. */
   onVote?: (reportId: string, kind: VoteKind) => void;
   loading?: boolean;
   error?: string | null;
   /** Para ordenar el estado de rutas: primero las que pasan cerca de ti. */
   userPosition?: LngLat | null;
-  /** Multiplicador del simulador, para el ETA de la parada. */
-  simSpeed?: number;
+  /** Id del usuario (useSession). Con él, en sus propios reportes no se ofrece votar (el servidor responde OWN_REPORT). */
+  userId?: string | null;
 }
 
 const CLOCK_MS = 30_000;
@@ -38,11 +38,12 @@ export function BottomSheet({
   bundle,
   reports,
   vehicles,
+  simSpeed = 1,
   onVote,
   loading = false,
   error = null,
   userPosition,
-  simSpeed = 1,
+  userId,
 }: BottomSheetProps) {
   const open = useUi((s) => s.sheetOpen);
   const setOpen = useUi((s) => s.setSheetOpen);
@@ -147,6 +148,7 @@ export function BottomSheet({
                   routes={bundle.routes}
                   now={now}
                   onVote={onVote}
+                  userId={userId}
                   loading={loading}
                   error={error}
                 />
@@ -179,8 +181,6 @@ export function BottomSheet({
                 loading={loading}
                 error={error}
               />
-              <Legend />
-              <ThemePicker />
             </div>
           </section>
         </div>

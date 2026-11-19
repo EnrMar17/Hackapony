@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, CircleCheck } from "lucide-react";
+import { ChevronDown, CircleCheck, Route as RouteIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive, timeAgo } from "@/lib/geo";
 import type { Report, ReportType, Route, RouteId } from "@/lib/types";
@@ -65,12 +65,23 @@ function FeedFilters({ type, onType, routeId, onRoute, counts, routes }: Filters
         ))}
       </div>
       {routes.length > 1 && (
-        <label className="block">
+        // Mismo formato que los chips: fondo suave, esquinas amplias y flecha propia (sin el estilo nativo).
+        <label className="relative block">
           <span className="sr-only">Filtrar por ruta</span>
+          <RouteIcon
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
+          />
           <select
             value={routeId}
             onChange={(e) => onRoute(e.target.value as RouteId | "all")}
-            className="min-h-12 w-full rounded-2xl bg-foreground/5 px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
+            className={cn(
+              "min-h-12 w-full cursor-pointer appearance-none rounded-full bg-foreground/5 pr-10 pl-10 text-sm font-semibold text-foreground",
+              "transition-colors duration-300 ease-out hover:bg-foreground/10",
+              "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+              // La lista que abre el navegador: colores del tema (en oscuro no sale blanca).
+              "[&>option]:bg-background [&>option]:font-medium [&>option]:text-foreground",
+            )}
           >
             <option value="all">Todas las rutas</option>
             {routes.map((r) => (
@@ -79,6 +90,10 @@ function FeedFilters({ type, onType, routeId, onRoute, counts, routes }: Filters
               </option>
             ))}
           </select>
+          <ChevronDown
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-muted-foreground"
+          />
         </label>
       )}
     </div>

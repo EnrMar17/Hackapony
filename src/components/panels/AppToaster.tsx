@@ -25,6 +25,18 @@ export function AppToaster() {
       offset={TOAST_OFFSET}
       mobileOffset={TOAST_OFFSET}
       containerAriaLabel="Notificaciones"
+      // Caja y texto con los tokens del tema: en oscuro la caja también se oscurece (no solo el texto).
+      toastOptions={{
+        classNames: {
+          toast: "bg-popover! text-popover-foreground! border-border! shadow-xl!",
+          title: "text-popover-foreground!",
+          description: "text-muted-foreground!",
+          // sonner deja estos botones en 24 px y sin transición de escala: 48 px y animación como el resto.
+          actionButton:
+            "bg-foreground! text-background! font-semibold! min-h-12! h-auto! px-4! text-sm! rounded-full! transition-[scale,opacity,box-shadow]! duration-300! ease-out!",
+          cancelButton: "bg-muted! text-foreground!",
+        },
+      }}
     />
   );
 }

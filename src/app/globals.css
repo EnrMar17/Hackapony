@@ -271,3 +271,17 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Botones: crecen un poco al pasar el mouse. Solo con mouse (no en táctil), nunca deshabilitados ni al presionar
+   (ahí manda active:scale-95). Usa `scale`, no `transform`, para no pisar translate (p. ej. la perilla del switch).
+   Fuera de @layer a propósito: así la transición incluye `scale` aunque el botón declare su propia lista. */
+@media (hover: hover) and (pointer: fine) {
+  button {
+    transition-property: scale, transform, opacity, filter, color, background-color, border-color, box-shadow;
+    transition-duration: 300ms;
+    transition-timing-function: var(--ease-out);
+  }
+  button:not(:disabled):not([aria-disabled="true"]):hover:not(:active) {
+    scale: 1.04;
+  }
+}
