@@ -7,6 +7,7 @@ import { isActive } from "@/lib/geo";
 import { useUi } from "@/store/ui";
 import type { CityBundle, LngLat, Report, Vehicle, VoteKind } from "@/lib/types";
 import { LiveClock } from "./LiveClock";
+import { NearestStopCard } from "./NearestStopCard";
 import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
@@ -139,6 +140,14 @@ export function BottomSheet({
 
             <div className="space-y-5 overflow-y-auto overscroll-contain px-4 pb-4">
               <LiveClock className="block text-xs text-muted-foreground lg:hidden" />
+              {/* Siempre arriba: la parada más cercana (o la del Tec si no hay ubicación). */}
+              <NearestStopCard
+                bundle={bundle}
+                reports={reports}
+                vehicles={vehicles}
+                simSpeed={simSpeed}
+                userPosition={userPosition}
+              />
               {selectedReport && (
                 <ReportDetail
                   key={selectedReport}
