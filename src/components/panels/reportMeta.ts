@@ -9,7 +9,8 @@ interface Look {
   className: string;
 }
 
-const TYPE_LOOK: Record<ReportType, Look> = {
+/** Mismo ícono y color que los botones de ReportBar. */
+export const TYPE_LOOK: Record<ReportType, Look> = {
   full: { icon: Users, className: "bg-peligro text-peligro-foreground" },
   passing: { icon: BusFront, className: "bg-info text-info-foreground" },
   incident: { icon: TriangleAlert, className: "bg-precaucion text-precaucion-foreground" },

@@ -4,6 +4,7 @@ import { Check, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import type { Route } from "@/lib/types";
+import { Onboarding } from "./Onboarding";
 
 export interface TopBarProps {
   routes: Route[];
@@ -73,6 +74,8 @@ export function TopBar({ routes, online }: TopBarProps) {
         <Users aria-hidden className="size-4 text-seguro" />
         <span className="tabular-nums">{online}</span> en línea
       </p>
+
+      <Onboarding />
     </div>
   );
 }
