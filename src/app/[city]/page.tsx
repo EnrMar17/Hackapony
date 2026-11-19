@@ -3,8 +3,9 @@ import { CityApp } from "./CityApp";
 
 async function CityRoute(props: PageProps<"/[city]">) {
   const { city } = await props.params;
-  const { admin } = await props.searchParams;
-  return <CityApp city={city} admin={admin === "1"} />;
+  const { admin, ruta, parada } = await props.searchParams;
+  const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+  return <CityApp city={city} admin={admin === "1"} initialRoute={first(ruta)} initialStop={first(parada)} />;
 }
 
 // Cache Components exige leer params/searchParams dentro de <Suspense>.

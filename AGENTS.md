@@ -47,10 +47,11 @@ El reparto de roles y tareas está en `PLAN_MAESTRO.md` (archivo local que Tony 
 - Si el contrato (types/constants/store) no alcanza, NO lo cambies: describe el cambio que necesitas para que Tony lo haga.
 
 ## Contrato de módulos (firmas fijas, las implementan sus dueños)
-- `src/lib/geo/*` (Kike): `snapToRoute`, `nearestStop`, `etaToStop`, `stopSafety`, `routeStatus`, `isActive`, `timeAgo`
+- `src/lib/geo/*` (Kike): `snapToRoute`, `nearestStop`, `etaToStop`, `stopSafety`, `routeStatus`, `isActive`, `timeAgo`, `reportConfidence`, `reportExpiresAt`
+- `src/lib/insights/*`, `src/components/admin/*`, `src/app/[city]/admin/*` (Kike): panel de operador (sugerencias a partir de los reportes)
 - `src/lib/simulator/*` (Kike): `simTimeMs`, `vehiclesAt`, `useVehicles`
 - `src/data/*` (Kike): `getCityBundle(city)` → rutas, paradas y configuración
-- `src/hooks/*` y `src/lib/supabase/*` (Cesar): `useSession`, `useReports`, `usePresenceCount`, `useSimConfig`, `useGeolocation`, `RealtimeProvider`
+- `src/hooks/*` y `src/lib/supabase/*` (Cesar): `useSession`, `useReports`, `usePresenceCount`, `useSimConfig`, `useGeolocation`, `RealtimeProvider`, `useReportHistory`
 - `src/components/map/*` (Tony): `TransitMap` y capas
 - `src/components/report/*`, `src/components/panels/*` (Paulo): UI de reporte y paneles
 - `src/components/simulator/*` (Kike): `SimulatorPanel`

@@ -1,15 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { getCityBundle } from "@/data";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { usePresenceCount } from "@/hooks/usePresenceCount";
 import { useReports } from "@/hooks/useReports";
 import { useSimConfig } from "@/hooks/useSimConfig";
+import { PRIVACY_SNAP_M, ROUTE_IDS } from "@/lib/constants";
 import { nearestStop } from "@/lib/geo";
 import { useVehicles } from "@/lib/simulator";
-import type { IncidentKind, ReportType, VoteKind } from "@/lib/types";
+import type { IncidentKind, ReportType, RouteId, VoteKind } from "@/lib/types";
+import { useUi } from "@/store/ui";
 import { TransitMap } from "@/components/map/TransitMap";
 import { BottomSheet } from "@/components/panels/BottomSheet";
 import { TopBar } from "@/components/panels/TopBar";
@@ -17,8 +19,24 @@ import { ReportBar } from "@/components/report/ReportBar";
 import { notifyReportSent } from "@/components/report/notifyReportSent";
 import { SimulatorPanel } from "@/components/simulator/SimulatorPanel";
 
-export function CityApp({ city, admin }: { city: string; admin: boolean }) {
+const round3 = (n: number) => Math.round(n * 1000) / 1000;
+
+interface CityAppProps {
+  city: string;
+  admin: boolean;
+  /** Enlaces compartibles: `?ruta=GRIS-1&parada=<id>` abren con eso seleccionado. */
+  initialRoute?: string;
+  initialStop?: string;
+}
+
+export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps) {
   const bundle = useMemo(() => getCityBundle(city), [city]);
+
+  useEffect(() => {
+    const { selectRoute, selectStop } = useUi.getState();
+    if (initialRoute && ROUTE_IDS.includes(initialRoute as RouteId)) selectRoute(initialRoute as RouteId);
+    if (initialStop && bundle.stops.some((s) => s.id === initialStop)) selectStop(initialStop);
+  }, [bundle.stops, initialRoute, initialStop]);
   const sim = useSimConfig();
   const vehicles = useVehicles(bundle.routes, sim);
   const { reports, loading, error, sendReport, vote, undo } = useReports();
@@ -31,8 +49,11 @@ export function CityApp({ city, admin }: { city: string; admin: boolean }) {
   );
 
   async function onReport(type: ReportType, incident_kind?: IncidentKind) {
-    const [lng, lat] = geo.position ?? bundle.center;
-    const near = nearestStop(bundle.stops, [lng, lat]);
+    const [gx, gy] = geo.position ?? bundle.center;
+    const near = nearestStop(bundle.stops, [gx, gy]);
+    // Privacidad: no guardamos la ubicación exacta. Cerca de una parada se guarda la parada; si no, se redondea (~110 m).
+    const [lng, lat] =
+      near && near.distanceM <= PRIVACY_SNAP_M ? [near.stop.lng, near.stop.lat] : [round3(gx), round3(gy)];
     try {
       const report = await sendReport({
         type,
@@ -57,7 +78,7 @@ export function CityApp({ city, admin }: { city: string; admin: boolean }) {
   return (
     <main className="relative h-dvh w-full overflow-hidden">
       <div className="absolute inset-0">
-        <TransitMap bundle={bundle} vehicles={vehicles} reports={reports} userPosition={geo.position} onLocateRequest={geo.request} />
+        <TransitMap bundle={bundle} vehicles={vehicles} reports={reports} userPosition={geo.position} onLocateRequest={geo.request} simSpeed={sim.speed} />
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-0 *:pointer-events-auto">
         <TopBar routes={bundle.routes} online={online} />

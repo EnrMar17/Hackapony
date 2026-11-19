@@ -6,6 +6,8 @@ export type IncidentKind = "accessibility" | "lighting" | "safety" | "other";
 export type OccupancyLevel = "low" | "medium" | "full";
 export type VoteKind = "confirm" | "resolved";
 export type SafetyLevel = "green" | "yellow" | "red";
+/** Sin confirmar = 1 persona; confirmado = el autor + al menos 1 persona más (`confirms >= CONFIRMED_MIN_CONFIRMS`). */
+export type ReportConfidence = "unconfirmed" | "confirmed";
 
 /** [longitud, latitud], el orden de GeoJSON y Mapbox. */
 export type LngLat = [number, number];
@@ -24,6 +26,8 @@ export interface Report {
   is_simulated: boolean;
   user_id: string | null;
   created_at: string; // ISO
+  /** Cuántas unidades vio quien reportó (dato opcional). Ausente o null = no se sabe. */
+  units?: number | null;
 }
 
 export interface NewReport {
@@ -33,6 +37,13 @@ export interface NewReport {
   lng: number;
   lat: number;
   incident_kind?: IncidentKind;
+  occupancy?: OccupancyLevel;
+  units?: number;
+}
+
+/** Datos opcionales que el autor agrega a su reporte justo después de enviarlo. */
+export interface ReportRefinement {
+  units?: number;
   occupancy?: OccupancyLevel;
 }
 
@@ -126,6 +137,8 @@ export interface ReportsState {
   sendReport: (input: NewReport) => Promise<Report>;
   vote: (reportId: string, kind: VoteKind) => Promise<void>;
   undo: (reportId: string) => Promise<void>;
+  /** Opcional hasta que Cesar lo implemente: agrega unidades u ocupación al reporte propio (primeros 60 s). */
+  refine?: (reportId: string, patch: ReportRefinement) => Promise<void>;
 }
 
 export interface SimControls extends SimConfig {
