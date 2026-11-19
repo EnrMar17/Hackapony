@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   description: "Mira las rutas de Morelia en vivo y reporta en un toque cómo va tu unidad y tu parada.",
   applicationName: "Ruta Segura",
   formatDetection: { telephone: false },
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
   appleWebApp: {
     capable: true,
     title: "Ruta Segura",
