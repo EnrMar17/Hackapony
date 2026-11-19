@@ -2,26 +2,36 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { FeatureCollection } from "geojson";
-import { CONFIRMED_MIN_CONFIRMS, REPORT_COLORS, REPORT_TTL_MS } from "@/lib/constants";
+import { CONFIRMED_MIN_CONFIRMS, REPORT_TTL_MS } from "@/lib/constants";
 import { isActive } from "@/lib/geo";
 import type { Report } from "@/lib/types";
 import { Layer, Source } from "./engine";
-import { clusterColors } from "./palette";
+import { REPORT_COLORS, clusterColors } from "./palette";
 
 export const REPORT_LAYER = "reports";
 export const REPORT_CLUSTER_LAYER = "reports-cluster";
 
+/** Color por tipo de reporte (una sola paleta: botones, lista y mapa). */
+const TYPE_COLOR = [
+  "match",
+  ["get", "type"],
+  "full",
+  REPORT_COLORS.full,
+  "passing",
+  REPORT_COLORS.passing,
+  REPORT_COLORS.incident,
+] as const;
+
 const PULSE_WINDOW_MS = 8_000;
 const PULSE_PERIOD_MS = 1_500;
-
-const TYPE_COLOR = ["match", ["get", "type"], "full", REPORT_COLORS.full, "passing", REPORT_COLORS.passing, REPORT_COLORS.incident];
 
 function reducedMotion(): boolean {
   return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /**
- * Reportes vigentes. Confirmados (autor + 1 persona): sólidos y grandes. Sin confirmar: anillo tenue.
+ * Reportes vigentes como pines de gota con el pictograma del tipo y el color de REPORT_COLORS.
+ * Confirmados (autor + 1 persona): sólidos y más grandes. Sin confirmar: pin hueco con borde punteado.
  * Los que están cerca se agrupan con un contador; los recién llegados pulsan unos segundos.
  */
 export function ReportLayer({ reports, iconsReady, dark }: { reports: Report[]; iconsReady: boolean; dark: boolean }) {
@@ -128,13 +138,13 @@ export function ReportLayer({ reports, iconsReady, dark }: { reports: Report[]; 
             type="symbol"
             filter={["!", ["has", "point_count"]]}
             layout={{
-              "icon-image": ["concat", "report-pin-", ["get", "type"], "-", ["case", ["get", "confirmed"], "c", "u"]],
+              "icon-image": ["concat", "pin-", ["get", "type"], ["case", ["get", "confirmed"], "-solid", "-faint"]],
               "icon-anchor": "bottom",
-              "icon-size": ["case", ["get", "confirmed"], 1.1, 0.9],
+              "icon-size": ["case", ["get", "confirmed"], 1, 0.85],
               "icon-allow-overlap": true,
               "icon-ignore-placement": true,
             }}
-            paint={{ "icon-opacity": ["case", ["get", "confirmed"], ["get", "opacity"], 0.85] }}
+            paint={{ "icon-opacity": ["get", "opacity"] }}
           />
         )}
       </Source>

@@ -27,7 +27,7 @@ const btn =
 
 export function DebugClient() {
   const session = useSession();
-  const { reports, loading, error, online, sendReport, vote, undo, refine } = useReports();
+  const { reports, loading, error, online, lastUpdateAt, sendReport, vote, undo, refine } = useReports();
   const presence = usePresenceCount();
 
   const [route, setRoute] = useState<RouteId>(ROUTE_IDS[0]);
@@ -82,6 +82,8 @@ export function DebugClient() {
           <dd>{presence}</dd>
           <dt>Reportes</dt>
           <dd>{reports.length}</dd>
+          <dt>Último dato</dt>
+          <dd>{lastUpdateAt ? ageLabel(new Date(lastUpdateAt).toISOString(), now) : "—"}</dd>
         </dl>
 
         {error && <p role="alert" className="rounded-lg bg-red-100 p-3 text-sm text-red-900">{error}</p>}

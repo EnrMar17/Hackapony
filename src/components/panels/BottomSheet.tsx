@@ -38,7 +38,7 @@ export function BottomSheet({
   bundle,
   reports,
   vehicles,
-  simSpeed,
+  simSpeed = 1,
   onVote,
   loading = false,
   error = null,

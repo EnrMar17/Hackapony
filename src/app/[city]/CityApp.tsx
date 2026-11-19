@@ -6,6 +6,7 @@ import { getCityBundle } from "@/data";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { usePresenceCount } from "@/hooks/usePresenceCount";
 import { useReports } from "@/hooks/useReports";
+import { useSession } from "@/hooks/useSession";
 import { useSimConfig } from "@/hooks/useSimConfig";
 import { ALL_ROUTES_ENABLED, DEFAULT_ROUTE_IDS, PRIVACY_SNAP_M, ROUTE_IDS } from "@/lib/constants";
 import { nearestStop } from "@/lib/geo";
@@ -16,8 +17,11 @@ import { TransitMap } from "@/components/map/TransitMap";
 import { BottomSheet } from "@/components/panels/BottomSheet";
 import { TopBar } from "@/components/panels/TopBar";
 import { ReportBar } from "@/components/report/ReportBar";
+import { voteErrorMessage } from "@/components/report/messages";
+import { notifyReportFailed } from "@/components/report/notifyReportFailed";
 import { notifyReportSent } from "@/components/report/notifyReportSent";
 import { SimulatorPanel } from "@/components/simulator/SimulatorPanel";
+import { Splash } from "@/components/splash/Splash";
 
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
 
@@ -57,7 +61,8 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
   }, [fullBundle.stops, initialRoute, initialStop]);
   const sim = useSimConfig();
   const vehicles = useVehicles(bundle.routes, sim);
-  const { reports: allReports, loading, error, sendReport, vote, undo } = useReports();
+  const { reports: allReports, loading, error, online: connected, sendReport, vote, undo, refine } = useReports();
+  const { userId } = useSession();
   const reports = useMemo(
     () => (showAll ? allReports : allReports.filter((r) => !r.route_id || DEFAULT_ROUTE_IDS.includes(r.route_id))),
     [allReports, showAll],
@@ -85,16 +90,26 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
         lat,
         incident_kind,
       });
-      notifyReportSent(report, () => {
-        undo(report.id).catch(() => toast.error("No se pudo deshacer"));
-      });
+      notifyReportSent(
+        report,
+        () => {
+          undo(report.id).catch(() => toast.error("No se pudo deshacer"));
+        },
+        refine
+          ? (patch) => {
+              refine(report.id, patch).catch(() => toast.error("No se pudo agregar el detalle"));
+            }
+          : undefined,
+      );
     } catch (e) {
-      toast.error(e instanceof Error && e.message === "RATE_LIMIT" ? "Espera 15 s para reportar de nuevo" : "No se pudo enviar");
+      notifyReportFailed(e, () => {
+        void onReport(type, incident_kind);
+      });
     }
   }
 
   function onVote(reportId: string, kind: VoteKind) {
-    vote(reportId, kind).catch(() => toast.error("No se pudo registrar tu voto"));
+    vote(reportId, kind).catch((e: unknown) => toast.error(voteErrorMessage(e)));
   }
 
   return (
@@ -103,7 +118,7 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
         <TransitMap bundle={bundle} vehicles={vehicles} reports={reports} userPosition={geo.position} onLocateRequest={geo.request} simSpeed={sim.speed} userAccuracyM={geo.accuracyM} />
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-0 *:pointer-events-auto">
-        <TopBar routes={bundle.routes} online={online} />
+        <TopBar routes={bundle.routes} online={online} connected={connected} />
         {admin && <SimulatorPanel sim={sim} stops={bundle.stops} sendReport={sendReport} />}
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 *:pointer-events-auto">
@@ -115,9 +130,12 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
           loading={loading}
           error={error}
           userPosition={geo.position}
+          simSpeed={sim.speed}
+          userId={userId}
         />
         <ReportBar onReport={onReport} geo={geo} nearestStop={nearest} />
       </div>
+      <Splash />
     </main>
   );
 }
