@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { POLL_INTERVAL_MS, RATE_LIMIT_MS, REPORT_TTL_MS } from "@/lib/constants";
+import { syncClock, toLocalIso } from "@/lib/supabase/clock";
 import { getSupabase } from "@/lib/supabase/client";
 import { ensureSession } from "@/lib/supabase/session";
 import type {
@@ -50,7 +51,7 @@ function fromRow(r: ReportRow): Report {
     resolved: r.resolved,
     is_simulated: r.is_simulated,
     user_id: r.user_id,
-    created_at: r.created_at,
+    created_at: toLocalIso(r.created_at),
   };
 }
 
@@ -116,11 +117,13 @@ export function useReports(): ReportsState {
     let channel: RealtimeChannel | null = null;
 
     (async () => {
+      const clock = syncClock(); // en paralelo con el login; no lanza
       try {
         userIdRef.current = await ensureSession();
       } catch {
         // Las lecturas son públicas: seguimos sin sesión; enviar reportes sí fallará.
       }
+      await clock; // antes de leer, para convertir las fechas del servidor al reloj local
       try {
         const list = await fetchReports();
         if (active) {
