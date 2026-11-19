@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, FlaskConical, Inbox, X } from "lucide-react";
+import { ChevronDown, Inbox, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive } from "@/lib/geo";
 import { useUi } from "@/store/ui";
 import type { CityBundle, LngLat, Report, Vehicle, VoteKind } from "@/lib/types";
 import { LiveClock } from "./LiveClock";
+import { NearestStopCard } from "./NearestStopCard";
 import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
@@ -70,7 +71,6 @@ export function BottomSheet({
   }, [visible]);
 
   const activeCount = reports.filter((r) => isActive(r, now)).length;
-  const hasSimulated = reports.some((r) => r.is_simulated);
 
   function close() {
     selectStop(null);
@@ -140,6 +140,14 @@ export function BottomSheet({
 
             <div className="space-y-5 overflow-y-auto overscroll-contain px-4 pb-4">
               <LiveClock className="block text-xs text-muted-foreground lg:hidden" />
+              {/* Siempre arriba: la parada más cercana (o la del Tec si no hay ubicación). */}
+              <NearestStopCard
+                bundle={bundle}
+                reports={reports}
+                vehicles={vehicles}
+                simSpeed={simSpeed}
+                userPosition={userPosition}
+              />
               {selectedReport && (
                 <ReportDetail
                   key={selectedReport}
@@ -163,12 +171,6 @@ export function BottomSheet({
                   loading={loading}
                   error={error}
                 />
-              )}
-              {hasSimulated && (
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <FlaskConical aria-hidden className="size-3.5 shrink-0" />
-                  Datos de demostración: algunos reportes son simulados.
-                </p>
               )}
               <AccessibleFilter />
               <RouteStatusCard routes={bundle.routes} reports={reports} loading={loading} error={error} userPosition={userPosition} />
