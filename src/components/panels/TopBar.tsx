@@ -23,6 +23,12 @@ export interface TopBarProps {
 export function TopBar({ routes, online, connected }: TopBarProps) {
   const selected = useUi((s) => s.selectedRoute);
   const selectRoute = useUi((s) => s.selectRoute);
+  const selectedTrip = useUi((s) => s.selectedTrip);
+
+  // Elegir un viaje en "¿A dónde vas?" también elige esa ruta aquí arriba (un solo filtro de ruta en la app).
+  useEffect(() => {
+    if (selectedTrip) selectRoute(selectedTrip);
+  }, [selectedTrip, selectRoute]);
   const deviceOnline = useDeviceOnline();
   const [helpOpen, setHelpOpen] = useState(false);
   // Sin red del dispositivo no hay conexión; con red, manda lo que diga useReports si CityApp lo pasa.

@@ -3,12 +3,12 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ChevronDown, Inbox, Navigation, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isActive } from "@/lib/geo";
+import { isActive, nearestStop } from "@/lib/geo";
+import { MAP_CENTER } from "@/lib/constants";
 import { useUi } from "@/store/ui";
 import type { CityBundle, LngLat, Report, Vehicle, VoteKind } from "@/lib/types";
 import { SplashLogo } from "@/components/splash/SplashLogo";
 import { LiveClock } from "./LiveClock";
-import { NearestStopCard } from "./NearestStopCard";
 import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
@@ -77,6 +77,24 @@ export function BottomSheet({
 
   const activeCount = reports.filter((r) => isActive(r, now)).length;
 
+  // Parada que se muestra: la elegida; si no hay, la más cercana a ti o, sin ubicación, la del Tec.
+  const nearest = nearestStop(bundle.stops, userPosition ?? MAP_CENTER);
+  const featured = selectedStop
+    ? {
+        stopId: selectedStop,
+        label: selectedStop === nearest?.stop.id && userPosition ? "Tu parada más cercana" : "Parada seleccionada",
+        distanceM: selectedStop === nearest?.stop.id && userPosition ? nearest.distanceM : null,
+        hint: undefined,
+      }
+    : nearest
+      ? {
+          stopId: nearest.stop.id,
+          label: userPosition ? "Tu parada más cercana" : "Parada del Tec",
+          distanceM: userPosition ? nearest.distanceM : null,
+          hint: userPosition ? undefined : "Activa tu ubicación para ver la parada más cercana a ti.",
+        }
+      : null;
+
   function close() {
     selectStop(null);
     selectReport(null);
@@ -139,8 +157,8 @@ export function BottomSheet({
             inert={!visible}
             className="glass pointer-events-auto mx-2 mb-2 flex max-h-[55dvh] flex-col rounded-3xl shadow-[0_-8px_24px_rgb(15_23_42/0.12)] lg:m-0 lg:h-full lg:max-h-none lg:shadow-xl"
           >
-            <div className="flex min-h-14 items-center justify-between px-4 pt-2 lg:pt-3">
-              <span aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/15 lg:hidden" />
+            {/* En celular un solo control centrado (la flecha para cerrar); en escritorio, logo y X a la derecha. */}
+            <div className="flex min-h-12 items-center justify-center px-4 pt-1 lg:min-h-14 lg:justify-between lg:pt-3">
               <div className="hidden items-center gap-3 lg:flex">
                 <SplashLogo className="size-10 shrink-0" />
                 <div>
@@ -153,11 +171,11 @@ export function BottomSheet({
                 type="button"
                 onClick={close}
                 className={cn(
-                  "-mr-2 flex size-12 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring lg:w-auto lg:gap-1.5 lg:px-3",
+                  "flex h-12 w-16 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring lg:-mr-2 lg:w-auto lg:gap-1.5 lg:px-3",
                   !hasSelection && "lg:hidden",
                 )}
               >
-                <ChevronDown aria-hidden className="size-5 lg:hidden" />
+                <ChevronDown aria-hidden className="size-6 lg:hidden" />
                 {/* En escritorio dice qué cierra (la parada o el reporte elegido), para no confundirse con el del viaje. */}
                 <X aria-hidden className="hidden size-4 lg:block" />
                 <span className="sr-only lg:not-sr-only lg:text-sm lg:font-semibold">
@@ -169,14 +187,6 @@ export function BottomSheet({
             <div className="space-y-5 overflow-y-auto overscroll-contain px-4 pb-4">
               <LiveClock className="block text-xs text-muted-foreground lg:hidden" />
               <div className="pt-3">{tripSlot}</div>
-              {/* Siempre arriba: la parada más cercana (o la del Tec si no hay ubicación). */}
-              <NearestStopCard
-                bundle={bundle}
-                reports={reports}
-                vehicles={vehicles}
-                simSpeed={simSpeed}
-                userPosition={userPosition}
-              />
               {selectedReport && (
                 <ReportDetail
                   key={selectedReport}
@@ -190,13 +200,18 @@ export function BottomSheet({
                   error={error}
                 />
               )}
-              {selectedStop && (
+              {/* Una sola parada, con toda su información: la elegida o, si no hay, la más cercana (o la del Tec). */}
+              {featured && (
                 <StopDetail
+                  key={featured.stopId}
                   bundle={bundle}
-                  stopId={selectedStop}
+                  stopId={featured.stopId}
                   reports={reports}
                   vehicles={vehicles}
                   simSpeed={simSpeed}
+                  label={featured.label}
+                  distanceM={featured.distanceM}
+                  hint={featured.hint}
                   loading={loading}
                   error={error}
                 />
