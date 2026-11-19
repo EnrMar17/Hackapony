@@ -22,6 +22,8 @@ export interface BottomSheetProps {
   reports: Report[];
   /** Opcional mientras CityApp no la pase: sin ella el ETA muestra "Sin datos". */
   vehicles?: Vehicle[];
+  /** Velocidad del simulador (sim.speed): la ETA debe coincidir con el globo del mapa a 2x o 5x. */
+  simSpeed?: number;
   /** Opcional: sin ella los botones de voto quedan deshabilitados. */
   onVote?: (reportId: string, kind: VoteKind) => void;
   loading?: boolean;
@@ -38,6 +40,7 @@ export function BottomSheet({
   bundle,
   reports,
   vehicles,
+  simSpeed,
   onVote,
   loading = false,
   error = null,
@@ -158,6 +161,7 @@ export function BottomSheet({
                   stopId={selectedStop}
                   reports={reports}
                   vehicles={vehicles}
+                  simSpeed={simSpeed}
                   loading={loading}
                   error={error}
                 />

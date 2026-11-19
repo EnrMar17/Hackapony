@@ -14,6 +14,8 @@ export interface StopDetailProps {
   reports: Report[];
   /** Sin vehículos (CityApp aún no los pasa) el ETA dice "Sin datos". */
   vehicles?: Vehicle[];
+  /** Velocidad del simulador; sin ella se asume 1x. */
+  simSpeed?: number;
   loading?: boolean;
   error?: string | null;
 }
@@ -44,7 +46,7 @@ function shareText(city: string, stop: Stop, routeName: string, routeId: string)
   return `Parada ${stop.name} · ${routeName} · ${url}`;
 }
 
-export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }: StopDetailProps) {
+export function StopDetail({ bundle, stopId, reports, vehicles, simSpeed = 1, loading, error }: StopDetailProps) {
   if (loading) return <PanelLoading rows={3} />;
   if (error) return <PanelError text="No pudimos cargar la parada." />;
 
@@ -57,7 +59,7 @@ export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }
   const stopReports = reports
     .filter((r) => r.stop_id === stop.id && isActive(r))
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
-  const eta = formatEta(route && vehicles ? etaToStop(route, stop, vehicles) : null);
+  const eta = formatEta(route && vehicles ? etaToStop(route, stop, vehicles, simSpeed) : null);
 
   return (
     <section aria-labelledby="stop-title" className="space-y-3">
