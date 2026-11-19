@@ -292,3 +292,56 @@ export function etaToProgress(route: Route, progress: number, vehicles: Vehicle[
   const mps = VEHICLE_SPEED_MS * speed;
   return Math.round(Math.min(...mine.map((v) => (positiveMod(progress - v.progress, 1) * totalM) / mps)));
 }
+
+// ───────────── Unidades que van llenas ─────────────
+
+/** Qué tan cerca (fracción del circuito, ~1 km) debe estar la unidad de donde se avisó para ser "la que va llena". */
+const FULL_MATCH = 0.02;
+
+const circularGap = (a: number, b: number) => {
+  const d = Math.abs(a - b) % 1;
+  return Math.min(d, 1 - d);
+};
+
+/**
+ * Unidades que, según un aviso vigente de "Unidad llena", van llenas. Se ubica cuál unidad estaba en el lugar
+ * del aviso cuando se mandó (retrocediendo lo que ha avanzado desde entonces) y esa es la que se marca.
+ * Devuelve id de unidad → aviso (si hay varios, el confirmado o el más reciente).
+ */
+export function fullVehicles(
+  routes: Route[],
+  stops: Stop[],
+  vehicles: Vehicle[],
+  reports: Report[],
+  speed = 1,
+  now = Date.now(),
+): Map<string, Report> {
+  const out = new Map<string, Report>();
+  const stopById = new Map(stops.map((s) => [s.id, s]));
+  for (const r of reports) {
+    if (r.type !== "full" || !r.route_id || !isActive(r, now)) continue;
+    const route = routes.find((x) => x.id === r.route_id);
+    if (!route) continue;
+    const own = r.stop_id ? stopById.get(r.stop_id) : undefined;
+    const at = typeof own?.progress === "number" ? [own.progress] : passProgresses(route, [r.lng, r.lat], 150);
+    if (at.length === 0) continue;
+    const { totalM } = routeGeometry(route);
+    const ageSec = Math.max(0, (now - new Date(r.created_at).getTime()) / 1000);
+    const travelled = (VEHICLE_SPEED_MS * speed * ageSec) / totalM;
+    let best: { id: string; gap: number } | null = null;
+    for (const v of vehicles) {
+      if (v.route_id !== route.id) continue;
+      const then = positiveMod(v.progress - travelled, 1);
+      for (const p of at) {
+        const gap = circularGap(then, p);
+        if (!best || gap < best.gap) best = { id: v.id, gap };
+      }
+    }
+    if (!best || best.gap > FULL_MATCH) continue;
+    const prev = out.get(best.id);
+    if (!prev || r.confirms > prev.confirms || (r.confirms === prev.confirms && r.created_at > prev.created_at)) {
+      out.set(best.id, r);
+    }
+  }
+  return out;
+}

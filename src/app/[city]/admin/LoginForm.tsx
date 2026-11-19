@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { Lock } from "lucide-react";
+import { SplashLogo } from "@/components/splash/SplashLogo";
 import { login, type LoginState } from "./actions";
 
 export const ADMIN_TITLE = "Movilidad y Transporte - Morelia, Michoacán";
@@ -11,7 +11,7 @@ export function LoginForm() {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center gap-6 p-4">
       <header className="space-y-2 text-center">
-        <Lock aria-hidden className="mx-auto size-8 text-muted-foreground" />
+        <SplashLogo className="mx-auto size-16" />
         <h1 className="text-2xl font-semibold">{ADMIN_TITLE}</h1>
         <p className="text-sm text-muted-foreground">Acceso para la comisión organizadora.</p>
       </header>

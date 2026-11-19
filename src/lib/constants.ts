@@ -38,7 +38,7 @@ export const RATE_LIMIT_MS = 15_000;
 
 /** Cuánto tiempo sigue vigente un reporte, por tipo (ajustable). */
 export const REPORT_TTL_MS: Record<ReportType, number> = {
-  full: 20 * 60_000,
+  full: 10 * 60_000,
   passing: 5 * 60_000,
   incident: 60 * 60_000,
 };
