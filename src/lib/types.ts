@@ -66,6 +66,12 @@ export interface Stop {
   has_light: boolean;
   has_ramp: boolean;
   has_roof: boolean;
+  /**
+   * Avance (0 a 1) del circuito en el que la ruta sirve a esta parada: su SENTIDO. Si el circuito recorre
+   * la calle de ida y de vuelta, la parada solo pertenece a una de las dos pasadas y el ETA no debe contar
+   * las unidades del sentido contrario. Se genera con `scripts/assign-stop-progress.mjs`.
+   */
+  progress?: number;
 }
 
 export interface Vehicle {

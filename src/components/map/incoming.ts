@@ -29,7 +29,8 @@ export function incomingUnit(
   // El circuito puede pasar por la parada más de una vez: se toma el paso más cercano de cada unidad.
   const { totalM } = routeGeometry(route);
   const point: [number, number] = [stop.lng, stop.lat];
-  const passes = passProgresses(route, point);
+  // Una parada sirve a UN sentido (`stop.progress`): solo esa pasada cuenta; sin él, todas.
+  const passes = typeof stop.progress === "number" ? [stop.progress] : passProgresses(route, point);
   const progresses = passes.length > 0 ? passes : [snapToRoute(route, point).progress];
 
   let best: { id: string; distM: number } | null = null;
