@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ChevronDown, Inbox, Navigation, X } from "lucide-react";
+import { ChevronDown, Inbox, Navigation, Radio, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive, nearestStop } from "@/lib/geo";
 import { MAP_CENTER } from "@/lib/constants";
@@ -179,7 +179,13 @@ export function BottomSheet({
               <div className="hidden items-center gap-3 lg:flex">
                 <SplashLogo className="size-10 shrink-0" />
                 <div>
-                  <p className="text-base font-bold">Ruta Segura · en vivo</p>
+                  <p className="flex items-center gap-2 text-base font-bold">
+                    Ruta Segura · ProjeXus
+                    <span className="inline-flex items-center text-red-600 dark:text-red-400">
+                      <Radio aria-hidden className="size-4 animate-pulse motion-reduce:animate-none" strokeWidth={2.5} />
+                      <span className="sr-only">En vivo</span>
+                    </span>
+                  </p>
                   <LiveClock className="text-xs text-muted-foreground" />
                 </div>
               </div>

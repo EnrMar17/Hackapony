@@ -65,7 +65,6 @@ export function SimSpeedControls({ sim }: { sim: SimControls }) {
           className="mt-1 h-12 w-full accent-slate-900"
         />
       </label>
-      <p className="text-xs text-slate-700">Normal: {Math.round(BASE_SPEED_KMH)} km/h (1x). El cambio llega a todos los dispositivos al instante.</p>
     </div>
   );
 }

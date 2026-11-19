@@ -15,6 +15,7 @@ import { REPORT_CLUSTER_LAYER, REPORT_LAYER, ReportLayer } from "./ReportLayer";
 import { ReportPopup } from "./ReportPopup";
 import { ROUTE_LINE_LAYER, RouteLayers } from "./RouteLayers";
 import { STOP_LAYERS, StopLayer } from "./StopLayer";
+import { fullVehicles } from "@/lib/geo";
 import { StopEtaChip } from "./StopEtaChip";
 import { DestinationBar } from "./DestinationBar";
 import { TripLayer } from "./TripLayer";
@@ -107,6 +108,11 @@ export function TransitMap({
   const incoming = useMemo(
     () => incomingUnit(bundle, vehicles, selectedStopId, simSpeed),
     [bundle, vehicles, selectedStopId, simSpeed],
+  );
+  // Unidades que van llenas según los avisos vigentes.
+  const fullIds = useMemo(
+    () => [...fullVehicles(bundle.routes, bundle.stops, vehicles, reports, simSpeed).keys()],
+    [bundle.routes, bundle.stops, vehicles, reports, simSpeed],
   );
   // En modo denso solo se ven las unidades de la ruta elegida, o las de la ruta de la parada elegida.
   const stopRouteId = incoming?.route.id ?? null;
@@ -257,7 +263,7 @@ export function TransitMap({
         <TripLayer trip={trip} destination={destination} dark={dark} />
         <StopLayer stops={bundle.stops} reports={reports} dense={dense} dark={dark} />
         <ReportLayer reports={mapReports} iconsReady={imagesReady} dark={dark} />
-        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} dark={dark} highlightId={incoming?.vehicleId ?? null} />
+        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} dark={dark} highlightId={incoming?.vehicleId ?? null} fullIds={fullIds} />
         <StopEtaChip incoming={incoming} />
         <UserLocation position={userPosition} accuracyM={userAccuracyM} />
         {selectedReport && <ReportPopup report={selectedReport} onClose={() => selectReport(null)} />}

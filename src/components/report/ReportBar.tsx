@@ -5,14 +5,17 @@ import { BusFront, TriangleAlert, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import { RATE_LIMIT_MS, REPORT_BUTTONS } from "@/lib/constants";
-import type { GeolocationState, IncidentKind, NearestStopResult, ReportType } from "@/lib/types";
+import type { GeolocationState, IncidentKind, NearestStopResult, ReportType, RouteId } from "@/lib/types";
 import { DESKTOP_QUERY } from "@/components/panels/useIsDesktop";
 import { onReportCooldownReset } from "./cooldown";
 import { IncidentPicker } from "./IncidentPicker";
 import { LocationChip } from "./LocationChip";
+import { RoutePicker, type RouteChoice } from "./RoutePicker";
 
 export interface ReportBarProps {
-  onReport: (type: ReportType, incidentKind?: IncidentKind) => void;
+  onReport: (type: ReportType, incidentKind?: IncidentKind, routeId?: RouteId) => void;
+  /** Rutas entre las que se elige al reportar "Unidad llena" o "pasando aquí" (las más cercanas primero). */
+  routeChoices?: RouteChoice[];
   disabled?: boolean;
   /** Opcional mientras CityApp no la pase: sin ella se asume "sin ubicación". */
   geo?: GeolocationState;
@@ -35,12 +38,13 @@ function vibrate() {
   }
 }
 
-export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarProps) {
+export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestStop }: ReportBarProps) {
   // Cooldown local: CityApp no nos pasa el estado del límite, así que lo llevamos aquí.
   // `round` cambia en cada reporte y reinicia el reloj del efecto.
   const [round, setRound] = useState(0);
   const [remainingMs, setRemainingMs] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [routePicker, setRoutePicker] = useState<"full" | "passing" | null>(null);
   const pickerId = useId();
   const closePicker = useCallback(() => setPickerOpen(false), []);
   const selectStop = useUi((s) => s.selectStop);
@@ -99,19 +103,26 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
   const seconds = Math.ceil(remainingMs / 1000);
   const blocked = Boolean(disabled) || coolingDown;
 
-  function send(type: ReportType, incidentKind?: IncidentKind) {
+  function send(type: ReportType, incidentKind?: IncidentKind, routeId?: RouteId) {
     if (blocked) return;
     vibrate();
     setPickerOpen(false);
+    setRoutePicker(null);
     setRemainingMs(RATE_LIMIT_MS);
     setRound((r) => r + 1);
-    onReport(type, incidentKind);
+    onReport(type, incidentKind, routeId);
   }
 
   function handleTap(type: ReportType) {
     // "Incidencia / Accesibilidad" primero pide el tipo; los otros envían en un toque.
-    if (type === "incident") setPickerOpen((open) => !open);
-    else send(type);
+    if (type === "incident") {
+      setRoutePicker(null);
+      setPickerOpen((open) => !open);
+    } else if (routeChoices.length > 0) {
+      // "Llena" y "pasando" primero preguntan en qué ruta: así el aviso no queda a la deriva.
+      setPickerOpen(false);
+      setRoutePicker((open) => (open === type ? null : type));
+    } else send(type);
   }
 
   return (
@@ -145,6 +156,16 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
         <LocationChip geo={geo} nearestStop={nearestStop} onOpenStop={selectStop} />
       </div>
 
+      {routePicker && !blocked && (
+        <RoutePicker
+          id={`${pickerId}-route`}
+          type={routePicker}
+          choices={routeChoices}
+          onSelect={(routeId) => send(routePicker, undefined, routeId)}
+          onClose={() => setRoutePicker(null)}
+        />
+      )}
+
       {pickerOpen && !blocked && (
         <IncidentPicker
           id={pickerId}
@@ -164,7 +185,7 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
               type="button"
               disabled={blocked}
               onClick={() => handleTap(b.type)}
-              aria-expanded={isPicker ? pickerOpen : undefined}
+              aria-expanded={isPicker ? pickerOpen : routePicker === b.type}
               aria-controls={isPicker && pickerOpen ? pickerId : undefined}
               className={cn(
                 "flex h-14 flex-col items-center justify-center gap-0.5 rounded-2xl px-1.5 text-center text-[13px] leading-tight font-semibold shadow-sm",

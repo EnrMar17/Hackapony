@@ -4,14 +4,20 @@ import { useMemo } from "react";
 import type { Feature, FeatureCollection } from "geojson";
 import { ROUTE_COLORS } from "@/lib/constants";
 import type { Destination, LngLat, TripOption } from "@/lib/types";
-import { Layer, Source } from "./engine";
-import { casingColor, routeColor } from "./palette";
+import { Layer, Popup, Source } from "./engine";
+import { POPUP_CLASS, casingColor, routeColor } from "./palette";
 
 /** Colores propios del viaje (no se usan en otra parte del mapa). */
 const BOARD_COLOR = "#15803d";
 const ALIGHT_COLOR = "#b91c1c";
-/** El tiempo aproximado va en violeta: nada más en el mapa lo usa, así resalta sobre cualquier ruta. */
-const TIME_COLOR = "#6d28d9";
+/** Globos de las etiquetas: igual que el de las alertas, pero sin atrapar toques (el mapa responde debajo). */
+const LABEL = {
+  closeButton: false,
+  closeOnClick: false,
+  focusAfterOpen: false,
+  className: `${POPUP_CLASS} pointer-events-none`,
+  maxWidth: "220px",
+} as const;
 
 const truncate = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
@@ -42,18 +48,18 @@ export function TripLayer({
 
   const points = useMemo<FeatureCollection>(() => {
     const features: Feature[] = [];
-    const point = (kind: string, label: string, coordinates: LngLat) =>
-      features.push({ type: "Feature", properties: { kind, label }, geometry: { type: "Point", coordinates } });
+    const point = (kind: string, coordinates: LngLat) =>
+      features.push({ type: "Feature", properties: { kind }, geometry: { type: "Point", coordinates } });
     if (trip) {
-      point("board", "Subes aquí", trip.board.point);
-      point("alight", "Bajas aquí", trip.alight.point);
-      const mid = Math.round((trip.rideMinMin + trip.rideMaxMin) / 2);
-      point("time", `~${mid} min`, trip.segment[Math.floor(trip.segment.length / 2)]);
+      point("board", trip.board.point);
+      point("alight", trip.alight.point);
     }
-    if (destination) point("dest", truncate(destination.label, 30), destination.point);
+    if (destination) point("dest", destination.point);
     return { type: "FeatureCollection", features };
   }, [trip, destination]);
 
+  const mid = trip ? trip.segment[Math.floor(trip.segment.length / 2)] : null;
+  const midMin = trip ? Math.round((trip.rideMinMin + trip.rideMaxMin) / 2) : 0;
   const ink = dark ? "#f8fafc" : "#0f172a";
   const halo = dark ? "#0b1220" : "#ffffff";
 
@@ -77,7 +83,6 @@ export function TripLayer({
         <Layer
           id="trip-points-dot"
           type="circle"
-          filter={["!=", ["get", "kind"], "time"]}
           paint={{
             // Subes = verde, bajas = rojo, destino = oscuro: se distinguen de un vistazo.
             "circle-radius": ["match", ["get", "kind"], "dest", 9, 12],
@@ -86,33 +91,28 @@ export function TripLayer({
             "circle-stroke-width": 4,
           }}
         />
-        <Layer
-          id="trip-points-label"
-          type="symbol"
-          layout={{
-            "text-field": ["get", "label"],
-            "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-            "text-size": ["match", ["get", "kind"], "time", 22, "dest", 13, 15],
-            // "Subes aquí" debajo de su punto, "Bajas aquí" arriba y el destino debajo, para que no se encimen.
-            "text-anchor": ["match", ["get", "kind"], "time", "center", "alight", "bottom", "top"],
-            "text-offset": [
-              "match",
-              ["get", "kind"],
-              "time",
-              ["literal", [0, 0]],
-              "alight",
-              ["literal", [0, -1.4]],
-              ["literal", [0, 1.4]],
-            ],
-            "text-allow-overlap": true,
-          }}
-          paint={{
-            "text-color": ["match", ["get", "kind"], "dest", ink, "#ffffff"],
-            "text-halo-color": ["match", ["get", "kind"], "time", TIME_COLOR, "board", BOARD_COLOR, "alight", ALIGHT_COLOR, halo],
-            "text-halo-width": ["match", ["get", "kind"], "time", 7, "dest", 2.4, 5],
-          }}
-        />
       </Source>
+      {trip && mid && (
+        <>
+          <Popup {...LABEL} longitude={trip.board.point[0]} latitude={trip.board.point[1]} anchor="top" offset={14}>
+            <p className="p-1 text-sm font-semibold">Subes aquí</p>
+          </Popup>
+          <Popup {...LABEL} longitude={trip.alight.point[0]} latitude={trip.alight.point[1]} anchor="bottom" offset={14}>
+            <p className="p-1 text-sm font-semibold">Bajas aquí</p>
+          </Popup>
+          <Popup {...LABEL} longitude={mid[0]} latitude={mid[1]} anchor="center">
+            <p className="p-1 text-sm">
+              <span className="font-semibold tabular-nums">~{midMin} min</span>
+              <span className="block text-xs text-muted-foreground">estimado</span>
+            </p>
+          </Popup>
+        </>
+      )}
+      {destination && (
+        <Popup {...LABEL} longitude={destination.point[0]} latitude={destination.point[1]} anchor="top" offset={14}>
+          <p className="p-1 text-sm font-semibold">{truncate(destination.label, 30)}</p>
+        </Popup>
+      )}
     </>
   );
 }

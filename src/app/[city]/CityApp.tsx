@@ -8,8 +8,8 @@ import { usePresenceCount } from "@/hooks/usePresenceCount";
 import { useReports } from "@/hooks/useReports";
 import { useSession } from "@/hooks/useSession";
 import { useSimConfig } from "@/hooks/useSimConfig";
-import { ALL_ROUTES_ENABLED, DEFAULT_ROUTE_IDS, PRIVACY_SNAP_M, ROUTE_IDS } from "@/lib/constants";
-import { nearestStop } from "@/lib/geo";
+import { ALL_ROUTES_ENABLED, DEFAULT_ROUTE_IDS, PRIVACY_SNAP_M, ROUTE_IDS, ROUTE_NEAR_M } from "@/lib/constants";
+import { nearestStop, routesNear, snapToRoute } from "@/lib/geo";
 import { useVehicles } from "@/lib/simulator";
 import { placeLabel } from "@/lib/trip/search";
 import { useTripOptions } from "@/lib/trip/useTripOptions";
@@ -23,7 +23,9 @@ import { useNotices } from "@/hooks/useNotices";
 import { useStopWaiting } from "@/hooks/useStopWaiting";
 import { TopBar } from "@/components/panels/TopBar";
 import { TripPanel } from "@/components/trip/TripPanel";
+import { resetReportCooldown } from "@/components/report/cooldown";
 import { ReportBar } from "@/components/report/ReportBar";
+import type { RouteChoice } from "@/components/report/RoutePicker";
 import { voteErrorMessage } from "@/components/report/messages";
 import { notifyReportFailed } from "@/components/report/notifyReportFailed";
 import { notifyReportSent } from "@/components/report/notifyReportSent";
@@ -121,16 +123,39 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
     }
   }, [selectedTrip]);
 
-  async function onReport(type: ReportType, incident_kind?: IncidentKind) {
-    const [gx, gy] = geo.position ?? bundle.center;
-    const near = nearestStop(bundle.stops, [gx, gy]);
+  // Rutas entre las que se elige al reportar "llena" / "pasando": las que pasan cerca de ti (la elegida arriba, primero);
+  // sin ubicación, las que se ven en el mapa.
+  const selectedRouteId = useUi((s) => s.selectedRoute);
+  const routeChoices = useMemo<RouteChoice[]>(() => {
+    const near = geo.position ? routesNear(bundle.routes, geo.position, ROUTE_NEAR_M) : [];
+    const list: RouteChoice[] =
+      near.length > 0
+        ? near.map((n) => ({ id: n.route.id, name: n.route.name, distanceM: n.distanceM }))
+        : bundle.routes.map((r) => ({ id: r.id, name: r.name }));
+    return [...list.filter((c) => c.id === selectedRouteId), ...list.filter((c) => c.id !== selectedRouteId)].slice(0, 4);
+  }, [bundle.routes, geo.position, selectedRouteId]);
+
+  async function onReport(type: ReportType, incident_kind?: IncidentKind, routeId?: RouteId) {
+    // Sin GPS se usa la parada elegida; sin ninguna de las dos no se envía (antes caía en el centro del mapa).
+    const picked = useUi.getState().selectedStop;
+    const pickedStop = picked ? bundle.stops.find((s) => s.id === picked) : undefined;
+    const here: LngLat | null = geo.position ?? (pickedStop ? [pickedStop.lng, pickedStop.lat] : null);
+    if (!here) {
+      resetReportCooldown();
+      toast.error("Activa tu ubicación o toca una parada en el mapa para reportar");
+      return;
+    }
+    const route = routeId ? bundle.routes.find((r) => r.id === routeId) : undefined;
+    // Con ruta elegida el aviso se queda en esa ruta (punto sobre su trazo y su parada más cercana).
+    const [px, py] = route ? snapToRoute(route, here).point : here;
+    const near = nearestStop(route ? bundle.stops.filter((s) => s.route_id === route.id) : bundle.stops, [px, py]);
     // Privacidad: no guardamos la ubicación exacta. Cerca de una parada se guarda la parada; si no, se redondea (~110 m).
     const [lng, lat] =
-      near && near.distanceM <= PRIVACY_SNAP_M ? [near.stop.lng, near.stop.lat] : [round3(gx), round3(gy)];
+      near && near.distanceM <= PRIVACY_SNAP_M ? [near.stop.lng, near.stop.lat] : [round3(px), round3(py)];
     try {
       const report = await sendReport({
         type,
-        route_id: near?.stop.route_id ?? null,
+        route_id: route?.id ?? near?.stop.route_id ?? null,
         stop_id: near?.stop.id ?? null,
         lng,
         lat,
@@ -149,7 +174,7 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
       );
     } catch (e) {
       notifyReportFailed(e, () => {
-        void onReport(type, incident_kind);
+        void onReport(type, incident_kind, routeId);
       });
     }
   }
@@ -202,7 +227,7 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
           noticesSlot={<NoticeBanner notices={notices} routes={fullBundle.routes} />}
           tripSlot={<TripPanel stops={tripStops} options={tripOptions} geo={geo} connected={connected} />}
         />
-        <ReportBar onReport={onReport} geo={geo} nearestStop={nearest} />
+        <ReportBar onReport={onReport} routeChoices={routeChoices} geo={geo} nearestStop={nearest} />
       </div>
       <Splash />
     </main>

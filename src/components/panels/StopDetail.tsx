@@ -1,9 +1,9 @@
 "use client";
 
-import { Accessibility, Clock, Lightbulb, LightbulbOff, Share2, Umbrella, type LucideIcon } from "lucide-react";
+import { Accessibility, Clock, Lightbulb, LightbulbOff, Share2, Umbrella, Users, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { etaRange, isActive, stopSafety, timeAgo, type EtaRange } from "@/lib/geo";
+import { etaRange, fullVehicles, isActive, nextUnits, stopSafety, timeAgo, type EtaRange } from "@/lib/geo";
 import type { CityBundle, Report, Stop, Vehicle } from "@/lib/types";
 import type { StopWaitingState } from "@/hooks/useStopWaiting";
 import { ConfidenceBadge } from "./ConfidenceBadge";
@@ -86,6 +86,15 @@ export function StopDetail({
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
   const range = route && vehicles ? etaRange(route, stop, vehicles, simSpeed, reports) : null;
   const eta = formatEta(range);
+  // ¿La próxima unidad viene llena? (según un aviso vigente). Si sí, se dice cuándo llega la siguiente.
+  const units = route && vehicles ? nextUnits(route, stop, vehicles, 2, simSpeed) : [];
+  const fullReport =
+    units[0] && route && vehicles
+      ? fullVehicles([route], bundle.stops, vehicles, reports, simSpeed).get(units[0].vehicle.id)
+      : undefined;
+  const nextAfter = units[1]
+    ? formatEta({ minSec: Math.max(0, units[1].etaSec - 30), maxSec: units[1].etaSec + 30, basis: "simulación" })
+    : null;
 
   return (
     <section aria-labelledby="stop-title" className="space-y-3">
@@ -128,6 +137,22 @@ export function StopDetail({
           )}
         </span>
       </p>
+      {fullReport && (
+        <p role="status" className="rounded-2xl bg-report-full/10 px-3 py-2 text-sm">
+          <span className="flex items-center gap-1.5 font-semibold text-report-full">
+            <Users aria-hidden className="size-4 shrink-0" />
+            La próxima unidad viene llena
+          </span>
+          <span className="mt-0.5 block text-xs text-muted-foreground">
+            {fullReport.confirms >= 1
+              ? `Confirmado por ${fullReport.confirms} ${fullReport.confirms === 1 ? "persona más" : "personas más"}`
+              : "Informado por 1 persona, sin confirmar"}
+            {" · "}
+            {timeAgo(fullReport.created_at)}
+            {nextAfter && ` · La siguiente llega en ${nextAfter}`}
+          </span>
+        </p>
+      )}
       {hint && <p className="px-1 text-xs text-muted-foreground">{hint}</p>}
       {waiting && <WaitingHere stopId={stop.id} waiting={waiting} />}
 
