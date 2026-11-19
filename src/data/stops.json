@@ -1,0 +1,272 @@
+[
+  {
+    "id": "g1-01",
+    "route_id": "GRIS-1",
+    "name": "Periférico Oriente · Insurgentes",
+    "lng": -101.15446,
+    "lat": 19.69992,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-02",
+    "route_id": "GRIS-1",
+    "name": "Avenida Camelinas · Las Américas",
+    "lng": -101.15043,
+    "lat": 19.6909,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "g1-03",
+    "route_id": "GRIS-1",
+    "name": "Avenida Camelinas · Chapultepec Oriente",
+    "lng": -101.16023,
+    "lat": 19.68809,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-04",
+    "route_id": "GRIS-1",
+    "name": "Avenida Camelinas",
+    "lng": -101.17027,
+    "lat": 19.68209,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-05",
+    "route_id": "GRIS-1",
+    "name": "Avenida Camelinas · Félix Ireta",
+    "lng": -101.18232,
+    "lat": 19.68131,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "g1-06",
+    "route_id": "GRIS-1",
+    "name": "Avenida Camelinas · Félix Ireta 2",
+    "lng": -101.1946,
+    "lat": 19.68182,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "g1-07",
+    "route_id": "GRIS-1",
+    "name": "Periférico Independencia · Residencial del Sur",
+    "lng": -101.20224,
+    "lat": 19.67721,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-08",
+    "route_id": "GRIS-1",
+    "name": "Periférico Independencia · Josefa Ortiz De Domínguez",
+    "lng": -101.21219,
+    "lat": 19.67331,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "g1-09",
+    "route_id": "GRIS-1",
+    "name": "Periférico Independencia · Jardines De La Loma",
+    "lng": -101.2223,
+    "lat": 19.67686,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-10",
+    "route_id": "GRIS-1",
+    "name": "Periférico Independencia · Sentimientos de La Nación",
+    "lng": -101.23366,
+    "lat": 19.67844,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "g1-11",
+    "route_id": "GRIS-1",
+    "name": "Calle Manantiales de Morelia · Campestre Los Manantiales",
+    "lng": -101.23834,
+    "lat": 19.68827,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "g1-12",
+    "route_id": "GRIS-1",
+    "name": "Periférico Independencia · Sindurio",
+    "lng": -101.24288,
+    "lat": 19.69911,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "g1-13",
+    "route_id": "GRIS-1",
+    "name": "Circuito Periférico Paseo de la República · La Quemada",
+    "lng": -101.23825,
+    "lat": 19.70644,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-14",
+    "route_id": "GRIS-1",
+    "name": "Circuito Periférico Paseo de la República · Infonavit Justo Mendoza",
+    "lng": -101.23132,
+    "lat": 19.71449,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "n1-01",
+    "route_id": "NARANJA-1",
+    "name": "Periférico Independencia · Josefa Ortiz De Domínguez",
+    "lng": -101.2162,
+    "lat": 19.67508,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "n1-02",
+    "route_id": "NARANJA-1",
+    "name": "Periférico Independencia · Balcones De Morelia",
+    "lng": -101.20358,
+    "lat": 19.67492,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "n1-03",
+    "route_id": "NARANJA-1",
+    "name": "Periférico Independencia",
+    "lng": -101.19574,
+    "lat": 19.68143,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "n1-04",
+    "route_id": "NARANJA-1",
+    "name": "Calle Rey Tariácuri · Félix Ireta",
+    "lng": -101.19065,
+    "lat": 19.69006,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "n1-05",
+    "route_id": "NARANJA-1",
+    "name": "Calle Antonio de Virrey de Mendoza · Centro Histórico",
+    "lng": -101.19039,
+    "lat": 19.70283,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "n1-06",
+    "route_id": "NARANJA-1",
+    "name": "Avenida Morelos Norte · Doctor Miguel Silva González",
+    "lng": -101.18837,
+    "lat": 19.713,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "n1-07",
+    "route_id": "NARANJA-1",
+    "name": "Instituto Tecnológico de Morelia",
+    "lng": -101.18683,
+    "lat": 19.72263,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "n1-08",
+    "route_id": "NARANJA-1",
+    "name": "Carretera Uriangato-Morelia",
+    "lng": -101.18422,
+    "lat": 19.72506,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "n1-09",
+    "route_id": "NARANJA-1",
+    "name": "Calle Apóstol de la Raza Maya · Felipe Carrillo Puerto",
+    "lng": -101.17856,
+    "lat": 19.73153,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "n1-10",
+    "route_id": "NARANJA-1",
+    "name": "Avenida Morelos Norte · Obrera",
+    "lng": -101.18891,
+    "lat": 19.71032,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "n1-11",
+    "route_id": "NARANJA-1",
+    "name": "Calle Mariano Jiménez · Centro Histórico",
+    "lng": -101.19149,
+    "lat": 19.70004,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "n1-12",
+    "route_id": "NARANJA-1",
+    "name": "Calle Gonzalo Gómez · Félix Ireta",
+    "lng": -101.19193,
+    "lat": 19.68748,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "n1-13",
+    "route_id": "NARANJA-1",
+    "name": "Periférico Independencia · Residencial del Sur",
+    "lng": -101.20021,
+    "lat": 19.68099,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  }
+]

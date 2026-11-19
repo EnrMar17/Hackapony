@@ -4,9 +4,11 @@ import { useRef, useState } from "react";
 import { ROUTE_IDS } from "@/lib/constants";
 import type { CityBundle, LngLat, Report, RouteId, Vehicle } from "@/lib/types";
 import { useUi } from "@/store/ui";
+import { addArrowImage } from "./arrowIcon";
 import { MAP_READY, MAP_STYLE, MapView, engineProps } from "./engine";
 import type { MapMouseEvent, MapRef } from "./engine";
 import { REPORT_LAYER, ReportLayer } from "./ReportLayer";
+import { ReportPopup } from "./ReportPopup";
 import { ROUTE_LINE_LAYER, RouteLayers } from "./RouteLayers";
 import { STOP_LAYER, StopLayer } from "./StopLayer";
 import { UserLocation } from "./UserLocation";
@@ -26,11 +28,14 @@ const INTERACTIVE = [STOP_LAYER, REPORT_LAYER, ROUTE_LINE_LAYER];
 export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRequest }: TransitMapProps) {
   const mapRef = useRef<MapRef>(null);
   const [loaded, setLoaded] = useState(false);
+  const [arrowReady, setArrowReady] = useState(false);
   const [failed, setFailed] = useState(!MAP_READY);
   const selectedRoute = useUi((s) => s.selectedRoute);
   const selectRoute = useUi((s) => s.selectRoute);
   const selectStop = useUi((s) => s.selectStop);
   const selectReport = useUi((s) => s.selectReport);
+  const selectedReportId = useUi((s) => s.selectedReport);
+  const selectedReport = reports.find((r) => r.id === selectedReportId) ?? null;
 
   function onClick(e: MapMouseEvent) {
     const feature = e.features?.[0];
@@ -63,15 +68,21 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
         initialViewState={{ longitude: bundle.center[0], latitude: bundle.center[1], zoom: bundle.zoom }}
         interactiveLayerIds={INTERACTIVE}
         onClick={onClick}
-        onLoad={() => setLoaded(true)}
+        onLoad={() => {
+          if (mapRef.current) setArrowReady(addArrowImage(mapRef.current));
+          setLoaded(true);
+        }}
         onError={() => setFailed(true)}
         style={{ width: "100%", height: "100%" }}
       >
         <RouteLayers routes={bundle.routes} selected={selectedRoute} />
         <StopLayer stops={bundle.stops} reports={reports} />
-        <VehicleLayer vehicles={vehicles} />
+        <VehicleLayer vehicles={vehicles} arrowReady={arrowReady} />
         <ReportLayer reports={reports} />
         <UserLocation position={userPosition} />
+        {selectedReport && (
+          <ReportPopup report={selectedReport} onClose={() => selectReport(null)} />
+        )}
       </MapView>
       {!loaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-100 text-sm text-slate-600">
