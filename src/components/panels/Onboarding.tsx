@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { MapPinned, Megaphone, Route } from "lucide-react";
+import { HeartHandshake, MapPinned, Megaphone, Route } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUi } from "@/store/ui";
 import { REPORT_BUTTONS, ROUTE_COLORS, ROUTE_IDS, ROUTE_NAMES } from "@/lib/constants";
 import { SAFETY_LOOK, TYPE_LOOK } from "./reportMeta";
 import { groupByFamily } from "./routeMeta";
@@ -12,6 +13,8 @@ import { groupByFamily } from "./routeMeta";
 const STORAGE_KEY = "ruta-segura:onboarding:v1";
 const listeners = new Set<() => void>();
 let seenInMemory = false;
+/** true cuando el usuario lo pidió con el botón "?" de TopBar. */
+let reopened = false;
 
 function readSeen(): boolean {
   if (seenInMemory) return true;
@@ -24,6 +27,7 @@ function readSeen(): boolean {
 
 function markSeen() {
   seenInMemory = true;
+  reopened = false;
   try {
     window.localStorage.setItem(STORAGE_KEY, "done");
   } catch {
@@ -43,6 +47,18 @@ function subscribe(fn: () => void) {
 
 // En el servidor se asume "ya lo vio" para no pintar el onboarding en el HTML.
 const getServerSeen = () => true;
+
+/** Lo llama el botón "?" de TopBar para volver a ver el onboarding. */
+export function openOnboarding() {
+  reopened = true;
+  listeners.forEach((fn) => fn());
+}
+
+const readReopened = () => reopened;
+const getServerReopened = () => false;
+
+/** Si el mapa nunca avisa que cargó (mapReady), el onboarding sale igual tras este tiempo. */
+const MAP_READY_FALLBACK_MS = 3_000;
 
 // ---- Pasos ----
 
@@ -96,17 +112,29 @@ const STEPS: { icon: typeof Route; title: string; text: string; visual: ReactNod
     title: "Paradas seguras",
     text: "Cada parada tiene semáforo según luz, rampa y reportes. Activa tu ubicación para ver la más cercana.",
     visual: (
-      <ul className="flex flex-wrap gap-2">
-        {(["green", "yellow", "red"] as const).map((level) => {
-          const look = SAFETY_LOOK[level];
-          return (
-            <Pill key={level} className={look.className}>
-              <look.icon aria-hidden className="size-4" />
-              {look.text}
-            </Pill>
-          );
-        })}
-      </ul>
+      <div className="space-y-3">
+        <ul className="flex flex-wrap gap-2">
+          {(["green", "yellow", "red"] as const).map((level) => {
+            const look = SAFETY_LOOK[level];
+            return (
+              <Pill key={level} className={look.className}>
+                <look.icon aria-hidden className="size-4" />
+                {look.text}
+              </Pill>
+            );
+          })}
+        </ul>
+        <div className="rounded-2xl bg-foreground/5 p-3">
+          <p className="flex items-center gap-2 text-sm font-semibold">
+            <HeartHandshake aria-hidden className="size-4 shrink-0 text-info-ink" />
+            ¿A quién ayuda?
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            A quien usa el transporte en Morelia sin una app oficial de horarios: personas con discapacidad, adultos
+            mayores y quien viaja de noche o solo.
+          </p>
+        </div>
+      </div>
     ),
   },
 ];
@@ -116,23 +144,40 @@ const STEPS: { icon: typeof Route; title: string; text: string; visual: ReactNod
 /** Se muestra solo en la primera visita. Se monta desde TopBar porque CityApp está bloqueado. */
 export function Onboarding() {
   const seen = useSyncExternalStore(subscribe, readSeen, getServerSeen);
+  const forced = useSyncExternalStore(subscribe, readReopened, getServerReopened);
+  const mapReady = useUi((s) => s.mapReady);
+  const [timedOut, setTimedOut] = useState(false);
   const [step, setStep] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
   const primaryRef = useRef<HTMLButtonElement>(null);
 
+  // Primera visita: espera al mapa para no abrir sobre un mapa gris; respaldo por si nunca carga.
+  useEffect(() => {
+    if (seen || mapReady) return;
+    const id = window.setTimeout(() => setTimedOut(true), MAP_READY_FALLBACK_MS);
+    return () => window.clearTimeout(id);
+  }, [seen, mapReady]);
+
+  const open = forced || (!seen && (mapReady || timedOut));
+
   // Foco en el botón principal en cada paso.
   useEffect(() => {
-    if (!seen) primaryRef.current?.focus();
-  }, [seen, step]);
+    if (open) primaryRef.current?.focus();
+  }, [open, step]);
 
-  if (seen) return null;
+  if (!open) return null;
+
+  function close() {
+    markSeen();
+    setStep(0);
+  }
 
   const isLast = step === STEPS.length - 1;
   const current = STEPS[step];
 
   function onKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     if (e.key === "Escape") {
-      markSeen();
+      close();
       return;
     }
     // Foco atrapado dentro de la tarjeta.
@@ -177,7 +222,7 @@ export function Onboarding() {
               {current.text}
             </p>
           </div>
-          <div aria-hidden>{current.visual}</div>
+          <div>{current.visual}</div>
         </div>
 
         <div aria-hidden className="mt-5 flex justify-center gap-1.5">
@@ -195,7 +240,7 @@ export function Onboarding() {
         <div className="mt-4 grid grid-cols-2 gap-2">
           <button
             type="button"
-            onClick={markSeen}
+            onClick={close}
             className="min-h-12 rounded-2xl text-sm font-semibold text-muted-foreground transition-colors duration-300 ease-out hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
           >
             Saltar
@@ -203,7 +248,7 @@ export function Onboarding() {
           <button
             ref={primaryRef}
             type="button"
-            onClick={() => (isLast ? markSeen() : setStep((s) => s + 1))}
+            onClick={() => (isLast ? close() : setStep((s) => s + 1))}
             className="min-h-12 rounded-2xl bg-foreground text-sm font-semibold text-background transition-transform duration-300 ease-out active:scale-95 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             {isLast ? "Empezar" : "Siguiente"}
