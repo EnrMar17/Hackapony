@@ -11,9 +11,9 @@ interface Look {
 
 /** Mismo ícono y color que los botones de ReportBar. */
 export const TYPE_LOOK: Record<ReportType, Look> = {
-  full: { icon: Users, className: "bg-peligro text-peligro-foreground" },
-  passing: { icon: BusFront, className: "bg-info text-info-foreground" },
-  incident: { icon: TriangleAlert, className: "bg-precaucion text-precaucion-foreground" },
+  full: { icon: Users, className: "bg-report-full text-report-full-foreground" },
+  passing: { icon: BusFront, className: "bg-report-passing text-report-passing-foreground" },
+  incident: { icon: TriangleAlert, className: "bg-report-incident text-report-incident-foreground" },
 };
 
 /** Ícono y color de un reporte; las incidencias usan el de su tipo. */

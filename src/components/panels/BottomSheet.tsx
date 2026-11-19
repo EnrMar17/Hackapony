@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ChevronDown, FlaskConical, Inbox, X } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { ChevronDown, Inbox, Navigation, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive } from "@/lib/geo";
 import { useUi } from "@/store/ui";
-import type { CityBundle, Report, Vehicle, VoteKind } from "@/lib/types";
+import type { CityBundle, LngLat, Report, Vehicle, VoteKind } from "@/lib/types";
+import { LiveClock } from "./LiveClock";
+import { NearestStopCard } from "./NearestStopCard";
 import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
 import { StopDetail } from "./StopDetail";
 import { AccessibleFilter } from "./AccessibleFilter";
-import { Legend } from "./Legend";
-import { ThemePicker } from "./ThemePicker";
 import { markReportsUpdated } from "./liveSync";
 import { useIsDesktop } from "./useIsDesktop";
 
@@ -21,19 +21,39 @@ export interface BottomSheetProps {
   reports: Report[];
   /** Opcional mientras CityApp no la pase: sin ella el ETA muestra "Sin datos". */
   vehicles?: Vehicle[];
+  /** Velocidad del simulador (sim.speed): la ETA debe coincidir con el globo del mapa a 2x o 5x. */
+  simSpeed?: number;
   /** Opcional: sin ella los botones de voto quedan deshabilitados. */
   onVote?: (reportId: string, kind: VoteKind) => void;
   loading?: boolean;
   error?: string | null;
+  /** Para ordenar el estado de rutas: primero las que pasan cerca de ti. */
+  userPosition?: LngLat | null;
+  /** Id del usuario (useSession). Con él, en sus propios reportes no se ofrece votar (el servidor responde OWN_REPORT). */
+  userId?: string | null;
+  /** Panel "¿A dónde vas?" (lo arma CityApp). Va arriba del contenido de la hoja. */
+  tripSlot?: ReactNode;
 }
 
 const CLOCK_MS = 30_000;
 
-export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false, error = null }: BottomSheetProps) {
+export function BottomSheet({
+  bundle,
+  reports,
+  vehicles,
+  simSpeed = 1,
+  onVote,
+  loading = false,
+  error = null,
+  userPosition,
+  userId,
+  tripSlot,
+}: BottomSheetProps) {
   const open = useUi((s) => s.sheetOpen);
   const setOpen = useUi((s) => s.setSheetOpen);
   const selectedStop = useUi((s) => s.selectedStop);
   const selectStop = useUi((s) => s.selectStop);
+  const setTripOpen = useUi((s) => s.setTripOpen);
   const selectedReport = useUi((s) => s.selectedReport);
   const selectReport = useUi((s) => s.selectReport);
   // En escritorio el panel es una columna fija a la izquierda, siempre visible.
@@ -55,7 +75,6 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
   }, [visible]);
 
   const activeCount = reports.filter((r) => isActive(r, now)).length;
-  const hasSimulated = reports.some((r) => r.is_simulated);
 
   function close() {
     selectStop(null);
@@ -71,21 +90,38 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
   return (
     <div className="pointer-events-none! flex flex-col items-end lg:fixed lg:top-4 lg:bottom-[calc(var(--report-bar-h,9rem)+1.75rem)] lg:left-4 lg:w-[400px] lg:items-stretch">
       {!open && (
-        <button
-          type="button"
-          onClick={openFeed}
-          aria-expanded={false}
-          aria-controls="bottom-sheet"
-          className={cn(
-            "glass pointer-events-auto mr-3 mb-2 flex min-h-12 items-center gap-2 rounded-full px-4 text-sm font-semibold shadow-md lg:hidden",
-            "transition-transform duration-300 ease-out active:scale-95",
-            "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
-          )}
-        >
-          <Inbox aria-hidden className="size-4" />
-          Qué está pasando
-          <span className="tabular-nums rounded-full bg-foreground/10 px-2 py-0.5 text-xs">{activeCount}</span>
-        </button>
+        <div className="pointer-events-auto mr-3 mb-2 flex flex-wrap justify-end gap-2 lg:hidden">
+          <button
+            type="button"
+            onClick={() => {
+              setTripOpen(true);
+              setOpen(true);
+            }}
+            className={cn(
+              "glass flex min-h-12 items-center gap-2 rounded-full px-4 text-sm font-semibold shadow-md",
+              "transition-transform duration-300 ease-out active:scale-95",
+              "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+            )}
+          >
+            <Navigation aria-hidden className="size-4" />
+            ¿A dónde vas?
+          </button>
+          <button
+            type="button"
+            onClick={openFeed}
+            aria-expanded={false}
+            aria-controls="bottom-sheet"
+            className={cn(
+              "glass flex min-h-12 items-center gap-2 rounded-full px-4 text-sm font-semibold shadow-md",
+              "transition-transform duration-300 ease-out active:scale-95",
+              "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+            )}
+          >
+            <Inbox aria-hidden className="size-4" />
+            Qué está pasando
+            <span className="tabular-nums rounded-full bg-foreground/10 px-2 py-0.5 text-xs">{activeCount}</span>
+          </button>
+        </div>
       )}
 
       {/* Abre y cierra con grid-rows 0fr → 1fr: sin ocupar espacio cerrado y sin saltos. */}
@@ -104,7 +140,10 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
           >
             <div className="flex min-h-14 items-center justify-between px-4 pt-2 lg:pt-3">
               <span aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/15 lg:hidden" />
-              <p className="hidden text-base font-bold lg:block">Ruta Segura · en vivo</p>
+              <div className="hidden lg:block">
+                <p className="text-base font-bold">Ruta Segura · en vivo</p>
+                <LiveClock className="text-xs text-muted-foreground" />
+              </div>
               {/* En escritorio el panel no se cierra: el botón solo limpia la parada o el reporte elegido. */}
               <button
                 type="button"
@@ -121,6 +160,16 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
             </div>
 
             <div className="space-y-5 overflow-y-auto overscroll-contain px-4 pb-4">
+              <LiveClock className="block text-xs text-muted-foreground lg:hidden" />
+              <div className="pt-3">{tripSlot}</div>
+              {/* Siempre arriba: la parada más cercana (o la del Tec si no hay ubicación). */}
+              <NearestStopCard
+                bundle={bundle}
+                reports={reports}
+                vehicles={vehicles}
+                simSpeed={simSpeed}
+                userPosition={userPosition}
+              />
               {selectedReport && (
                 <ReportDetail
                   key={selectedReport}
@@ -129,6 +178,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
                   routes={bundle.routes}
                   now={now}
                   onVote={onVote}
+                  userId={userId}
                   loading={loading}
                   error={error}
                 />
@@ -139,18 +189,13 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
                   stopId={selectedStop}
                   reports={reports}
                   vehicles={vehicles}
+                  simSpeed={simSpeed}
                   loading={loading}
                   error={error}
                 />
               )}
-              {hasSimulated && (
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <FlaskConical aria-hidden className="size-3.5 shrink-0" />
-                  Datos de demostración: algunos reportes son simulados.
-                </p>
-              )}
               <AccessibleFilter />
-              <RouteStatusCard routes={bundle.routes} reports={reports} loading={loading} error={error} />
+              <RouteStatusCard routes={bundle.routes} reports={reports} loading={loading} error={error} userPosition={userPosition} />
               <ReportFeed
                 reports={reports}
                 routes={bundle.routes}
@@ -160,8 +205,6 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
                 loading={loading}
                 error={error}
               />
-              <Legend />
-              <ThemePicker />
             </div>
           </section>
         </div>

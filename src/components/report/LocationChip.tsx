@@ -20,7 +20,11 @@ export function LocationChip({ geo, nearestStop, onOpenStop }: LocationChipProps
     return (
       <p className="flex min-h-9 w-full items-center gap-2 px-1 text-left text-xs text-muted-foreground">
         <MapPinOff aria-hidden className="size-4 shrink-0" />
-        <span>Ubicación no disponible · usando el ITM</span>
+        <span>
+          {geo?.status === "denied"
+            ? "Aún no sabemos dónde estás. Activa la ubicación en los ajustes del navegador."
+            : "Aún no sabemos dónde estás. No pudimos ubicarte ahora mismo."}
+        </span>
       </p>
     );
   }
@@ -38,7 +42,10 @@ export function LocationChip({ geo, nearestStop, onOpenStop }: LocationChipProps
         )}
       >
         <LocateFixed aria-hidden className="size-5 shrink-0 text-info-ink" />
-        <span>Activar ubicación</span>
+        <span className="min-w-0 leading-snug">
+          <span className="block">Activar ubicación</span>
+          <span className="block text-xs font-normal text-muted-foreground">Aún no sabemos dónde estás</span>
+        </span>
       </button>
     );
   }
@@ -57,8 +64,8 @@ export function LocationChip({ geo, nearestStop, onOpenStop }: LocationChipProps
       >
         <MapPin aria-hidden className="size-5 shrink-0 text-info-ink" />
         <span className="min-w-0 flex-1 leading-snug break-words">
-          Cerca de: <span className="font-semibold">{nearestStop.stop.name}</span>
-          {" · "}
+          Te encuentras cerca de <span className="font-semibold">{nearestStop.stop.name}</span>
+          {", a "}
           <span className="tabular-nums">{Math.round(nearestStop.distanceM)} m</span>
         </span>
         <ChevronRight aria-hidden className="size-4 shrink-0 text-muted-foreground" />
@@ -73,8 +80,8 @@ export function LocationChip({ geo, nearestStop, onOpenStop }: LocationChipProps
       <MapPin aria-hidden className="size-5 shrink-0 text-info-ink" />
       {nearestStop ? (
         <span className="min-w-0 leading-snug break-words">
-          Cerca de: <span className="font-semibold">{nearestStop.stop.name}</span>
-          {" · "}
+          Te encuentras cerca de <span className="font-semibold">{nearestStop.stop.name}</span>
+          {", a "}
           <span className="tabular-nums">{Math.round(nearestStop.distanceM)} m</span>
         </span>
       ) : (

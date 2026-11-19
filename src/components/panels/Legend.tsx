@@ -1,4 +1,4 @@
-import { ChevronDown, CircleHelp, Navigation, type LucideIcon } from "lucide-react";
+import { Navigation, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { REPORT_BUTTONS } from "@/lib/constants";
 import type { SafetyLevel } from "@/lib/types";
@@ -33,57 +33,58 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-/** Qué significa cada color e ícono del mapa. Plegable y cerrada por defecto. */
+/** Qué significa cada color e ícono del mapa. Se muestra dentro del diálogo de ayuda (botón "?"). */
 export function Legend() {
   return (
-    <details className="group rounded-2xl bg-foreground/5">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-2xl px-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
-        <CircleHelp aria-hidden className="size-4 shrink-0 text-muted-foreground" />
-        <span className="flex-1">Qué significa cada color</span>
-        <ChevronDown
-          aria-hidden
-          className="size-4 shrink-0 transition-transform duration-300 ease-out group-open:rotate-180"
+    <div className="space-y-4">
+      <Group title="Paradas (anillos en el mapa)">
+        {(["green", "yellow", "red"] as const).map((level) => {
+          const look = SAFETY_LOOK[level];
+          return (
+            <Row key={level} icon={look.icon} swatch={look.className} title={look.text} text={SAFETY_TEXT[level]} />
+          );
+        })}
+      </Group>
+
+      <Group title="Reportes en el mapa">
+        {REPORT_BUTTONS.map((b) => {
+          const look = TYPE_LOOK[b.type];
+          return <Row key={b.type} icon={look.icon} swatch={look.className} title={b.label} />;
+        })}
+        <li className="flex items-center gap-3">
+          <span className="flex w-8 shrink-0 items-center justify-center gap-1">
+            <span aria-hidden className="size-3.5 rounded-full bg-foreground" />
+            <span aria-hidden className="size-2.5 rounded-full border-2 border-foreground/40" />
+          </span>
+          <span className="text-sm leading-snug">
+            <span className="font-semibold">Sólido</span>
+            <span className="text-muted-foreground">: confirmado por otra persona. </span>
+            <span className="font-semibold">Tenue</span>
+            <span className="text-muted-foreground">: sin confirmar. Se desvanece al envejecer.</span>
+          </span>
+        </li>
+        <li className="flex items-center gap-3">
+          <span
+            aria-hidden
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background"
+          >
+            3
+          </span>
+          <span className="text-sm leading-snug">
+            <span className="font-semibold">Número</span>
+            <span className="text-muted-foreground">: varios reportes juntos; acerca el mapa para verlos.</span>
+          </span>
+        </li>
+      </Group>
+
+      <Group title="Unidades">
+        <Row
+          icon={Navigation}
+          swatch="bg-foreground text-background"
+          title="Unidad en camino"
+          text="la flecha marca hacia dónde va"
         />
-      </summary>
-
-      <div className="space-y-4 px-3 pt-1 pb-3">
-        <Group title="Paradas">
-          {(["green", "yellow", "red"] as const).map((level) => {
-            const look = SAFETY_LOOK[level];
-            return (
-              <Row key={level} icon={look.icon} swatch={look.className} title={look.text} text={SAFETY_TEXT[level]} />
-            );
-          })}
-        </Group>
-
-        <Group title="Reportes en el mapa">
-          {REPORT_BUTTONS.map((b) => {
-            const look = TYPE_LOOK[b.type];
-            return <Row key={b.type} icon={look.icon} swatch={look.className} title={b.label} />;
-          })}
-          <li className="flex items-center gap-3">
-            <span className="flex w-8 shrink-0 items-center justify-center gap-1">
-              <span aria-hidden className="size-3.5 rounded-full bg-foreground" />
-              <span aria-hidden className="size-2.5 rounded-full border-2 border-foreground/40" />
-            </span>
-            <span className="text-sm leading-snug">
-              <span className="font-semibold">Sólido</span>
-              <span className="text-muted-foreground">: confirmado por otra persona. </span>
-              <span className="font-semibold">Tenue</span>
-              <span className="text-muted-foreground">: sin confirmar. Se desvanece al envejecer.</span>
-            </span>
-          </li>
-        </Group>
-
-        <Group title="Unidades">
-          <Row
-            icon={Navigation}
-            swatch="bg-foreground text-background"
-            title="Unidad en camino"
-            text="la flecha marca hacia dónde va"
-          />
-        </Group>
-      </div>
-    </details>
+      </Group>
+    </div>
   );
 }

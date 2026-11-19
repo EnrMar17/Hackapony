@@ -66,6 +66,12 @@ export interface Stop {
   has_light: boolean;
   has_ramp: boolean;
   has_roof: boolean;
+  /**
+   * Avance (0 a 1) del circuito en el que la ruta sirve a esta parada: su SENTIDO. Si el circuito recorre
+   * la calle de ida y de vuelta, la parada solo pertenece a una de las dos pasadas y el ETA no debe contar
+   * las unidades del sentido contrario. Se genera con `scripts/assign-stop-progress.mjs`.
+   */
+  progress?: number;
 }
 
 export interface Vehicle {
@@ -141,6 +147,8 @@ export interface ReportsState {
   undo: (reportId: string) => Promise<void>;
   /** Opcional hasta que Cesar lo implemente: agrega unidades u ocupación al reporte propio (primeros 60 s). */
   refine?: (reportId: string, patch: ReportRefinement) => Promise<void>;
+  /** ms del último dato recibido (para "actualizado hace N s"). */
+  lastUpdateAt?: number;
 }
 
 export interface SimControls extends SimConfig {
@@ -155,4 +163,52 @@ export interface GeolocationState {
   accuracyM: number | null;
   status: GeoStatus;
   request: () => void;
+}
+
+// ---- Modo "¿A dónde vas?" y unidades (contrato compartido) ----
+
+export interface Destination {
+  point: LngLat;
+  label: string;
+}
+
+export interface TripLeg {
+  point: LngLat;
+  stop: Stop | null;
+  /** Metros a pie hasta (o desde) ese punto. */
+  walkM: number;
+}
+
+export interface TripOption {
+  route_id: RouteId;
+  /** Dónde sube. */
+  board: TripLeg;
+  /** Dónde baja. */
+  alight: TripLeg;
+  rideM: number;
+  /** Rango de minutos de viaje. */
+  rideMinMin: number;
+  rideMaxMin: number;
+  /** Estado actual de la ruta. */
+  status: RouteStatus;
+  /** Razones: incidencias, unidad llena, parada sin luz o rampa. */
+  alerts: string[];
+  /** Próxima unidad en la parada de subida. */
+  nextUnitSec: number | null;
+  /** Tramo de la ruta entre subida y bajada, para dibujarlo. */
+  segment: LngLat[];
+  /** Calles por las que pasas, en orden (de las paradas del tramo). Para "Pasas por…". */
+  via?: string[];
+}
+
+export interface NearRoute {
+  route: Route;
+  distanceM: number;
+  /** Avance (0 a 1) del punto más cercano de la ruta. */
+  progress: number;
+}
+
+export interface UnitEta {
+  vehicle: Vehicle;
+  etaSec: number;
 }

@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import type { FeatureCollection } from "geojson";
 import type { Route, RouteId } from "@/lib/types";
+import { CHEVRON_IMAGE } from "./arrowIcon";
 import { Layer, Source } from "./engine";
 import { casingColor, routeColor } from "./palette";
 
@@ -17,11 +18,14 @@ export function RouteLayers({
   selected,
   dense,
   dark,
+  iconsReady = false,
 }: {
   routes: Route[];
   selected: RouteId | null;
   dense: boolean;
   dark: boolean;
+  /** Los chevrons son una imagen: se dibujan cuando ya está registrada en el mapa. */
+  iconsReady?: boolean;
 }) {
   const opacity = selected ? (["case", ["==", ["get", "id"], selected], 1, dense ? 0.12 : 0.3] as const) : dense ? 0.55 : 0.9;
   const width = selected ? (["case", ["==", ["get", "id"], selected], 6, dense ? 2 : 5] as const) : dense ? 2.5 : 5;
@@ -60,6 +64,29 @@ export function RouteLayers({
           "line-opacity": opacity as unknown as number,
         }}
       />
+      {iconsReady && (
+        // Flechas de dirección: se ven aunque no haya combis. Con muchas rutas, solo en la elegida.
+        <Layer
+          id="routes-arrows"
+          type="symbol"
+          minzoom={12}
+          filter={dense ? ["==", ["get", "id"], selected ?? ""] : ["has", "id"]}
+          layout={{
+            "symbol-placement": "line",
+            "symbol-spacing": 90,
+            "icon-image": CHEVRON_IMAGE,
+            "icon-size": ["interpolate", ["linear"], ["zoom"], 12, 0.4, 16, 0.7],
+            "icon-rotation-alignment": "map",
+            "icon-allow-overlap": true,
+            "icon-ignore-placement": true,
+          }}
+          paint={{
+            // Blanco sobre la línea de color en claro; casi negro sobre las líneas aclaradas del modo oscuro.
+            "icon-color": dark ? "#0b1220" : "#ffffff",
+            "icon-opacity": selected ? (["case", ["==", ["get", "id"], selected], 1, 0.35] as unknown as number) : 0.9,
+          }}
+        />
+      )}
     </Source>
   );
 }

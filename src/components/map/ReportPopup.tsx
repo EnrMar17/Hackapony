@@ -21,7 +21,7 @@ export function ReportPopup({ report, onClose }: { report: Report; onClose: () =
     >
       <div className="space-y-1 p-1 text-sm">
         <p className="font-medium">{label}</p>
-        <p className="text-muted-foreground">
+        <p className="opacity-70">
           {timeAgo(report.created_at)} · {report.confirms} {report.confirms === 1 ? "confirmación" : "confirmaciones"}
         </p>
       </div>
