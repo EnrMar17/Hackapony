@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { HeartHandshake, MapPinned, Megaphone, Route } from "lucide-react";
+import { HeartHandshake, Info, MapPinned, Megaphone, Route } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import { REPORT_BUTTONS, ROUTE_COLORS, ROUTE_IDS, ROUTE_NAMES } from "@/lib/constants";
+import { SplashLogo } from "@/components/splash/SplashLogo";
 import { SAFETY_LOOK, TYPE_LOOK } from "./reportMeta";
 import { groupByFamily } from "./routeMeta";
 
@@ -73,6 +74,13 @@ function Pill({ className, children }: { className?: string; children: ReactNode
   );
 }
 
+const TEAM = [
+  "Jose Antonio Medina Ayala",
+  "Cesar Enrique Díaz Maldonado",
+  "Paulo Cesar Pérez Martínez",
+  "Enrique Martínez",
+];
+
 const STEPS: { icon: typeof Route; title: string; text: string; visual: ReactNode }[] = [
   {
     icon: Route,
@@ -134,6 +142,23 @@ const STEPS: { icon: typeof Route; title: string; text: string; visual: ReactNod
             mayores y quien viaja de noche o solo.
           </p>
         </div>
+      </div>
+    ),
+  },
+  {
+    icon: Info,
+    title: "Sobre el proyecto",
+    text: "RutaSegura ITM. Desarrollado para el Hackapony 2026 por:",
+    visual: (
+      <div className="space-y-3">
+        <SplashLogo className="mx-auto size-16" />
+        <ul className="space-y-2">
+          {TEAM.map((name) => (
+            <li key={name} className="rounded-2xl bg-foreground/5 px-3 py-2 text-sm font-semibold">
+              {name}
+            </li>
+          ))}
+        </ul>
       </div>
     ),
   },
