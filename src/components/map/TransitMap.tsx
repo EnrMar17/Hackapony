@@ -205,13 +205,19 @@ export function TransitMap({
             type="button"
             onClick={() => setShowAll(!showAll)}
             aria-pressed={showAll}
-            className={`${BUTTON} min-h-12 gap-2 px-4 text-sm font-semibold`}
+            className={`${BUTTON} min-h-12 min-w-12 gap-2 px-3 text-sm font-semibold sm:px-4`}
           >
             <Layers aria-hidden className="size-4" />
-            {showAll ? "Solo Gris 1 y Naranja 1" : `Ver todas las rutas (${ROUTE_IDS.length})`}
+            {/* En móvil solo ícono y contador (~48 px); el texto completo desde 640 px. Sigue leyéndose para lectores de pantalla. */}
+            <span className="sr-only sm:not-sr-only">
+              {showAll ? "Solo Gris 1 y Naranja 1" : `Ver todas las rutas (${ROUTE_IDS.length})`}
+            </span>
+            <span aria-hidden className="text-xs tabular-nums sm:hidden">
+              {showAll ? DEFAULT_ROUTE_IDS.length : ROUTE_IDS.length}
+            </span>
           </button>
           {dense && !selectedRoute && (
-            <p className="glass rounded-xl px-3 py-2 text-xs text-muted-foreground shadow-md">
+            <p className="glass hidden rounded-xl px-3 py-2 text-xs text-muted-foreground shadow-md sm:block">
               Toca una línea para ver sus paradas y unidades.
             </p>
           )}
