@@ -84,9 +84,18 @@ export interface RouteStatus {
   label: string;
 }
 
+/**
+ * Configuración compartida del simulador. El anclaje evita que los dispositivos se desincronicen:
+ * tiempo del simulador = playing ? anchorSimMs + (Date.now() - anchorWallMs) * speed : anchorSimMs.
+ * Al cambiar play/pausa o velocidad se recalcula el anclaje con el tiempo actual del simulador.
+ */
 export interface SimConfig {
   playing: boolean;
   speed: 1 | 2 | 5;
+  /** Date.now() en el momento del último cambio. */
+  anchorWallMs: number;
+  /** Tiempo del simulador (ms) en ese momento. */
+  anchorSimMs: number;
 }
 
 // ---- Firmas del contrato entre módulos (las implementan sus dueños) ----
@@ -113,8 +122,8 @@ export interface ReportsState {
   loading: boolean;
   error: string | null;
   online: boolean;
-  /** Rechaza con Error("RATE_LIMIT") si no pasaron 15 s. */
-  sendReport: (input: NewReport) => Promise<void>;
+  /** Devuelve el reporte creado (el id sirve para deshacer). Rechaza con Error("RATE_LIMIT") si no pasaron 15 s. */
+  sendReport: (input: NewReport) => Promise<Report>;
   vote: (reportId: string, kind: VoteKind) => Promise<void>;
   undo: (reportId: string) => Promise<void>;
 }
