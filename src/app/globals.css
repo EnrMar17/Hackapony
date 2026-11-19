@@ -128,3 +128,104 @@
     @apply font-sans;
   }
 }
+
+/* ---- Ruta Segura · sistema visual (no reescribe las variables de shadcn) ----
+   El color NUNCA es la única señal: siempre ícono + texto. */
+:root {
+  /* Estados */
+  --peligro: #dc2626;
+  --peligro-foreground: #ffffff;
+  --precaucion: #f59e0b;
+  --precaucion-foreground: #0f172a; /* SOLO texto oscuro sobre ámbar */
+  --seguro: #15803d;
+  --seguro-foreground: #ffffff;
+  --info: #2563eb;
+  --info-foreground: #ffffff;
+  --accesibilidad: #0d9488; /* siempre con ícono ♿ */
+  --accesibilidad-foreground: #ffffff;
+
+  /* Rutas (el naranja solo se usa para Naranja 1) */
+  --ruta-gris-1: #64748b;
+  --ruta-gris-1-foreground: #ffffff;
+  --ruta-naranja-1: #f97316;
+  --ruta-naranja-1-foreground: #0f172a; /* nunca blanco */
+
+  /* Áreas seguras (notch y barra de inicio) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+@theme inline {
+  --color-peligro: var(--peligro);
+  --color-peligro-foreground: var(--peligro-foreground);
+  --color-precaucion: var(--precaucion);
+  --color-precaucion-foreground: var(--precaucion-foreground);
+  --color-seguro: var(--seguro);
+  --color-seguro-foreground: var(--seguro-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-accesibilidad: var(--accesibilidad);
+  --color-accesibilidad-foreground: var(--accesibilidad-foreground);
+  --color-ruta-gris-1: var(--ruta-gris-1);
+  --color-ruta-gris-1-foreground: var(--ruta-gris-1-foreground);
+  --color-ruta-naranja-1: var(--ruta-naranja-1);
+  --color-ruta-naranja-1-foreground: var(--ruta-naranja-1-foreground);
+}
+
+/* Curva de salida: la clase `ease-out` de Tailwind y var(--ease-out) usan esta. */
+@theme {
+  --ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Panel de vidrio: fondo semitransparente + desenfoque. */
+@utility glass {
+  background-color: color-mix(in oklab, var(--background) 72%, transparent);
+  border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background-color: color-mix(in oklab, var(--background) 96%, transparent);
+  }
+}
+
+@utility pt-safe {
+  padding-top: max(var(--safe-top), 0.75rem);
+}
+@utility pb-safe {
+  padding-bottom: max(var(--safe-bottom), 0.75rem);
+}
+@utility pl-safe {
+  padding-left: max(var(--safe-left), 0.75rem);
+}
+@utility pr-safe {
+  padding-right: max(var(--safe-right), 0.75rem);
+}
+@utility px-safe {
+  padding-left: max(var(--safe-left), 0.75rem);
+  padding-right: max(var(--safe-right), 0.75rem);
+}
+
+@layer base {
+  /* Números alineados (contadores, tiempos, cooldown). Para otros casos: clase `tabular-nums`. */
+  time,
+  data,
+  output {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
