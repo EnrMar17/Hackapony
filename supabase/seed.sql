@@ -3,6 +3,6 @@
 -- las coordenadas reales (insert into stops ...).
 
 insert into routes (id, name, color) values
-  ('GRIS-1',    'Gris 1',    '#6B7280'),
-  ('NARANJA-1', 'Naranja 1', '#F97316')
+  ('GRIS-1',    'Gris 1',    '#64748b'),
+  ('NARANJA-1', 'Naranja 1', '#f97316')
 on conflict (id) do nothing;

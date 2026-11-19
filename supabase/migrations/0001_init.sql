@@ -3,8 +3,8 @@
 
 -- ───────────── Enums ─────────────
 create type report_type as enum ('full', 'passing', 'incident');
-create type incident_kind as enum ('inseguridad', 'accesibilidad', 'falla_unidad', 'otro');
-create type occupancy_level as enum ('baja', 'media', 'llena');
+create type incident_kind as enum ('accessibility', 'lighting', 'safety', 'other');
+create type occupancy_level as enum ('low', 'medium', 'full');
 create type vote_kind as enum ('confirm', 'resolved');
 
 -- ───────────── Tablas ─────────────
@@ -32,14 +32,14 @@ create table reports (
   id uuid primary key default gen_random_uuid(),
   user_id uuid default auth.uid(),
   route_id text references routes(id) on delete set null,
-  stop_id text references stops(id) on delete set null,
+  stop_id text,                       -- id de src/data (las paradas no viven en la base)
   type report_type not null,
   incident_kind incident_kind,
   occupancy occupancy_level,
-  lat double precision check (lat between -90 and 90),
-  lng double precision check (lng between -180 and 180),
+  lat double precision not null check (lat between -90 and 90),
+  lng double precision not null check (lng between -180 and 180),
   is_simulated boolean not null default false,
-  confirmations int not null default 0,
+  confirms int not null default 0,
   resolved_votes int not null default 0,
   resolved boolean not null default false,
   created_at timestamptz not null default now(),
@@ -101,7 +101,7 @@ begin
   from votes where report_id = rid;
 
   update reports
-     set confirmations = c,
+     set confirms = c,
          resolved_votes = r,
          resolved = (r >= 2)
    where id = rid;
