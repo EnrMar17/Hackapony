@@ -5,6 +5,7 @@ import { ChevronDown, Inbox } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import type { CityBundle, Report, Vehicle, VoteKind } from "@/lib/types";
+import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
 import { StopDetail } from "./StopDetail";
@@ -20,11 +21,12 @@ export interface BottomSheetProps {
 
 const CLOCK_MS = 30_000;
 
-export function BottomSheet({ bundle, reports, vehicles }: BottomSheetProps) {
+export function BottomSheet({ bundle, reports, vehicles, onVote }: BottomSheetProps) {
   const open = useUi((s) => s.sheetOpen);
   const setOpen = useUi((s) => s.setSheetOpen);
   const selectedStop = useUi((s) => s.selectedStop);
   const selectStop = useUi((s) => s.selectStop);
+  const selectedReport = useUi((s) => s.selectedReport);
   const selectReport = useUi((s) => s.selectReport);
 
   // Reloj para "hace N min"; solo corre con el panel abierto.
@@ -97,6 +99,18 @@ export function BottomSheet({ bundle, reports, vehicles }: BottomSheetProps) {
             </div>
 
             <div className="space-y-5 overflow-y-auto overscroll-contain px-4 pb-4">
+              {selectedReport && (
+                <ReportDetail
+                  key={selectedReport}
+                  reportId={selectedReport}
+                  reports={reports}
+                  routes={bundle.routes}
+                  now={now}
+                  onVote={onVote}
+                  loading={loading}
+                  error={error}
+                />
+              )}
               {selectedStop && (
                 <StopDetail
                   bundle={bundle}
@@ -108,7 +122,15 @@ export function BottomSheet({ bundle, reports, vehicles }: BottomSheetProps) {
                 />
               )}
               <RouteStatusCard routes={bundle.routes} reports={reports} loading={loading} error={error} />
-              <ReportFeed reports={reports} routes={bundle.routes} now={now} loading={loading} error={error} />
+              <ReportFeed
+                reports={reports}
+                routes={bundle.routes}
+                now={now}
+                selectedId={selectedReport}
+                onSelect={selectReport}
+                loading={loading}
+                error={error}
+              />
             </div>
           </section>
         </div>
