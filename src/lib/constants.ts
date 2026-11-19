@@ -40,7 +40,7 @@ export const RATE_LIMIT_MS = 15_000;
 export const REPORT_TTL_MS: Record<ReportType, number> = {
   full: 20 * 60_000,
   passing: 5 * 60_000,
-  incident: 3 * 60 * 60_000,
+  incident: 60 * 60_000,
 };
 
 /** Efímeros dejan de ser verdad en minutos; persistentes describen el estado de una parada y duran horas. */

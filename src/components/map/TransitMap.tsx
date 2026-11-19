@@ -108,9 +108,17 @@ export function TransitMap({
   );
   // En modo denso solo se ven las unidades de la ruta elegida, o las de la ruta de la parada elegida.
   const stopRouteId = incoming?.route.id ?? null;
-  const mapVehicles = useMemo(
-    () => (dense ? vehicles.filter((v) => v.route_id === selectedRoute || v.route_id === stopRouteId) : vehicles),
-    [dense, vehicles, selectedRoute, stopRouteId],
+  // La ruta en la que se enfoca el mapa: la del viaje elegido o la que eliges arriba.
+  const focusRoute = trip?.route_id ?? selectedRoute;
+  const mapVehicles = useMemo(() => {
+    // Con una ruta elegida solo se ven SUS unidades; si no, las de las 2 principales (o todas fuera del modo "todas").
+    if (focusRoute) return vehicles.filter((v) => v.route_id === focusRoute);
+    return dense ? vehicles.filter((v) => DEFAULT_ROUTE_IDS.includes(v.route_id) || v.route_id === stopRouteId) : vehicles;
+  }, [dense, vehicles, focusRoute, stopRouteId]);
+  // Y solo sus reportes (los que no son de ninguna ruta se conservan).
+  const mapReports = useMemo(
+    () => (focusRoute ? reports.filter((r) => !r.route_id || r.route_id === focusRoute) : reports),
+    [reports, focusRoute],
   );
 
   // Último viaje elegido, para encuadrarlo sin depender de que su objeto cambie cada vez que se refrescan las unidades.
@@ -119,12 +127,13 @@ export function TransitMap({
     tripRef.current = { trip, destination, tripFrom };
   });
 
-  // En modo "todas" el mapa NO dibuja las 13 rutas a la vez: solo las 2 principales y, si eliges una, esa.
-  const focusRoute = trip?.route_id ?? selectedRoute;
-  const routesToDraw = useMemo(
-    () => (dense ? bundle.routes.filter((r) => DEFAULT_ROUTE_IDS.includes(r.id) || r.id === focusRoute) : bundle.routes),
-    [dense, bundle.routes, focusRoute],
-  );
+  // Con una ruta elegida (o un viaje) SOLO se dibuja esa. Sin ninguna elegida: las 2 principales en el modo
+  // "todas" (el mapa no dibuja las 13 a la vez) o todas las visibles.
+  const routesToDraw = useMemo(() => {
+    const only = focusRoute ? bundle.routes.filter((r) => r.id === focusRoute) : [];
+    if (only.length > 0) return only;
+    return dense ? bundle.routes.filter((r) => DEFAULT_ROUTE_IDS.includes(r.id)) : bundle.routes;
+  }, [dense, bundle.routes, focusRoute]);
 
   // Se vuelve a encuadrar cuando cambia el conjunto de rutas (por ejemplo al pulsar "Ver todas").
   // En escritorio el panel izquierdo (416 px) y la barra de reporte tapan parte del mapa.
@@ -244,7 +253,7 @@ export function TransitMap({
         <RouteLayers routes={routesToDraw} selected={focusRoute} dense={dense && routesToDraw.length > 3} dark={dark} iconsReady={imagesReady} />
         <TripLayer trip={trip} destination={destination} from={tripFrom} dark={dark} />
         <StopLayer stops={bundle.stops} reports={reports} dense={dense} dark={dark} />
-        <ReportLayer reports={reports} iconsReady={imagesReady} dark={dark} />
+        <ReportLayer reports={mapReports} iconsReady={imagesReady} dark={dark} />
         <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} dark={dark} highlightId={incoming?.vehicleId ?? null} />
         <StopEtaChip incoming={incoming} />
         <UserLocation position={userPosition} accuracyM={userAccuracyM} />
