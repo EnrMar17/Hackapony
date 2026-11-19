@@ -68,7 +68,7 @@ export function ReportFeed({ reports, routes, now, selectedId, onSelect, loading
                     </span>
                   </span>
                   {r.resolved && (
-                    <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-seguro">
+                    <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-seguro-ink">
                       <CircleCheck aria-hidden className="size-4" />
                       Resuelto
                     </span>

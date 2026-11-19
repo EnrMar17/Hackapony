@@ -28,7 +28,7 @@ function Attribute({ ok, icon: Icon, yes, no }: { ok: boolean; icon: LucideIcon;
     <li
       className={cn(
         "flex min-h-12 items-center gap-2 rounded-2xl px-3 py-2 text-sm font-medium min-[360px]:flex-col min-[360px]:justify-center min-[360px]:gap-1 min-[360px]:px-1 min-[360px]:text-xs",
-        ok ? "bg-seguro/10 text-seguro" : "bg-precaucion/15 text-precaucion-foreground",
+        ok ? "bg-seguro/10 text-seguro-ink" : "bg-precaucion/15 text-precaucion-ink",
       )}
     >
       <Icon aria-hidden className="size-5 shrink-0" />
@@ -75,7 +75,7 @@ export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }
       </header>
 
       <p className="flex min-h-12 items-center justify-between gap-2 rounded-2xl bg-info/10 px-3">
-        <span className="flex items-center gap-2 text-sm font-medium text-info">
+        <span className="flex items-center gap-2 text-sm font-medium text-info-ink">
           <Clock aria-hidden className="size-5 shrink-0" />
           Próxima unidad
         </span>

@@ -49,7 +49,7 @@ export function TopBar({ routes, online }: TopBarProps) {
                 ) : (
                   <span
                     aria-hidden
-                    className="size-3 shrink-0 rounded-full ring-2 ring-white"
+                    className="size-3 shrink-0 rounded-full ring-2 ring-background"
                     style={{ backgroundColor: r.color }}
                   />
                 )}
@@ -61,7 +61,7 @@ export function TopBar({ routes, online }: TopBarProps) {
       )}
 
       <p className="glass pointer-events-auto ml-auto flex min-h-12 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-medium shadow-md">
-        <Users aria-hidden className="size-4 text-seguro" />
+        <Users aria-hidden className="size-4 text-seguro-ink" />
         <span className="tabular-nums">{online}</span> en línea
       </p>
 

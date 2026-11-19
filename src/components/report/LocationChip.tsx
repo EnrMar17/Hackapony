@@ -32,7 +32,7 @@ export function LocationChip({ geo, nearestStop, onOpenStop }: LocationChipProps
         onClick={geo.request}
         className={cn(
           BASE,
-          "bg-info/10 text-info transition-colors duration-300 ease-out hover:bg-info/15 active:bg-info/20",
+          "bg-info/10 text-info-ink transition-colors duration-300 ease-out hover:bg-info/15 active:bg-info/20",
           "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
         )}
       >
@@ -54,7 +54,7 @@ export function LocationChip({ geo, nearestStop, onOpenStop }: LocationChipProps
           "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
         )}
       >
-        <MapPin aria-hidden className="size-5 shrink-0 text-info" />
+        <MapPin aria-hidden className="size-5 shrink-0 text-info-ink" />
         <span className="min-w-0 flex-1 leading-snug break-words">
           Cerca de: <span className="font-semibold">{nearestStop.stop.name}</span>
           {" · "}
@@ -69,7 +69,7 @@ export function LocationChip({ geo, nearestStop, onOpenStop }: LocationChipProps
   // granted, sin parada o sin callback
   return (
     <p className={cn(BASE, "bg-foreground/5")} aria-live="polite">
-      <MapPin aria-hidden className="size-5 shrink-0 text-info" />
+      <MapPin aria-hidden className="size-5 shrink-0 text-info-ink" />
       {nearestStop ? (
         <span className="min-w-0 leading-snug break-words">
           Cerca de: <span className="font-semibold">{nearestStop.stop.name}</span>

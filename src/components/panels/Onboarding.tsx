@@ -162,7 +162,7 @@ export function Onboarding() {
       >
         <div key={step} className="space-y-4 animate-in fade-in duration-300">
           <div className="flex items-center justify-between">
-            <span className="flex size-11 items-center justify-center rounded-2xl bg-info/10 text-info">
+            <span className="flex size-11 items-center justify-center rounded-2xl bg-info/10 text-info-ink">
               <current.icon aria-hidden className="size-6" />
             </span>
             <p className="text-xs font-medium text-muted-foreground tabular-nums">

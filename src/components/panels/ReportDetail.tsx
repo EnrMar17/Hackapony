@@ -72,7 +72,7 @@ export function ReportDetail({ reportId, reports, routes, now, onVote, loading, 
       </header>
 
       {report.resolved ? (
-        <p className="flex min-h-12 items-center gap-2 rounded-2xl bg-seguro/10 px-3 text-sm font-semibold text-seguro">
+        <p className="flex min-h-12 items-center gap-2 rounded-2xl bg-seguro/10 px-3 text-sm font-semibold text-seguro-ink">
           <CircleCheck aria-hidden className="size-5 shrink-0" />
           Resuelto
         </p>
