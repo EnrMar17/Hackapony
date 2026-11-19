@@ -9,6 +9,7 @@ import { useDeviceOnline } from "./connection";
 import { formatSince, useLastReportsUpdate } from "./liveSync";
 import { HelpDialog } from "./HelpDialog";
 import { Onboarding } from "./Onboarding";
+import { ThemePicker } from "./ThemePicker";
 import { RoutePicker } from "./RoutePicker";
 import { MAX_INLINE_ROUTES, readableText } from "./routeMeta";
 
@@ -93,23 +94,28 @@ export function TopBar({ routes, online, connected }: TopBarProps) {
         <span className="sr-only">Ayuda: qué significa cada cosa</span>
       </button>
 
-      <p className="glass pointer-events-auto flex min-h-12 shrink-0 flex-col items-start justify-center rounded-3xl px-3 py-1 text-xs font-medium shadow-md">
-        <span className="flex items-center gap-1.5">
-          <Users aria-hidden className="size-4 text-seguro-ink" />
-          <span className="tabular-nums">{online}</span> en línea
-        </span>
-        {/* Discreto: dice si lo que se ve está al día. */}
-        {freshness && (
-          <span
-            className={cn(
-              "text-[11px] leading-tight font-normal tabular-nums",
-              isOnline ? "text-muted-foreground" : "font-semibold text-peligro-ink",
-            )}
-          >
-            {freshness}
+      <ThemePicker />
+
+      {/* En móvil el contador baja a una segunda fila para que quepan rutas, ayuda y modo oscuro. */}
+      <div className="flex basis-full sm:basis-auto">
+        <p className="glass pointer-events-auto flex min-h-12 shrink-0 flex-col items-start justify-center rounded-3xl px-3 py-1 text-xs font-medium shadow-md">
+          <span className="flex items-center gap-1.5">
+            <Users aria-hidden className="size-4 text-seguro-ink" />
+            <span className="tabular-nums">{online}</span> en línea
           </span>
-        )}
-      </p>
+          {/* Discreto: dice si lo que se ve está al día. */}
+          {freshness && (
+            <span
+              className={cn(
+                "text-[11px] leading-tight font-normal tabular-nums",
+                isOnline ? "text-muted-foreground" : "font-semibold text-peligro-ink",
+              )}
+            >
+              {freshness}
+            </span>
+          )}
+        </p>
+      </div>
 
       {/* Sin red no se puede reportar (useReports no guarda una cola), así que se avisa claro. */}
       {!isOnline && (

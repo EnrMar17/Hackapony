@@ -6,8 +6,8 @@ import { DARK_QUERY } from "./themeScript";
 import { setThemePreference, useResolvedTheme } from "./theme";
 
 /**
- * Interruptor de modo oscuro. Por defecto sigue al sistema; al tocarlo se guarda la elección.
- * Si la elección coincide con el sistema, se vuelve a "seguir al sistema" (no se guarda nada).
+ * Interruptor claro/oscuro para la barra superior: sol y luna, con la perilla en el modo activo.
+ * Por defecto sigue al sistema; si la elección coincide con el sistema, se vuelve a seguirlo.
  */
 export function ThemePicker() {
   const dark = useResolvedTheme() === "dark";
@@ -24,32 +24,34 @@ export function ThemePicker() {
       role="switch"
       aria-checked={dark}
       onClick={toggle}
-      className={cn(
-        "flex min-h-12 w-full items-center gap-3 rounded-2xl bg-foreground/5 px-3 py-2 text-left text-sm font-semibold",
-        "transition-colors duration-300 ease-out hover:bg-foreground/10",
-        "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
-      )}
+      className="glass pointer-events-auto relative flex h-12 w-[5.25rem] shrink-0 items-center justify-between rounded-full px-1.5 shadow-md focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
     >
-      {dark ? (
-        <Moon aria-hidden className="size-5 shrink-0" />
-      ) : (
-        <Sun aria-hidden className="size-5 shrink-0" />
-      )}
-      <span className="flex-1">Modo oscuro</span>
-      {/* Riel y perilla del interruptor */}
+      <span className="sr-only">Modo oscuro</span>
+      {/* Perilla: se desliza al modo activo */}
       <span
         aria-hidden
         className={cn(
-          "relative h-7 w-12 shrink-0 rounded-full transition-colors duration-300 ease-out",
-          dark ? "bg-info" : "bg-foreground/20",
+          "absolute top-1.5 left-1.5 size-9 rounded-full bg-foreground shadow-sm transition-transform duration-300 ease-out",
+          dark && "translate-x-9",
+        )}
+      />
+      <span
+        aria-hidden
+        className={cn(
+          "relative flex size-9 items-center justify-center transition-colors duration-300",
+          dark ? "text-muted-foreground" : "text-background",
         )}
       >
-        <span
-          className={cn(
-            "absolute top-1 left-1 size-5 rounded-full bg-white shadow-sm transition-transform duration-300 ease-out",
-            dark && "translate-x-5",
-          )}
-        />
+        <Sun className="size-4.5" />
+      </span>
+      <span
+        aria-hidden
+        className={cn(
+          "relative flex size-9 items-center justify-center transition-colors duration-300",
+          dark ? "text-background" : "text-muted-foreground",
+        )}
+      >
+        <Moon className="size-4.5" />
       </span>
     </button>
   );
