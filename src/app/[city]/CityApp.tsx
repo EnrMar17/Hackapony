@@ -227,7 +227,7 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
           noticesSlot={<NoticeBanner notices={notices} routes={fullBundle.routes} />}
           tripSlot={<TripPanel stops={tripStops} options={tripOptions} geo={geo} connected={connected} />}
         />
-        <ReportBar onReport={onReport} routeChoices={routeChoices} geo={geo} nearestStop={nearest} />
+        <ReportBar onReport={onReport} routeChoices={routeChoices} geo={geo} nearestStop={nearest} reports={reports} />
       </div>
       <Splash />
     </main>
