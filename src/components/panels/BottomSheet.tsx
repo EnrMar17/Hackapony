@@ -17,11 +17,13 @@ export interface BottomSheetProps {
   vehicles?: Vehicle[];
   /** Opcional: sin ella los botones de voto quedan deshabilitados. */
   onVote?: (reportId: string, kind: VoteKind) => void;
+  loading?: boolean;
+  error?: string | null;
 }
 
 const CLOCK_MS = 30_000;
 
-export function BottomSheet({ bundle, reports, vehicles, onVote }: BottomSheetProps) {
+export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false, error = null }: BottomSheetProps) {
   const open = useUi((s) => s.sheetOpen);
   const setOpen = useUi((s) => s.setSheetOpen);
   const selectedStop = useUi((s) => s.selectedStop);
@@ -47,10 +49,6 @@ export function BottomSheet({ bundle, reports, vehicles, onVote }: BottomSheetPr
     setNow(Date.now());
     setOpen(true);
   }
-
-  // TODO(Tony): pasar loading/error de useReports cuando BottomSheetProps los tenga.
-  const loading = false;
-  const error: string | null = null;
 
   return (
     <div className="pointer-events-none! flex flex-col items-end">
