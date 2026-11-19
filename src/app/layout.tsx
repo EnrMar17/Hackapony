@@ -23,6 +23,7 @@ export const metadata: Metadata = {
   applicationName: "Ruta Segura",
   formatDetection: { telephone: false },
   icons: {
+    icon: "/icon.svg",
     apple: "/icons/apple-touch-icon.png",
   },
   appleWebApp: {
