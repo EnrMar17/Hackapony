@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Inbox, X } from "lucide-react";
+import { ChevronDown, FlaskConical, Inbox, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive } from "@/lib/geo";
 import { useUi } from "@/store/ui";
@@ -49,6 +49,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
   }, [visible]);
 
   const activeCount = reports.filter((r) => isActive(r, now)).length;
+  const hasSimulated = reports.some((r) => r.is_simulated);
 
   function close() {
     selectStop(null);
@@ -135,6 +136,12 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
                   loading={loading}
                   error={error}
                 />
+              )}
+              {hasSimulated && (
+                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <FlaskConical aria-hidden className="size-3.5 shrink-0" />
+                  Datos de demostración: algunos reportes son simulados.
+                </p>
               )}
               <AccessibleFilter />
               <RouteStatusCard routes={bundle.routes} reports={reports} loading={loading} error={error} />

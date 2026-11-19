@@ -1,9 +1,10 @@
 "use client";
 
-import { Check, CircleHelp, Users } from "lucide-react";
+import { Check, CircleHelp, Users, WifiOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import type { Route } from "@/lib/types";
+import { useDeviceOnline } from "./connection";
 import { Onboarding, openOnboarding } from "./Onboarding";
 import { RoutePicker } from "./RoutePicker";
 import { MAX_INLINE_ROUTES, readableText } from "./routeMeta";
@@ -16,10 +17,11 @@ export interface TopBarProps {
 export function TopBar({ routes, online }: TopBarProps) {
   const selected = useUi((s) => s.selectedRoute);
   const selectRoute = useUi((s) => s.selectRoute);
+  const deviceOnline = useDeviceOnline();
 
   return (
     // La franja completa deja pasar los toques al mapa; solo los chips y el contador los reciben.
-    <div className="pointer-events-none! flex items-center gap-2 px-safe pt-safe pb-2 lg:pt-4 lg:pr-4 lg:pl-[432px]">
+    <div className="pointer-events-none! flex flex-wrap items-center gap-2 px-safe pt-safe pb-2 lg:pt-4 lg:pr-4 lg:pl-[432px]">
       {routes.length > MAX_INLINE_ROUTES ? (
         <RoutePicker routes={routes} />
       ) : (
@@ -73,6 +75,17 @@ export function TopBar({ routes, online }: TopBarProps) {
         <Users aria-hidden className="size-4 text-seguro-ink" />
         <span className="tabular-nums">{online}</span> en línea
       </p>
+
+      {/* Sin red no se puede reportar (useReports no guarda una cola), así que se avisa claro. */}
+      {!deviceOnline && (
+        <p
+          role="status"
+          className="pointer-events-auto flex min-h-10 basis-full items-center gap-2 rounded-2xl bg-precaucion px-3 py-2 text-sm font-semibold text-precaucion-foreground shadow-md animate-in fade-in slide-in-from-top-1 duration-300"
+        >
+          <WifiOff aria-hidden className="size-4 shrink-0" />
+          Sin conexión · reporta cuando vuelva la señal
+        </p>
+      )}
 
       <Onboarding />
     </div>
