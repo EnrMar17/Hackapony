@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RATE_LIMIT_MS } from "@/lib/constants";
-import { BASE_SPEED_KMH } from "@/lib/simulator/config";
+import { BASE_SPEED_KMH, MAX_HEADWAY_S, MIN_HEADWAY_S } from "@/lib/simulator/config";
 import type { NewReport, Report, SimControls, Stop } from "@/lib/types";
 
 export interface SimulatorPanelProps {
@@ -23,6 +23,12 @@ export function SimSpeedControls({ sim }: { sim: SimControls }) {
   const kmh = Math.round(sim.speed * BASE_SPEED_KMH);
   const [draft, setDraft] = useState<number | null>(null);
   const shown = draft ?? kmh;
+  const [headDraft, setHeadDraft] = useState<number | null>(null);
+  const headMin = headDraft ?? Math.round(sim.headwayS / 60);
+  const commitHead = () => {
+    if (headDraft !== null) sim.setHeadwayS(headDraft * 60);
+    setHeadDraft(null);
+  };
   const commit = () => {
     if (draft !== null) sim.setSpeed(draft / BASE_SPEED_KMH);
     setDraft(null);
@@ -62,6 +68,24 @@ export function SimSpeedControls({ sim }: { sim: SimControls }) {
           onPointerUp={commit}
           onKeyUp={commit}
           onBlur={commit}
+          className="mt-1 h-12 w-full accent-slate-900"
+        />
+      </label>
+      <label className="block">
+        <span className="flex items-baseline justify-between text-xs font-medium text-slate-700">
+          Unidades por ruta (una cada…)
+          <span className="text-sm font-semibold tabular-nums text-slate-900">{headMin} min</span>
+        </span>
+        <input
+          type="range"
+          min={MIN_HEADWAY_S / 60}
+          max={MAX_HEADWAY_S / 60}
+          step={1}
+          value={headMin}
+          onChange={(e) => setHeadDraft(Number(e.target.value))}
+          onPointerUp={commitHead}
+          onKeyUp={commitHead}
+          onBlur={commitHead}
           className="mt-1 h-12 w-full accent-slate-900"
         />
       </label>

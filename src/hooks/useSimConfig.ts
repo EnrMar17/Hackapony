@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { getSupabase } from "@/lib/supabase/client";
 import { localToServerMs, serverToLocalMs, syncClock } from "@/lib/supabase/clock";
+import { HEADWAY_S, MAX_HEADWAY_S, MIN_HEADWAY_S } from "@/lib/simulator/config";
 import type { SimConfig, SimControls } from "@/lib/types";
 
 /** Rango válido del multiplicador (≈4 a 216 km/h). Fuera de él se ignora el mensaje. */
@@ -21,7 +22,7 @@ const nowMs = () => Date.now();
 
 /** Valor inicial común a todos: el tiempo del simulador arranca igual en cualquier dispositivo (hora del servidor). */
 function defaultConfig(): SimConfig {
-  return { playing: true, speed: 1, anchorWallMs: serverToLocalMs(0), anchorSimMs: 0 };
+  return { playing: true, speed: 1, headwayS: HEADWAY_S, anchorWallMs: serverToLocalMs(0), anchorSimMs: 0 };
 }
 
 function toWire(c: SimConfig): SimConfig {
@@ -30,11 +31,13 @@ function toWire(c: SimConfig): SimConfig {
 
 function fromWire(payload: unknown): SimConfig | null {
   if (typeof payload !== "object" || payload === null) return null;
-  const { playing, speed, anchorWallMs, anchorSimMs } = payload as Record<string, unknown>;
+  const { playing, speed, headwayS, anchorWallMs, anchorSimMs } = payload as Record<string, unknown>;
   if (typeof playing !== "boolean" || typeof speed !== "number" || !(speed >= MIN_SPEED && speed <= MAX_SPEED)) return null;
   if (typeof anchorWallMs !== "number" || !Number.isFinite(anchorWallMs)) return null;
   if (typeof anchorSimMs !== "number" || !Number.isFinite(anchorSimMs)) return null;
-  return { playing, speed, anchorWallMs: serverToLocalMs(anchorWallMs), anchorSimMs };
+  // Un mensaje de una versión anterior no trae el intervalo: se usa el normal.
+  const headway = typeof headwayS === "number" && headwayS >= MIN_HEADWAY_S && headwayS <= MAX_HEADWAY_S ? headwayS : HEADWAY_S;
+  return { playing, speed, headwayS: headway, anchorWallMs: serverToLocalMs(anchorWallMs), anchorSimMs };
 }
 
 export function useSimConfig(): SimControls {
@@ -89,7 +92,7 @@ export function useSimConfig(): SimControls {
     };
   }, []);
 
-  const update = useCallback((patch: Partial<Pick<SimConfig, "playing" | "speed">>) => {
+  const update = useCallback((patch: Partial<Pick<SimConfig, "playing" | "speed" | "headwayS">>) => {
     const now = nowMs();
     const c = configRef.current;
     // El tiempo del simulador "ahora" se calcula con la configuración ANTERIOR y pasa a ser el nuevo ancla.
@@ -104,5 +107,10 @@ export function useSimConfig(): SimControls {
   const setPlaying = useCallback((playing: boolean) => update({ playing }), [update]);
   const setSpeed = useCallback((speed: SimConfig["speed"]) => update({ speed: Math.min(MAX_SPEED, Math.max(MIN_SPEED, speed)) }), [update]);
 
-  return { ...config, setPlaying, setSpeed };
+  const setHeadwayS = useCallback(
+    (headwayS: number) => update({ headwayS: Math.min(MAX_HEADWAY_S, Math.max(MIN_HEADWAY_S, Math.round(headwayS))) }),
+    [update],
+  );
+
+  return { ...config, setPlaying, setSpeed, setHeadwayS };
 }
