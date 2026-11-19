@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, Inbox, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isActive } from "@/lib/geo";
 import { useUi } from "@/store/ui";
 import type { CityBundle, Report, Vehicle, VoteKind } from "@/lib/types";
 import { ReportDetail } from "./ReportDetail";
@@ -45,6 +46,8 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
     return () => window.clearInterval(id);
   }, [visible]);
 
+  const activeCount = reports.filter((r) => isActive(r, now)).length;
+
   function close() {
     selectStop(null);
     selectReport(null);
@@ -71,8 +74,8 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
           )}
         >
           <Inbox aria-hidden className="size-4" />
-          Reportes
-          <span className="tabular-nums rounded-full bg-foreground/10 px-2 py-0.5 text-xs">{reports.length}</span>
+          Qué está pasando
+          <span className="tabular-nums rounded-full bg-foreground/10 px-2 py-0.5 text-xs">{activeCount}</span>
         </button>
       )}
 
