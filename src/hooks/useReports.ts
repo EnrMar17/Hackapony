@@ -87,12 +87,16 @@ async function fetchReports(): Promise<Report[]> {
   return (data as ReportRow[]).map(fromRow);
 }
 
-export function useReports(): ReportsState {
+/** ReportsState más `lastUpdateAt` (ms del último dato recibido). Kike lo añade al contrato; el tipo es compatible. */
+export type ReportsStateLive = ReportsState & { lastUpdateAt?: number };
+
+export function useReports(): ReportsStateLive {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(() => getSupabase() !== null);
   const [error, setError] = useState<string | null>(() => (getSupabase() ? null : "Falta configurar Supabase"));
   const [online, setOnline] = useState(false);
   const [live, setLive] = useState(false);
+  const [lastUpdateAt, setLastUpdateAt] = useState<number | undefined>(undefined);
 
   const lastSent = useRef(0);
   const userIdRef = useRef<string | null>(null);
@@ -106,6 +110,7 @@ export function useReports(): ReportsState {
   /** Reemplaza la lista con lo del servidor, conservando los reportes optimistas pendientes. */
   const applyFetched = useCallback((list: Report[]) => {
     setReports((prev) => [...list, ...prev.filter((r) => r.id.startsWith(TMP))].sort(byNewest));
+    setLastUpdateAt(Date.now()); // llegó un dato (carga inicial o sondeo)
   }, []);
 
   const refresh = useCallback(async () => {
@@ -151,6 +156,7 @@ export function useReports(): ReportsState {
         .channel(`reports-feed-${Math.random().toString(36).slice(2)}`)
         .on<ReportRow>("postgres_changes", { event: "*", schema: "public", table: "reports" }, (payload) => {
           if (!active) return;
+          setLastUpdateAt(Date.now()); // llegó un dato en vivo
           if (payload.eventType === "DELETE") {
             const id = payload.old.id;
             if (id) setReports((prev) => prev.filter((r) => r.id !== id));
@@ -348,5 +354,5 @@ export function useReports(): ReportsState {
     [refresh],
   );
 
-  return { reports, loading, error, online, sendReport, vote, undo, refine };
+  return { reports, loading, error, online, lastUpdateAt, sendReport, vote, undo, refine };
 }
