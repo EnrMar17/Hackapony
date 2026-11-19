@@ -140,6 +140,76 @@
     "has_roof": false
   },
   {
+    "id": "g1-15",
+    "route_id": "GRIS-1",
+    "name": "Avenida Camelinas · Chapultepec Oriente (sentido contrario)",
+    "lng": -101.16022,
+    "lat": 19.6879,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-16",
+    "route_id": "GRIS-1",
+    "name": "Avenida Camelinas · Félix Ireta (sentido contrario)",
+    "lng": -101.18134,
+    "lat": 19.68127,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "g1-17",
+    "route_id": "GRIS-1",
+    "name": "Periférico Independencia · Residencial del Sur (sentido contrario)",
+    "lng": -101.20221,
+    "lat": 19.67696,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-18",
+    "route_id": "GRIS-1",
+    "name": "Periférico Independencia · Josefa Ortiz De Domínguez (sentido contrario)",
+    "lng": -101.21191,
+    "lat": 19.67301,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "g1-19",
+    "route_id": "GRIS-1",
+    "name": "Periférico Independencia · Jardines De La Loma (sentido contrario)",
+    "lng": -101.2221,
+    "lat": 19.67675,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-20",
+    "route_id": "GRIS-1",
+    "name": "Circuito Periférico Paseo de la República · La Quemada (sentido contrario)",
+    "lng": -101.23847,
+    "lat": 19.70663,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "g1-21",
+    "route_id": "GRIS-1",
+    "name": "Circuito Periférico Paseo de la República · Infonavit Justo Mendoza (sentido contrario)",
+    "lng": -101.23157,
+    "lat": 19.71449,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
     "id": "n1-01",
     "route_id": "NARANJA-1",
     "name": "Periférico Independencia · Josefa Ortiz De Domínguez",
@@ -267,6 +337,2576 @@
     "lat": 19.68099,
     "has_light": false,
     "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-2-01",
+    "route_id": "GRIS-2",
+    "name": "Avenida Siervo de la Nación · Agustín Arriaga Rivera",
+    "lng": -101.22574,
+    "lat": 19.69138,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-2-02",
+    "route_id": "GRIS-2",
+    "name": "Avenida Pedregal · Infonavit La Colina",
+    "lng": -101.21584,
+    "lat": 19.70499,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "gris-2-03",
+    "route_id": "GRIS-2",
+    "name": "Avenida Pedregal · Eduardo Ruíz",
+    "lng": -101.22351,
+    "lat": 19.72321,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-2-04",
+    "route_id": "GRIS-2",
+    "name": "El Realito",
+    "lng": -101.2038,
+    "lat": 19.72524,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-2-05",
+    "route_id": "GRIS-2",
+    "name": "Periférico Revolución · Alfonso García Robles",
+    "lng": -101.18168,
+    "lat": 19.71916,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "gris-2-06",
+    "route_id": "GRIS-2",
+    "name": "Avenida Madero · Buenavista I",
+    "lng": -101.16377,
+    "lat": 19.70744,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-2-07",
+    "route_id": "GRIS-2",
+    "name": "Calle Ocolusen · Poblado Ocolusen",
+    "lng": -101.15036,
+    "lat": 19.69163,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-2-08",
+    "route_id": "GRIS-2",
+    "name": "Avenida Camelinas",
+    "lng": -101.16941,
+    "lat": 19.68234,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "gris-2-09",
+    "route_id": "GRIS-2",
+    "name": "Calle Cutzi · Félix Ireta",
+    "lng": -101.18556,
+    "lat": 19.68775,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-2-10",
+    "route_id": "GRIS-2",
+    "name": "Calzada Juárez · Alberto Oviedo Mota",
+    "lng": -101.19567,
+    "lat": 19.6864,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-2-11",
+    "route_id": "GRIS-2",
+    "name": "Periférico Independencia · Josefa Ortiz De Domínguez",
+    "lng": -101.20917,
+    "lat": 19.67207,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "gris-2-12",
+    "route_id": "GRIS-2",
+    "name": "Periférico Independencia · Indeco El Vivero",
+    "lng": -101.2312,
+    "lat": 19.67752,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-01",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Calle Francisco Matos Coronado · Unión",
+    "lng": -101.15886,
+    "lat": 19.71088,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-02",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Circuito Periférico Paseo de la República · Poblado Ocolusen",
+    "lng": -101.15008,
+    "lat": 19.69248,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "gris-3-furamo-03",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Avenida Solidaridad · Ventura Puente",
+    "lng": -101.18082,
+    "lat": 19.68849,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-04",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Calzada Arnulfo Ávila · Morelos",
+    "lng": -101.20839,
+    "lat": 19.69698,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-05",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Calle Bocamelia · Eduardo Ruíz",
+    "lng": -101.22106,
+    "lat": 19.72139,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "gris-3-furamo-06",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Circuito Periférico Paseo de la República",
+    "lng": -101.24385,
+    "lat": 19.70521,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-07",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Calle Valentín Fernández · Ignacio López Rayón",
+    "lng": -101.25138,
+    "lat": 19.68984,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-08",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Avenida José María Ocampo · Héroes De La Nación",
+    "lng": -101.2483,
+    "lat": 19.69029,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "gris-3-furamo-09",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Manantiales Poniente",
+    "lng": -101.24251,
+    "lat": 19.69848,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-10",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Parada",
+    "lng": -101.22663,
+    "lat": 19.72103,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-11",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Avenida Francisco I. Madero Poniente · Nueva Valladolid",
+    "lng": -101.21241,
+    "lat": 19.70177,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "gris-3-furamo-12",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Avenida Solidaridad · Félix Ireta",
+    "lng": -101.19139,
+    "lat": 19.69091,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-13",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Avenida Solidaridad · Electricistas",
+    "lng": -101.17702,
+    "lat": 19.68701,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-furamo-14",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Circuito Periférico Paseo de la República · Lomas De Las Américas",
+    "lng": -101.14908,
+    "lat": 19.69562,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "gris-3-furamo-15",
+    "route_id": "GRIS-3-FURAMO",
+    "name": "Calle Juan José Moreno · Unión",
+    "lng": -101.1552,
+    "lat": 19.70948,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-oxxo-01",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Calle Filipinas · Unión",
+    "lng": -101.15714,
+    "lat": 19.70998,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-oxxo-02",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Periférico Oriente · Pascual Ortiz de Ayala",
+    "lng": -101.15261,
+    "lat": 19.69848,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "gris-3-oxxo-03",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Avenida Solidaridad · Nueva Chapultepec",
+    "lng": -101.16894,
+    "lat": 19.68524,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-oxxo-04",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Calle General Martin Castrejón · Felícitas Del Río",
+    "lng": -101.19864,
+    "lat": 19.6918,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-oxxo-05",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Avenida Pedregal · Infonavit La Colina",
+    "lng": -101.21551,
+    "lat": 19.70599,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "gris-3-oxxo-06",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Nicolaitas Ilustres",
+    "lng": -101.22797,
+    "lat": 19.72015,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-oxxo-07",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Avenida Francisco I. Madero Poniente",
+    "lng": -101.24596,
+    "lat": 19.69975,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-oxxo-08",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Avenida Hacienda de los Naranjos · Hacienda De Tiníjaro",
+    "lng": -101.25756,
+    "lat": 19.68491,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "gris-3-oxxo-09",
+    "route_id": "GRIS-3-OXXO",
+    "name": "La Quemada",
+    "lng": -101.2432,
+    "lat": 19.70058,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-oxxo-10",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Ampliación Félix Arreguín",
+    "lng": -101.22582,
+    "lat": 19.72238,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-oxxo-11",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Avenida Francisco I. Madero Poniente",
+    "lng": -101.2133,
+    "lat": 19.70211,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "gris-3-oxxo-12",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Avenida Solidaridad",
+    "lng": -101.17196,
+    "lat": 19.68565,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-3-oxxo-13",
+    "route_id": "GRIS-3-OXXO",
+    "name": "Circuito Periférico Paseo de la República · Pascual Ortiz de Ayala",
+    "lng": -101.1493,
+    "lat": 19.69625,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-4-01",
+    "route_id": "GRIS-4",
+    "name": "Avenida del Ferrocarril · Las Margaritas",
+    "lng": -101.21054,
+    "lat": 19.71071,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-4-02",
+    "route_id": "GRIS-4",
+    "name": "Calle División del Norte · Industrial",
+    "lng": -101.19365,
+    "lat": 19.71226,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "gris-4-03",
+    "route_id": "GRIS-4",
+    "name": "Periférico Revolución",
+    "lng": -101.17746,
+    "lat": 19.71895,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-4-04",
+    "route_id": "GRIS-4",
+    "name": "Avenida Madero · Buenavista I",
+    "lng": -101.16375,
+    "lat": 19.70743,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-4-05",
+    "route_id": "GRIS-4",
+    "name": "Circuito Periférico Paseo de la República · Pascual Ortiz de Ayala",
+    "lng": -101.14967,
+    "lat": 19.69591,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "gris-4-06",
+    "route_id": "GRIS-4",
+    "name": "Avenida Camelinas · Cinco De Diciembre",
+    "lng": -101.1616,
+    "lat": 19.6873,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-4-07",
+    "route_id": "GRIS-4",
+    "name": "Avenida Camelinas",
+    "lng": -101.17859,
+    "lat": 19.68166,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-4-08",
+    "route_id": "GRIS-4",
+    "name": "Periférico Independencia",
+    "lng": -101.19614,
+    "lat": 19.68157,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "gris-4-09",
+    "route_id": "GRIS-4",
+    "name": "Periférico Independencia · Josefa Ortiz De Domínguez",
+    "lng": -101.20962,
+    "lat": 19.67212,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "gris-4-10",
+    "route_id": "GRIS-4",
+    "name": "Periférico Independencia · Ampliación Ana María Gallaga",
+    "lng": -101.227,
+    "lat": 19.67689,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "gris-4-11",
+    "route_id": "GRIS-4",
+    "name": "Avenida Siervo de la Nación · Sentimientos de La Nación",
+    "lng": -101.23313,
+    "lat": 19.68659,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "gris-4-12",
+    "route_id": "GRIS-4",
+    "name": "Avenida Periodismo · Agustín Arriaga Rivera",
+    "lng": -101.21859,
+    "lat": 19.69638,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-1-soledad-01",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Periférico Independencia · Josefa Ortiz De Domínguez",
+    "lng": -101.21509,
+    "lat": 19.67453,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-1-soledad-02",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Periférico Independencia · Vista Bella",
+    "lng": -101.20213,
+    "lat": 19.6772,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-1-soledad-03",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Virrey Antonio de Mendoza · Félix Ireta",
+    "lng": -101.19075,
+    "lat": 19.68442,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-1-soledad-04",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Calle Antonio de Virrey de Mendoza · Centro Histórico",
+    "lng": -101.19045,
+    "lat": 19.69945,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-1-soledad-05",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Avenida Morelos Norte · Doctor Miguel Silva González",
+    "lng": -101.18836,
+    "lat": 19.71288,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-1-soledad-06",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Carretera Morelia - Salamanca · Fovissste Santiaguito",
+    "lng": -101.18362,
+    "lat": 19.72613,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-1-soledad-07",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Avenida Tecnológico",
+    "lng": -101.18674,
+    "lat": 19.72312,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-1-soledad-08",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Avenida Morelos Norte · Obrera",
+    "lng": -101.18966,
+    "lat": 19.70912,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-1-soledad-09",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Avenida Morelos Sur · Centro Histórico",
+    "lng": -101.19164,
+    "lat": 19.69628,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-1-soledad-10",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Avenida Camelinas · Félix Ireta",
+    "lng": -101.19322,
+    "lat": 19.68216,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-1-soledad-11",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Periférico Independencia · Balcones De Morelia",
+    "lng": -101.204,
+    "lat": 19.67481,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-1-soledad-12",
+    "route_id": "NARANJA-1-SOLEDAD",
+    "name": "Circuito Uacúsecha · Xangari",
+    "lng": -101.21798,
+    "lat": 19.67354,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-01",
+    "route_id": "NARANJA-2",
+    "name": "Boulevard París · Tres de Agosto",
+    "lng": -101.16872,
+    "lat": 19.73254,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-02",
+    "route_id": "NARANJA-2",
+    "name": "Avenida Morelos Norte · San Juan",
+    "lng": -101.18309,
+    "lat": 19.7315,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-2-03",
+    "route_id": "NARANJA-2",
+    "name": "Avenida Morelos Norte · Doctor Miguel Silva González",
+    "lng": -101.1885,
+    "lat": 19.71295,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-04",
+    "route_id": "NARANJA-2",
+    "name": "Avenida Morelos Sur · Ventura Puente",
+    "lng": -101.19178,
+    "lat": 19.69321,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-05",
+    "route_id": "NARANJA-2",
+    "name": "Calle General Francisco J. Múgica · Ciudad Universitaria",
+    "lng": -101.20714,
+    "lat": 19.69161,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-2-06",
+    "route_id": "NARANJA-2",
+    "name": "Avenida La Huerta",
+    "lng": -101.21752,
+    "lat": 19.6807,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-07",
+    "route_id": "NARANJA-2",
+    "name": "Calle Doctor Cayetano Andrade · Gustavo Díaz Ordaz",
+    "lng": -101.20342,
+    "lat": 19.69266,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-08",
+    "route_id": "NARANJA-2",
+    "name": "Calle Lago de Pátzcuaro · Ventura Puente",
+    "lng": -101.18671,
+    "lat": 19.69226,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-2-09",
+    "route_id": "NARANJA-2",
+    "name": "Calle Vasco de Quiroga · Centro Histórico",
+    "lng": -101.18976,
+    "lat": 19.69889,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-10",
+    "route_id": "NARANJA-2",
+    "name": "Avenida Morelos Norte · Doctor Miguel Silva González",
+    "lng": -101.18838,
+    "lat": 19.71988,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-11",
+    "route_id": "NARANJA-2",
+    "name": "Calle Licenciado Guillermo Morales Osorio · Profesor Jesús Romero Flores",
+    "lng": -101.18102,
+    "lat": 19.73338,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-2-12",
+    "route_id": "NARANJA-2",
+    "name": "París · Satélite",
+    "lng": -101.16489,
+    "lat": 19.73266,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-santa-fe-01",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Calle Sitio de Cuautla · Tiníjaro",
+    "lng": -101.25765,
+    "lat": 19.69644,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-santa-fe-02",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Avenida Francisco I. Madero Poniente · Manantiales Poniente",
+    "lng": -101.2426,
+    "lat": 19.70037,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-2-santa-fe-03",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Avenida Francisco I Madero Poniente · Los Ejidos",
+    "lng": -101.21877,
+    "lat": 19.70494,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-santa-fe-04",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Avenida Francisco I. Madero Poniente · Centro Histórico",
+    "lng": -101.19643,
+    "lat": 19.703,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-santa-fe-05",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Avenida Acueducto · Chapultepec Norte",
+    "lng": -101.17603,
+    "lat": 19.69811,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-2-santa-fe-06",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Calle Rey Tizoc · Insurgentes",
+    "lng": -101.15399,
+    "lat": 19.69643,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-santa-fe-07",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Periférico Oriente · Buenavista I",
+    "lng": -101.1621,
+    "lat": 19.70627,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-santa-fe-08",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Periférico Revolución · Doctor Miguel Silva González",
+    "lng": -101.18089,
+    "lat": 19.71984,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-2-santa-fe-09",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Circuito Periférico Paseo de la República · El Realito",
+    "lng": -101.20401,
+    "lat": 19.72564,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-santa-fe-10",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Circuito Periférico Paseo de la República · Nicolaitas Ilustres",
+    "lng": -101.22593,
+    "lat": 19.72279,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-2-santa-fe-11",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Circuito Periférico Paseo de la República · Reforma",
+    "lng": -101.24148,
+    "lat": 19.70591,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-2-santa-fe-12",
+    "route_id": "NARANJA-2-SANTA-FE",
+    "name": "Avenida Francisco I. Madero Poniente · Tiníjaro",
+    "lng": -101.26169,
+    "lat": 19.6966,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-directo-01",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Avenida Galaxias",
+    "lng": -101.19811,
+    "lat": 19.76273,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-directo-02",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Parada",
+    "lng": -101.18203,
+    "lat": 19.75938,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-directo-03",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Carretera Morelia - Salamanca",
+    "lng": -101.17223,
+    "lat": 19.74987,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-directo-04",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Carretera Morelia - Salamanca · La Soledad Oriente",
+    "lng": -101.18275,
+    "lat": 19.73472,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-directo-05",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Avenida Morelos Norte · Doctor Miguel Silva González",
+    "lng": -101.18894,
+    "lat": 19.71599,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-directo-06",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Calle Juan José de Lejarza · Centro Histórico",
+    "lng": -101.18637,
+    "lat": 19.70051,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-directo-07",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Emiliano Zapata · Centro Histórico",
+    "lng": -101.18941,
+    "lat": 19.70543,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-directo-08",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Avenida Tecnológico",
+    "lng": -101.18728,
+    "lat": 19.72225,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-directo-09",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Carretera Morelia - Salamanca · Los Ángeles",
+    "lng": -101.17785,
+    "lat": 19.73907,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-directo-10",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Parada",
+    "lng": -101.1671,
+    "lat": 19.75854,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-directo-11",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Parada",
+    "lng": -101.18225,
+    "lat": 19.7644,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-directo-12",
+    "route_id": "NARANJA-3-DIRECTO",
+    "name": "Boulevard Hacienda del Sol",
+    "lng": -101.20172,
+    "lat": 19.76376,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-centro-01",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Boulevard Hacienda del Sol",
+    "lng": -101.20588,
+    "lat": 19.76439,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-centro-02",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Avenida Marfil Norte",
+    "lng": -101.19565,
+    "lat": 19.75683,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-centro-03",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Carretera Municipal: Torreon Nuevo - Erandeni - Entronque MEX 43",
+    "lng": -101.184,
+    "lat": 19.75151,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-centro-04",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Carretera Morelia - Salamanca · Los Ángeles",
+    "lng": -101.17509,
+    "lat": 19.74449,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-centro-05",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Carretera Morelia - Salamanca · Fovissste Santiaguito",
+    "lng": -101.18429,
+    "lat": 19.72524,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-centro-06",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Calle Emiliano Zapata · Centro Histórico",
+    "lng": -101.1912,
+    "lat": 19.70535,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-centro-07",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Carretera Morelia - Salamanca",
+    "lng": -101.18767,
+    "lat": 19.72215,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-centro-08",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Parada",
+    "lng": -101.16507,
+    "lat": 19.75848,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-centro-09",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Torreon Nuevo - Erandeni - Entronque MEX 43",
+    "lng": -101.18527,
+    "lat": 19.74823,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-centro-10",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Avenida Centauro",
+    "lng": -101.19492,
+    "lat": 19.76037,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-centro-11",
+    "route_id": "NARANJA-3-CENTRO",
+    "name": "Boulevard Hacienda Real",
+    "lng": -101.20566,
+    "lat": 19.76716,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-erandeni-01",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Avenida Cereal",
+    "lng": -101.17805,
+    "lat": 19.75138,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-erandeni-02",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Carretera Morelia - Salamanca · Los Ángeles",
+    "lng": -101.17778,
+    "lat": 19.73942,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-erandeni-03",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Avenida Tecnológico",
+    "lng": -101.18805,
+    "lat": 19.72175,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-erandeni-04",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Calle Belisario Domínguez · Centro Histórico",
+    "lng": -101.18879,
+    "lat": 19.7032,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-erandeni-05",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Gertrudiz Bocanegra · Ventura Puente",
+    "lng": -101.18357,
+    "lat": 19.68971,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-erandeni-06",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Avenida Camelinas · Félix Ireta",
+    "lng": -101.19428,
+    "lat": 19.68199,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-erandeni-07",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Avenida Michuacan · Lomas De Vista Bella",
+    "lng": -101.19787,
+    "lat": 19.67296,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-erandeni-08",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Calle Antonio Plaza · Lomas De Santa María",
+    "lng": -101.1866,
+    "lat": 19.67191,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-erandeni-09",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Parada",
+    "lng": -101.19101,
+    "lat": 19.68327,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-erandeni-10",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Calle Pino Suárez · Centro Histórico",
+    "lng": -101.19027,
+    "lat": 19.7067,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-erandeni-11",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Carretera Morelia - Salamanca",
+    "lng": -101.18519,
+    "lat": 19.72417,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-erandeni-12",
+    "route_id": "NARANJA-3-ERANDENI",
+    "name": "Óscar Chávez · Bicentenario",
+    "lng": -101.18223,
+    "lat": 19.74011,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-01",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Boulevard Hacienda del Sol",
+    "lng": -101.2019,
+    "lat": 19.76378,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-02",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Avenida Turquesa",
+    "lng": -101.19681,
+    "lat": 19.75179,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-metropolis-03",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Carretera Municipal: Torreon Nuevo - Erandeni - Entronque MEX 43",
+    "lng": -101.18072,
+    "lat": 19.7523,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-04",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Carretera Morelia - Salamanca · Los Ángeles",
+    "lng": -101.1773,
+    "lat": 19.74032,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-05",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Avenida Tecnológico",
+    "lng": -101.18796,
+    "lat": 19.7219,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-metropolis-06",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Calle Fray Juan de San Miguel · Centro Histórico",
+    "lng": -101.18881,
+    "lat": 19.70252,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-07",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Calle Río Suchiate · Ventura Puente",
+    "lng": -101.18052,
+    "lat": 19.6905,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-08",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Calle Juan de Ortega y Montañés · Centro Histórico",
+    "lng": -101.18952,
+    "lat": 19.69835,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-metropolis-09",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Avenida Morelos Norte · Doctor Miguel Silva González",
+    "lng": -101.18863,
+    "lat": 19.71724,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-10",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Carretera Morelia - Salamanca · La Soledad Oriente",
+    "lng": -101.1809,
+    "lat": 19.73733,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-11",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Carretera Morelia - Salamanca",
+    "lng": -101.16874,
+    "lat": 19.75628,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "naranja-3-metropolis-12",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Carretera Municipal: Torreon Nuevo - Erandeni - Entronque MEX 43",
+    "lng": -101.18377,
+    "lat": 19.75241,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-13",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Avenida Topacio",
+    "lng": -101.20017,
+    "lat": 19.75272,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "naranja-3-metropolis-14",
+    "route_id": "NARANJA-3-METROPOLIS",
+    "name": "Avenida Galaxias",
+    "lng": -101.19829,
+    "lat": 19.76271,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-1-01",
+    "route_id": "ROJA-1",
+    "name": "Circuito Periférico Paseo de la República · Jardines Del Rincón",
+    "lng": -101.15077,
+    "lat": 19.68976,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-02",
+    "route_id": "ROJA-1",
+    "name": "Avenida Acueducto · Matamoros",
+    "lng": -101.16565,
+    "lat": 19.69626,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-1-03",
+    "route_id": "ROJA-1",
+    "name": "Avenida Francisco I Madero Poniente · Centro Histórico",
+    "lng": -101.18577,
+    "lat": 19.70286,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-04",
+    "route_id": "ROJA-1",
+    "name": "Avenida Francisco I Madero Poniente · Nueva Valladolid",
+    "lng": -101.206,
+    "lat": 19.70236,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-05",
+    "route_id": "ROJA-1",
+    "name": "Calle Diamante · Infonavit La Colina",
+    "lng": -101.21783,
+    "lat": 19.71095,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-1-06",
+    "route_id": "ROJA-1",
+    "name": "Calle Capitán Carlos Rovirosa · Wenceslao Victoria",
+    "lng": -101.22315,
+    "lat": 19.71582,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-07",
+    "route_id": "ROJA-1",
+    "name": "Calle Teniente Coronel Juan Pablo Aldasoro · Jardines De Guadalupe",
+    "lng": -101.22324,
+    "lat": 19.71233,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-08",
+    "route_id": "ROJA-1",
+    "name": "Avenida Pedregal · Infonavit La Colina",
+    "lng": -101.21536,
+    "lat": 19.70747,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-1-09",
+    "route_id": "ROJA-1",
+    "name": "Avenida Francisco I. Madero Poniente · Centro Histórico",
+    "lng": -101.202,
+    "lat": 19.70279,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-10",
+    "route_id": "ROJA-1",
+    "name": "Avenida Acueducto · Centro Histórico",
+    "lng": -101.18222,
+    "lat": 19.70257,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-11",
+    "route_id": "ROJA-1",
+    "name": "Avenida Acueducto · Chapultepec Oriente",
+    "lng": -101.162,
+    "lat": 19.69562,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-1-12",
+    "route_id": "ROJA-1",
+    "name": "Circuito Periférico Paseo de la República · Las Américas",
+    "lng": -101.15294,
+    "lat": 19.68784,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-punhuato-01",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Avenida Cerro del Punhuato · Lomas De Las Américas",
+    "lng": -101.14513,
+    "lat": 19.69528,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-punhuato-02",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Avenida Acueducto · Matamoros",
+    "lng": -101.16433,
+    "lat": 19.69606,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-1-punhuato-03",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Avenida Acueducto · Centro Histórico",
+    "lng": -101.18202,
+    "lat": 19.70255,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-punhuato-04",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Avenida Francisco I. Madero Poniente · Centro Histórico",
+    "lng": -101.19942,
+    "lat": 19.70302,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-punhuato-05",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Avenida Pedregal · Infonavit La Colina",
+    "lng": -101.21551,
+    "lat": 19.70589,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-1-punhuato-06",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Décima · Guadalupe",
+    "lng": -101.22592,
+    "lat": 19.70829,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-punhuato-07",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Calle José del Río · Wenceslao Victoria",
+    "lng": -101.22588,
+    "lat": 19.71792,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-punhuato-08",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Circuito Periférico Paseo de la República · Lago I",
+    "lng": -101.21532,
+    "lat": 19.72676,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-1-punhuato-09",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Circuito Periférico Paseo de la República · Barrio Alto",
+    "lng": -101.19589,
+    "lat": 19.7243,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-punhuato-10",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Periférico Revolución",
+    "lng": -101.17799,
+    "lat": 19.71935,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-1-punhuato-11",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Periférico Oriente · Buenavista I",
+    "lng": -101.16343,
+    "lat": 19.70716,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-1-punhuato-12",
+    "route_id": "ROJA-1-PUNHUATO",
+    "name": "Circuito Periférico Paseo de la República · Lomas De Las Américas",
+    "lng": -101.14913,
+    "lat": 19.69518,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-oken-01",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Calle 30 de Julio de 1811 · Infonavit Lomas De Hidalgo",
+    "lng": -101.16157,
+    "lat": 19.69888,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-oken-02",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida Acueducto · Vasco de Quiroga",
+    "lng": -101.17321,
+    "lat": 19.6977,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-2-oken-03",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida Francisco I Madero Poniente · Centro Histórico",
+    "lng": -101.18517,
+    "lat": 19.70288,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-oken-04",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida Francisco I. Madero Poniente · Centro Histórico",
+    "lng": -101.19713,
+    "lat": 19.70299,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-oken-05",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida Francisco I. Madero Poniente · Nueva Valladolid",
+    "lng": -101.211,
+    "lat": 19.70202,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-2-oken-06",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida Francisco I. Madero Poniente · Los Ejidos",
+    "lng": -101.22392,
+    "lat": 19.70492,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-oken-07",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida Francisco I Madero Poniente · Los Ejidos",
+    "lng": -101.22015,
+    "lat": 19.70536,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-oken-08",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida La Huerta · Nueva Valladolid",
+    "lng": -101.2075,
+    "lat": 19.70191,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-2-oken-09",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Calle Allende · Centro Histórico",
+    "lng": -101.1939,
+    "lat": 19.70189,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-oken-10",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida Acueducto · Centro Histórico",
+    "lng": -101.18148,
+    "lat": 19.70197,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-oken-11",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida Acueducto · Chapultepec Norte",
+    "lng": -101.16919,
+    "lat": 19.69679,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-2-oken-12",
+    "route_id": "ROJA-2-OKEN",
+    "name": "Avenida del Maestro · Fovissste Acueducto",
+    "lng": -101.15844,
+    "lat": 19.69757,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-villas-del-sol-01",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Circuito Presidente Adolfo López Mateos · Infonavit Adolfo López Mateos",
+    "lng": -101.22906,
+    "lat": 19.70088,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-villas-del-sol-02",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Avenida Francisco I Madero Poniente · Los Ejidos",
+    "lng": -101.21753,
+    "lat": 19.70429,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-2-villas-del-sol-03",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Avenida Francisco I. Madero Poniente · Molino de Parras",
+    "lng": -101.20415,
+    "lat": 19.70242,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-villas-del-sol-04",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Calle Valladolid · Centro Histórico",
+    "lng": -101.18997,
+    "lat": 19.70181,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-villas-del-sol-05",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Avenida Acueducto · Chapultepec Norte",
+    "lng": -101.17751,
+    "lat": 19.69855,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-2-villas-del-sol-06",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Avenida Insurgentes · Lomas De Hidalgo",
+    "lng": -101.16271,
+    "lat": 19.69643,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-villas-del-sol-07",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Circuito Periférico Paseo de la República · Lomas De Guayangareo",
+    "lng": -101.15629,
+    "lat": 19.70121,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-villas-del-sol-08",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Circuito Periférico Paseo de la República",
+    "lng": -101.16427,
+    "lat": 19.70871,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-2-villas-del-sol-09",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Avenida Francisco I. Madero Oriente · Vasco de Quiroga",
+    "lng": -101.17719,
+    "lat": 19.70511,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-villas-del-sol-10",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Avenida Francisco I Madero · Centro Histórico",
+    "lng": -101.194,
+    "lat": 19.70293,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-2-villas-del-sol-11",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Avenida Francisco I. Madero Poniente · Bocanegra",
+    "lng": -101.20743,
+    "lat": 19.70226,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-2-villas-del-sol-12",
+    "route_id": "ROJA-2-VILLAS-DEL-SOL",
+    "name": "Avenida Héroes Anónimos de la Independencia · Hacienda Corralejo",
+    "lng": -101.2206,
+    "lat": 19.69764,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3-01",
+    "route_id": "ROJA-3",
+    "name": "Calle Grafito · Infonavit La Colina",
+    "lng": -101.21637,
+    "lat": 19.70983,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3-02",
+    "route_id": "ROJA-3",
+    "name": "Calzada La Huerta · Nueva Valladolid",
+    "lng": -101.20694,
+    "lat": 19.70138,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3-03",
+    "route_id": "ROJA-3",
+    "name": "Calle Fray Manuel Navarrete · Centro Histórico",
+    "lng": -101.18767,
+    "lat": 19.70232,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3-04",
+    "route_id": "ROJA-3",
+    "name": "Calzada Ventura Puente · Del Empleado",
+    "lng": -101.1799,
+    "lat": 19.68982,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3-05",
+    "route_id": "ROJA-3",
+    "name": "Avenida Camelinas · Bosque Camelinas",
+    "lng": -101.16917,
+    "lat": 19.68211,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3-06",
+    "route_id": "ROJA-3",
+    "name": "Circuito Periférico Paseo de la República · Jardines Del Rincón",
+    "lng": -101.15082,
+    "lat": 19.68964,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3-07",
+    "route_id": "ROJA-3",
+    "name": "Toluca - Morelia · Puerta Tres Marías Sur II",
+    "lng": -101.13824,
+    "lat": 19.69042,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3-08",
+    "route_id": "ROJA-3",
+    "name": "Periférico Oriente · Insurgentes",
+    "lng": -101.1552,
+    "lat": 19.70081,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3-09",
+    "route_id": "ROJA-3",
+    "name": "Artículo 27 Constitucional",
+    "lng": -101.17106,
+    "lat": 19.71434,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3-10",
+    "route_id": "ROJA-3",
+    "name": "Circuito Periférico Paseo de la República",
+    "lng": -101.18947,
+    "lat": 19.7219,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3-11",
+    "route_id": "ROJA-3",
+    "name": "Circuito Periférico Paseo de la República · Lago I",
+    "lng": -101.21023,
+    "lat": 19.72641,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3-12",
+    "route_id": "ROJA-3",
+    "name": "Nicolaitas Ilustres",
+    "lng": -101.22782,
+    "lat": 19.72041,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3a-01",
+    "route_id": "ROJA-3A",
+    "name": "Toluca - Morelia · Puerta Tres Marías Sur II",
+    "lng": -101.13707,
+    "lat": 19.69016,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3a-02",
+    "route_id": "ROJA-3A",
+    "name": "Circuito Periférico Paseo de la República · Las Américas",
+    "lng": -101.15349,
+    "lat": 19.68748,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3a-03",
+    "route_id": "ROJA-3A",
+    "name": "Avenida Camelinas",
+    "lng": -101.1745,
+    "lat": 19.6819,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3a-04",
+    "route_id": "ROJA-3A",
+    "name": "Calzada Ventura Puente · Chapultepec Norte",
+    "lng": -101.17868,
+    "lat": 19.69662,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3a-05",
+    "route_id": "ROJA-3A",
+    "name": "Calle El Nigromante · Centro Histórico",
+    "lng": -101.19506,
+    "lat": 19.70327,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3a-06",
+    "route_id": "ROJA-3A",
+    "name": "Calle Agustina Ramírez · Jacarandas",
+    "lng": -101.21063,
+    "lat": 19.70819,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3a-07",
+    "route_id": "ROJA-3A",
+    "name": "Avenida Escuadrón 201 · Torres del Tepeyac",
+    "lng": -101.22558,
+    "lat": 19.70646,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3a-08",
+    "route_id": "ROJA-3A",
+    "name": "Avenida Héroes Anónimos de la Independencia · Hacienda Corralejo",
+    "lng": -101.22147,
+    "lat": 19.69648,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3a-09",
+    "route_id": "ROJA-3A",
+    "name": "Avenida Francisco I. Madero Poniente · Centro Histórico",
+    "lng": -101.20235,
+    "lat": 19.70274,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3a-10",
+    "route_id": "ROJA-3A",
+    "name": "Avenida Acueducto · Centro Histórico",
+    "lng": -101.18025,
+    "lat": 19.70087,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3a-11",
+    "route_id": "ROJA-3A",
+    "name": "Morelia - Toluca · Poblado Ocolusen",
+    "lng": -101.15853,
+    "lat": 19.69542,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3a-12",
+    "route_id": "ROJA-3A",
+    "name": "Morelia - Toluca · Cumbres de Morelia",
+    "lng": -101.13506,
+    "lat": 19.6872,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3b-01",
+    "route_id": "ROJA-3B",
+    "name": "Tercera · Guadalupe",
+    "lng": -101.21838,
+    "lat": 19.71025,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3b-02",
+    "route_id": "ROJA-3B",
+    "name": "Avenida La Huerta · Nueva Valladolid",
+    "lng": -101.20737,
+    "lat": 19.70133,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3b-03",
+    "route_id": "ROJA-3B",
+    "name": "Avenida Francisco I. Madero Poniente · Centro Histórico",
+    "lng": -101.19722,
+    "lat": 19.703,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3b-04",
+    "route_id": "ROJA-3B",
+    "name": "Calzada Ventura Puente · Chapultepec Norte",
+    "lng": -101.17849,
+    "lat": 19.69762,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3b-05",
+    "route_id": "ROJA-3B",
+    "name": "Avenida Camelinas · La Loma",
+    "lng": -101.17453,
+    "lat": 19.68173,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3b-06",
+    "route_id": "ROJA-3B",
+    "name": "Baltazar Echanove · Fray Antonio De San Miguel Iglesias",
+    "lng": -101.15297,
+    "lat": 19.68602,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3b-07",
+    "route_id": "ROJA-3B",
+    "name": "Circuito Periférico Paseo de la República · Las Américas",
+    "lng": -101.15608,
+    "lat": 19.68767,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3b-08",
+    "route_id": "ROJA-3B",
+    "name": "Avenida Camelinas",
+    "lng": -101.17852,
+    "lat": 19.68164,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3b-09",
+    "route_id": "ROJA-3B",
+    "name": "Avenida Acueducto · Centro Histórico",
+    "lng": -101.17954,
+    "lat": 19.70037,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3b-10",
+    "route_id": "ROJA-3B",
+    "name": "Calle Vicente Riva Palacio · Centro Histórico",
+    "lng": -101.20013,
+    "lat": 19.7037,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-3b-11",
+    "route_id": "ROJA-3B",
+    "name": "Calle Margarita · Las Flores",
+    "lng": -101.2069,
+    "lat": 19.70656,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-3b-12",
+    "route_id": "ROJA-3B",
+    "name": "Calle Tepeyac · Irrigación",
+    "lng": -101.22148,
+    "lat": 19.70767,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4-tinijaro-01",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Calle 30 de Julio de 1811 · Lomas De Hidalgo",
+    "lng": -101.16172,
+    "lat": 19.69734,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4-tinijaro-02",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Avenida Francisco I Madero · Centro Histórico",
+    "lng": -101.18246,
+    "lat": 19.70297,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4-tinijaro-03",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Avenida Francisco I Madero Poniente · Centro Histórico",
+    "lng": -101.20397,
+    "lat": 19.70254,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4-tinijaro-04",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Avenida Francisco I. Madero Poniente · Irrigación",
+    "lng": -101.22629,
+    "lat": 19.70443,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4-tinijaro-05",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Avenida Francisco I. Madero Poniente",
+    "lng": -101.24906,
+    "lat": 19.699,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4-tinijaro-06",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Calle Mariano Tercero",
+    "lng": -101.26466,
+    "lat": 19.69204,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4-tinijaro-07",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Avenida Francisco I. Madero Poniente · Sindurio",
+    "lng": -101.24603,
+    "lat": 19.69948,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4-tinijaro-08",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Circuito Periférico Paseo de la República · La Quemada",
+    "lng": -101.23458,
+    "lat": 19.70981,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4-tinijaro-09",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Circuito Periférico Paseo de la República · Lago I",
+    "lng": -101.22097,
+    "lat": 19.72741,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4-tinijaro-10",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Circuito Periférico Paseo de la República · Lomas Del Tecnológico",
+    "lng": -101.19766,
+    "lat": 19.72452,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4-tinijaro-11",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Periférico Revolución · Lomas De Morelia",
+    "lng": -101.17632,
+    "lat": 19.71812,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4-tinijaro-12",
+    "route_id": "ROJA-4-TINIJARO",
+    "name": "Periférico Oriente · Lomas De Guayangareo",
+    "lng": -101.15888,
+    "lat": 19.70345,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4a-01",
+    "route_id": "ROJA-4A",
+    "name": "Calle María Manuela Medina · Margarita Maza De Juárez",
+    "lng": -101.25368,
+    "lat": 19.6931,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4a-02",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Francisco I Madero Poniente · Los Manantiales De Morelia",
+    "lng": -101.23775,
+    "lat": 19.70146,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4a-03",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Francisco I Madero Poniente · Los Ejidos",
+    "lng": -101.21676,
+    "lat": 19.70389,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4a-04",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Francisco I. Madero Poniente · Centro Histórico",
+    "lng": -101.19679,
+    "lat": 19.70301,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4a-05",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Acueducto · Centro Histórico",
+    "lng": -101.17863,
+    "lat": 19.69941,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4a-06",
+    "route_id": "ROJA-4A",
+    "name": "Avenida del Maestro · Infonavit Lomas De Hidalgo",
+    "lng": -101.15859,
+    "lat": 19.69758,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4a-07",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Insurgentes · Lomas De Hidalgo",
+    "lng": -101.16178,
+    "lat": 19.69708,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4a-08",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Francisco I Madero · Centro Histórico",
+    "lng": -101.18308,
+    "lat": 19.70295,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4a-09",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Francisco I Madero Poniente · Molino de Parras",
+    "lng": -101.20492,
+    "lat": 19.70244,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4a-10",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Francisco I. Madero Poniente · Los Ejidos",
+    "lng": -101.22007,
+    "lat": 19.70563,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4a-11",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Francisco I. Madero Poniente · La Quemada",
+    "lng": -101.24138,
+    "lat": 19.70087,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4a-12",
+    "route_id": "ROJA-4A",
+    "name": "Avenida Anastasio Nájera · Ignacio López Rayón",
+    "lng": -101.2565,
+    "lat": 19.69008,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4m-01",
+    "route_id": "ROJA-4M",
+    "name": "Avenida Francisco I Madero Poniente · Los Manantiales De Morelia",
+    "lng": -101.23474,
+    "lat": 19.70219,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4m-02",
+    "route_id": "ROJA-4M",
+    "name": "Avenida Francisco I. Madero Poniente",
+    "lng": -101.21459,
+    "lat": 19.70278,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4m-03",
+    "route_id": "ROJA-4M",
+    "name": "Calle Galeana · Centro Histórico",
+    "lng": -101.19507,
+    "lat": 19.70287,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4m-04",
+    "route_id": "ROJA-4M",
+    "name": "Avenida Acueducto · Vasco de Quiroga",
+    "lng": -101.17773,
+    "lat": 19.69869,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4m-05",
+    "route_id": "ROJA-4M",
+    "name": "Avenida del Maestro · Fovissste Acueducto",
+    "lng": -101.15805,
+    "lat": 19.69753,
+    "has_light": false,
+    "has_ramp": false,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4m-06",
+    "route_id": "ROJA-4M",
+    "name": "Calle Beleño · Loma Libre",
+    "lng": -101.14843,
+    "lat": 19.70573,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4m-07",
+    "route_id": "ROJA-4M",
+    "name": "Periférico Oriente · Enrique Ramírez",
+    "lng": -101.16449,
+    "lat": 19.7087,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4m-08",
+    "route_id": "ROJA-4M",
+    "name": "Periférico Revolución · Doctor Miguel Silva González",
+    "lng": -101.18109,
+    "lat": 19.71974,
+    "has_light": false,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4m-09",
+    "route_id": "ROJA-4M",
+    "name": "Circuito Periférico Paseo de la República · Barrio Alto",
+    "lng": -101.20097,
+    "lat": 19.72522,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4m-10",
+    "route_id": "ROJA-4M",
+    "name": "Circuito Periférico Paseo de la República · Lago I",
+    "lng": -101.22206,
+    "lat": 19.72743,
+    "has_light": true,
+    "has_ramp": false,
+    "has_roof": true
+  },
+  {
+    "id": "roja-4m-11",
+    "route_id": "ROJA-4M",
+    "name": "Circuito Periférico Paseo de la República · Defensores De Puebla",
+    "lng": -101.23406,
+    "lat": 19.711,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": false
+  },
+  {
+    "id": "roja-4m-12",
+    "route_id": "ROJA-4M",
+    "name": "Periférico Independencia · Sindurio",
+    "lng": -101.24227,
+    "lat": 19.69719,
+    "has_light": false,
+    "has_ramp": false,
     "has_roof": true
   }
 ]
