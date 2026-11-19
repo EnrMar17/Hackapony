@@ -9,6 +9,7 @@ import type { CityBundle, LngLat, Report, Route, RouteId, Vehicle } from "@/lib/
 import { useUi } from "@/store/ui";
 import { MAP_READY, MAP_STYLE, MAP_STYLE_DARK, MapView, engineProps } from "./engine";
 import type { MapMouseEvent, MapRef } from "./engine";
+import { incomingUnit } from "./incoming";
 import { ensureMapImages } from "./mapImages";
 import { REPORT_CLUSTER_LAYER, REPORT_LAYER, ReportLayer } from "./ReportLayer";
 import { ReportPopup } from "./ReportPopup";
@@ -28,6 +29,8 @@ export interface TransitMapProps {
   onLocateRequest: () => void;
   /** Multiplicador del simulador (1, 2 o 5), para el ETA de la parada. */
   simSpeed?: number;
+  /** Precisión del GPS en metros: se dibuja como un halo alrededor de tu punto. */
+  userAccuracyM?: number | null;
 }
 
 const INTERACTIVE = [...STOP_LAYERS, REPORT_LAYER, REPORT_CLUSTER_LAYER, ROUTE_LINE_LAYER];
@@ -47,7 +50,15 @@ const BUTTON =
   "glass pointer-events-auto flex items-center justify-center rounded-full text-foreground shadow-md " +
   "transition-transform duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring";
 
-export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRequest, simSpeed = 1 }: TransitMapProps) {
+export function TransitMap({
+  bundle,
+  vehicles,
+  reports,
+  userPosition,
+  onLocateRequest,
+  simSpeed = 1,
+  userAccuracyM = null,
+}: TransitMapProps) {
   // Abre la conexión a Mapbox antes de que el mapa la pida: acorta la espera inicial.
   if (MAP_READY) {
     preconnect("https://api.mapbox.com");
@@ -72,9 +83,16 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
   const setShowAll = useUi((s) => s.setShowAllRoutes);
   // Modo denso: más rutas que las 2 del reto. Las unidades solo se ven de la ruta elegida.
   const dense = bundle.routes.length > DEFAULT_ROUTE_IDS.length;
+  // La unidad que viene hacia la parada elegida (para el globo de ETA y para resaltarla).
+  const incoming = useMemo(
+    () => incomingUnit(bundle, vehicles, selectedStopId, simSpeed),
+    [bundle, vehicles, selectedStopId, simSpeed],
+  );
+  // En modo denso solo se ven las unidades de la ruta elegida, o las de la ruta de la parada elegida.
+  const stopRouteId = incoming?.route.id ?? null;
   const mapVehicles = useMemo(
-    () => (dense ? vehicles.filter((v) => v.route_id === selectedRoute) : vehicles),
-    [dense, vehicles, selectedRoute],
+    () => (dense ? vehicles.filter((v) => v.route_id === selectedRoute || v.route_id === stopRouteId) : vehicles),
+    [dense, vehicles, selectedRoute, stopRouteId],
   );
 
   // Se vuelve a encuadrar cuando cambia el conjunto de rutas (por ejemplo al pulsar "Ver todas").
@@ -98,7 +116,9 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
     map.flyTo({
       center: [stop.lng, stop.lat],
       zoom: Math.max(map.getZoom(), 15),
-      offset: desktop ? [208, 0] : [0, -90],
+      // En móvil la hoja de la parada tapa buena parte del mapa y los botones se apilan a la derecha:
+      // la parada se sube y se corre a la izquierda para que ella, su anillo y su globo queden a la vista.
+      offset: desktop ? [208, 0] : [-Math.round(window.innerWidth * 0.18), -Math.round(window.innerHeight * 0.27)],
       duration: 700,
     });
   }, [selectedStopId, loaded, bundle.stops, desktop]);
@@ -153,12 +173,13 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
         onError={() => setFailed(true)}
         style={{ width: "100%", height: "100%" }}
       >
-        <RouteLayers routes={bundle.routes} selected={selectedRoute} dense={dense} dark={dark} />
-        <StopLayer stops={bundle.stops} reports={reports} dense={dense} />
-        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} />
+        {/* De abajo hacia arriba: rutas, paradas, reportes, unidades y, encima de todo, tú. */}
+        <RouteLayers routes={bundle.routes} selected={selectedRoute} dense={dense} dark={dark} iconsReady={imagesReady} />
+        <StopLayer stops={bundle.stops} reports={reports} dense={dense} dark={dark} />
         <ReportLayer reports={reports} iconsReady={imagesReady} dark={dark} />
-        <UserLocation position={userPosition} />
-        <StopEtaChip bundle={bundle} vehicles={vehicles} speed={simSpeed} />
+        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} dark={dark} highlightId={incoming?.vehicleId ?? null} />
+        <StopEtaChip incoming={incoming} />
+        <UserLocation position={userPosition} accuracyM={userAccuracyM} />
         {selectedReport && <ReportPopup report={selectedReport} onClose={() => selectReport(null)} />}
       </MapView>
 

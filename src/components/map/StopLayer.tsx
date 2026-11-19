@@ -6,20 +6,34 @@ import { stopSafety } from "@/lib/geo";
 import type { Report, Stop } from "@/lib/types";
 import { useUi } from "@/store/ui";
 import { Layer, Source } from "./engine";
+import { stopColors, stopFill } from "./palette";
 
 export const STOP_LAYER = "stops";
 export const STOP_OK_LAYER = "stops-ok";
 export const STOP_LAYERS = [STOP_LAYER, STOP_OK_LAYER];
 
 /**
- * Paradas con color de semáforo. Las que no tienen novedades (verde) son pequeñas y solo se ven al acercar:
- * lo que llama la atención son las que tienen un problema. Con una ruta seleccionada solo se ven sus paradas.
+ * Paradas como anillos huecos: fondo del tema y borde con el color del semáforo. Las que no tienen novedades
+ * (verde) son más pequeñas y solo se ven al acercar: lo que llama la atención son las que tienen un problema.
+ * Con una ruta seleccionada solo se ven sus paradas.
  */
-export function StopLayer({ stops, reports, dense }: { stops: Stop[]; reports: Report[]; dense: boolean }) {
+export function StopLayer({
+  stops,
+  reports,
+  dense,
+  dark,
+}: {
+  stops: Stop[];
+  reports: Report[];
+  dense: boolean;
+  dark: boolean;
+}) {
   const selectedRoute = useUi((s) => s.selectedRoute);
   const onlyAccessible = useUi((s) => s.onlyAccessible);
   // Con muchas rutas y ninguna elegida, las paradas solo aparecen muy de cerca.
   const far = dense && !selectedRoute;
+  const colors = stopColors(dark);
+  const fill = stopFill(dark);
 
   const data = useMemo<FeatureCollection>(
     () => ({
@@ -44,10 +58,10 @@ export function StopLayer({ stops, reports, dense }: { stops: Stop[]; reports: R
         minzoom={far ? 14.5 : 13.5}
         filter={["==", ["get", "level"], "green"]}
         paint={{
-          "circle-radius": ["interpolate", ["linear"], ["zoom"], 13.5, 3, 16, 6],
-          "circle-color": "#86c5a1",
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 1.5,
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 13.5, 3.5, 16, 6],
+          "circle-color": fill,
+          "circle-stroke-color": colors.green,
+          "circle-stroke-width": 2.5,
         }}
       />
       <Layer
@@ -61,13 +75,13 @@ export function StopLayer({ stops, reports, dense }: { stops: Stop[]; reports: R
             ["linear"],
             ["zoom"],
             10.5,
-            ["match", ["get", "level"], "red", 4, 3],
+            ["match", ["get", "level"], "red", 4.5, 3.5],
             15,
-            ["match", ["get", "level"], "red", 10, 8],
+            ["match", ["get", "level"], "red", 8.5, 7],
           ],
-          "circle-color": ["match", ["get", "level"], "yellow", "#eab308", "#dc2626"],
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 2,
+          "circle-color": fill,
+          "circle-stroke-color": ["match", ["get", "level"], "yellow", colors.yellow, colors.red],
+          "circle-stroke-width": 3,
         }}
       />
     </Source>

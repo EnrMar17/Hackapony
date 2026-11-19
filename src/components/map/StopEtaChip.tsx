@@ -1,38 +1,57 @@
 "use client";
 
-import { etaToStop } from "@/lib/geo";
-import type { CityBundle, Vehicle } from "@/lib/types";
-import { useUi } from "@/store/ui";
-import { Popup } from "./engine";
-import { POPUP_CLASS } from "./palette";
+import { Marker, Popup } from "./engine";
+import { formatDistance, type Incoming } from "./incoming";
+import { POPUP_CLASS, routeColor } from "./palette";
+import { useIsDark } from "./useIsDark";
 
-/** Cuándo llega la próxima unidad, sobre la parada seleccionada: se ve sin abrir ningún panel. */
-export function StopEtaChip({ bundle, vehicles, speed }: { bundle: CityBundle; vehicles: Vehicle[]; speed: number }) {
-  const stopId = useUi((s) => s.selectedStop);
-  const stop = bundle.stops.find((s) => s.id === stopId);
-  const route = stop && bundle.routes.find((r) => r.id === stop.route_id);
-  if (!stop || !route) return null;
+/**
+ * Sobre la parada seleccionada: un anillo pulsante con el color de su ruta (para saber de qué parada se habla)
+ * y un globo con cuándo llega la próxima unidad. La punta del globo señala la parada exacta.
+ */
+export function StopEtaChip({ incoming }: { incoming: Incoming | null }) {
+  const dark = useIsDark();
+  if (!incoming) return null;
+  const { stop, route, etaSec, distM } = incoming;
 
-  const sec = etaToStop(route, stop, vehicles, speed);
-  const text =
-    sec === null ? "Sin unidades por ahora" : sec < 60 ? "Llega en menos de 1 min" : `Llega en ~${Math.round(sec / 60)} min`;
+  const timeText =
+    etaSec === null
+      ? "Sin unidades por ahora"
+      : etaSec < 60
+        ? "Llega a esta parada en menos de 1 min"
+        : `Llega a esta parada en ~${Math.round(etaSec / 60)} min`;
+  const color = routeColor(route.color, dark);
 
   return (
-    <Popup
-      longitude={stop.lng}
-      latitude={stop.lat}
-      anchor="bottom"
-      offset={16}
-      closeButton={false}
-      closeOnClick={false}
-      maxWidth="220px"
-      className={POPUP_CLASS}
-    >
-      <div className="p-1 text-sm">
-        <p className="font-semibold">{route.name}</p>
-        <p>{text}</p>
-        <p className="text-xs text-muted-foreground">estimado</p>
-      </div>
-    </Popup>
+    <>
+      <Marker longitude={stop.lng} latitude={stop.lat} anchor="center" style={{ pointerEvents: "none" }}>
+        <span className="relative flex size-9 items-center justify-center">
+          <span
+            aria-hidden
+            className="absolute inset-0 animate-ping rounded-full border-[3px] opacity-70 motion-reduce:animate-none"
+            style={{ borderColor: color }}
+          />
+          <span aria-hidden className="size-9 rounded-full border-[3px]" style={{ borderColor: color }} />
+        </span>
+      </Marker>
+      <Popup
+        longitude={stop.lng}
+        latitude={stop.lat}
+        anchor="bottom"
+        offset={26}
+        closeButton={false}
+        closeOnClick={false}
+        maxWidth="240px"
+        className={POPUP_CLASS}
+      >
+        <div className="p-1 text-sm">
+          <p className="font-semibold">{route.name}</p>
+          <p>{timeText}</p>
+          <p className="text-xs text-muted-foreground">
+            {distM !== null ? `Unidad a ${formatDistance(distM)} · ` : ""}estimado
+          </p>
+        </div>
+      </Popup>
+    </>
   );
 }

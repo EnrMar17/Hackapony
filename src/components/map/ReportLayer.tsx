@@ -6,11 +6,21 @@ import { CONFIRMED_MIN_CONFIRMS, REPORT_TTL_MS } from "@/lib/constants";
 import { isActive } from "@/lib/geo";
 import type { Report } from "@/lib/types";
 import { Layer, Source } from "./engine";
-import { clusterColors } from "./palette";
-import { REPORT_ICON_IMAGES } from "./reportIcons";
+import { REPORT_COLORS, clusterColors } from "./palette";
 
 export const REPORT_LAYER = "reports";
 export const REPORT_CLUSTER_LAYER = "reports-cluster";
+
+/** Color por tipo de reporte (una sola paleta: botones, lista y mapa). */
+const TYPE_COLOR = [
+  "match",
+  ["get", "type"],
+  "full",
+  REPORT_COLORS.full,
+  "passing",
+  REPORT_COLORS.passing,
+  REPORT_COLORS.incident,
+] as const;
 
 const PULSE_WINDOW_MS = 8_000;
 const PULSE_PERIOD_MS = 1_500;
@@ -20,7 +30,8 @@ function reducedMotion(): boolean {
 }
 
 /**
- * Reportes vigentes. Confirmados (autor + 1 persona): sólidos y grandes. Sin confirmar: anillo tenue.
+ * Reportes vigentes como pines de gota con el pictograma del tipo y el color de REPORT_COLORS.
+ * Confirmados (autor + 1 persona): sólidos y más grandes. Sin confirmar: pin hueco con borde punteado.
  * Los que están cerca se agrupan con un contador; los recién llegados pulsan unos segundos.
  */
 export function ReportLayer({ reports, iconsReady, dark }: { reports: Report[]; iconsReady: boolean; dark: boolean }) {
@@ -91,7 +102,7 @@ export function ReportLayer({ reports, iconsReady, dark }: { reports: Report[]; 
           type="circle"
           paint={{
             "circle-radius": 10 + 22 * phase,
-            "circle-color": ["match", ["get", "type"], "full", "#7c3aed", "passing", "#2563eb", "#dc2626"],
+            "circle-color": TYPE_COLOR as unknown as string,
             "circle-opacity": 0.5 * (1 - phase),
           }}
         />
@@ -121,50 +132,19 @@ export function ReportLayer({ reports, iconsReady, dark }: { reports: Report[]; 
           }}
           paint={{ "text-color": cluster.text }}
         />
-        <Layer
-          id={REPORT_LAYER}
-          type="circle"
-          filter={["!", ["has", "point_count"]]}
-          paint={{
-            "circle-radius": ["case", ["get", "confirmed"], 11, 8],
-            "circle-color": ["match", ["get", "type"], "full", "#7c3aed", "passing", "#2563eb", "#dc2626"],
-            "circle-opacity": ["case", ["get", "confirmed"], ["get", "opacity"], 0.25],
-            "circle-stroke-color": [
-              "case",
-              ["get", "confirmed"],
-              "#ffffff",
-              ["match", ["get", "type"], "full", "#7c3aed", "passing", "#2563eb", "#dc2626"],
-            ],
-            "circle-stroke-width": 2.5,
-          }}
-        />
         {iconsReady && (
           <Layer
-            id="reports-icon"
+            id={REPORT_LAYER}
             type="symbol"
             filter={["!", ["has", "point_count"]]}
             layout={{
-              "icon-image": [
-                "match",
-                ["get", "type"],
-                "full",
-                REPORT_ICON_IMAGES.full,
-                "passing",
-                REPORT_ICON_IMAGES.passing,
-                REPORT_ICON_IMAGES.incident,
-              ],
-              "icon-size": ["case", ["get", "confirmed"], 0.26, 0.2],
+              "icon-image": ["concat", "pin-", ["get", "type"], ["case", ["get", "confirmed"], "-solid", "-faint"]],
+              "icon-anchor": "bottom",
+              "icon-size": ["case", ["get", "confirmed"], 1, 0.85],
               "icon-allow-overlap": true,
               "icon-ignore-placement": true,
             }}
-            paint={{
-              "icon-color": [
-                "case",
-                ["get", "confirmed"],
-                "#ffffff",
-                ["match", ["get", "type"], "full", "#7c3aed", "passing", "#2563eb", "#dc2626"],
-              ],
-            }}
+            paint={{ "icon-opacity": ["get", "opacity"] }}
           />
         )}
       </Source>
