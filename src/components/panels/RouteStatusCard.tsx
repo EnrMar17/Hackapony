@@ -23,6 +23,20 @@ interface RouteWithStatus {
 /** Una ruta: nombre completo (puede ocupar dos líneas) y su estado; si no cabe, el estado baja de renglón. */
 function RouteRow({ route, status }: RouteWithStatus) {
   const look = SAFETY_LOOK[status.level];
+
+  // En rojo se dice en una frase: "Hay problemas en Gris 1" (más claro que "Servicio con problemas").
+  if (status.level === "red") {
+    return (
+      <li className="flex min-h-12 items-center gap-2 rounded-2xl bg-peligro/10 px-3 py-2 text-sm font-semibold text-peligro-ink">
+        <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-full", look.className)}>
+          <look.icon aria-hidden className="size-3.5" />
+        </span>
+        <span aria-hidden className="size-3 shrink-0 rounded-full" style={{ backgroundColor: route.color }} />
+        <span className="min-w-0 break-words">Hay problemas en {route.name}</span>
+      </li>
+    );
+  }
+
   return (
     <li className="flex min-h-12 flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-2xl bg-foreground/5 px-3 py-2">
       <span className="flex min-w-0 flex-1 basis-40 items-center gap-2 text-sm font-semibold">
