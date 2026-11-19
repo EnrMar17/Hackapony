@@ -38,3 +38,13 @@ export function toLocalIso(serverIso: string): string {
   const ms = Date.parse(serverIso);
   return Number.isFinite(ms) ? new Date(ms - offsetMs).toISOString() : serverIso;
 }
+
+/** Hora local -> hora del servidor (una referencia común entre dispositivos). */
+export function localToServerMs(localMs: number): number {
+  return localMs + offsetMs;
+}
+
+/** Hora del servidor -> hora de este dispositivo. */
+export function serverToLocalMs(serverMs: number): number {
+  return serverMs - offsetMs;
+}

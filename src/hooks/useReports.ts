@@ -183,7 +183,7 @@ export function useReports(): ReportsState {
     return () => clearInterval(timer);
   }, [live, loading, refresh]);
 
-  const sendReport = useCallback(async (input: NewReport) => {
+  const sendReport = useCallback(async (input: NewReport): Promise<Report> => {
     const now = Date.now();
     if (now - lastSent.current < RATE_LIMIT_MS) throw new Error("RATE_LIMIT");
     lastSent.current = now; // se fija antes de esperar, para que un doble toque no mande dos
@@ -242,6 +242,7 @@ export function useReports(): ReportsState {
     }
     const real = fromRow(data as ReportRow);
     setReports((prev) => upsert(prev.filter((r) => r.id !== optimisticId), real));
+    return real;
   }, []);
 
   const vote = useCallback(

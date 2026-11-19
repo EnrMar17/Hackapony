@@ -16,7 +16,7 @@ function ageLabel(iso: string, now: number | null): string {
 
 /** Fuera del componente: las llamadas impuras no se permiten durante el render. */
 const stamp = () => Date.now();
-async function timed(action: () => Promise<void>): Promise<number> {
+async function timed(action: () => Promise<unknown>): Promise<number> {
   const t0 = performance.now();
   await action();
   return Math.round(performance.now() - t0);
