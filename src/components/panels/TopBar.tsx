@@ -49,7 +49,7 @@ export function TopBar({ routes, online, connected }: TopBarProps) {
         <div
           role="group"
           aria-label="Filtrar por ruta"
-          className="pointer-events-auto flex min-w-0 snap-x gap-2 overflow-x-auto overscroll-x-contain"
+          className="pointer-events-auto -m-1.5 flex min-w-0 snap-x gap-2 overflow-x-auto overscroll-x-contain p-1.5"
         >
           {routes.map((r) => {
             const pressed = selected === r.id;
