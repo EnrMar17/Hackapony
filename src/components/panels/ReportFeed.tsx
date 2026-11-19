@@ -60,15 +60,15 @@ export function ReportFeed({ reports, routes, now, selectedId, onSelect, loading
                     <look.icon aria-hidden className="size-4.5" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold">{reportTitle(r)}</span>
-                    <span className="block truncate text-xs text-muted-foreground">
+                    <span className="block text-sm leading-snug font-semibold break-words">{reportTitle(r)}</span>
+                    <span className="block text-xs leading-snug break-words text-muted-foreground">
                       {route ? `${route.name} · ` : ""}
                       <time dateTime={r.created_at}>{timeAgo(r.created_at, now)}</time>
                       {r.confirms > 0 && <span className="tabular-nums"> · +{r.confirms}</span>}
                     </span>
                   </span>
                   {r.resolved && (
-                    <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-seguro">
+                    <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-seguro-ink">
                       <CircleCheck aria-hidden className="size-4" />
                       Resuelto
                     </span>

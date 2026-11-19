@@ -150,6 +150,13 @@
   --ruta-naranja-1: #f97316;
   --ruta-naranja-1-foreground: #0f172a; /* nunca blanco */
 
+  /* Texto de estado sobre fondos suaves (bg-x/10). En oscuro se aclaran para mantener contraste. */
+  --peligro-ink: #dc2626;
+  --precaucion-ink: #0f172a;
+  --seguro-ink: #15803d;
+  --info-ink: #2563eb;
+  --accesibilidad-ink: #0f766e;
+
   /* Áreas seguras (notch y barra de inicio) */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
@@ -172,6 +179,28 @@
   --color-ruta-gris-1-foreground: var(--ruta-gris-1-foreground);
   --color-ruta-naranja-1: var(--ruta-naranja-1);
   --color-ruta-naranja-1-foreground: var(--ruta-naranja-1-foreground);
+  --color-peligro-ink: var(--peligro-ink);
+  --color-precaucion-ink: var(--precaucion-ink);
+  --color-seguro-ink: var(--seguro-ink);
+  --color-info-ink: var(--info-ink);
+  --color-accesibilidad-ink: var(--accesibilidad-ink);
+}
+
+/* Modo oscuro: los fondos de estado se quedan igual (ya contrastan con su texto);
+   solo se aclaran los textos que van sobre fondos suaves o sobre el panel oscuro. */
+.dark {
+  --peligro-ink: #fca5a5;
+  --precaucion-ink: #fcd34d;
+  --seguro-ink: #86efac;
+  --info-ink: #93c5fd;
+  --accesibilidad-ink: #5eead4;
+}
+
+:root {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
 }
 
 /* Curva de salida: la clase `ease-out` de Tailwind y var(--ease-out) usan esta. */

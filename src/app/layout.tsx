@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Raleway } from "next/font/google";
-import { Toaster } from "sonner";
+import { AppToaster } from "@/components/panels/AppToaster";
+import { THEME_COLORS, THEME_INIT_SCRIPT } from "@/components/panels/themeScript";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -35,23 +36,28 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#ffffff",
+  // Sigue al dispositivo; si el usuario elige un tema, el script del <head> ajusta el color.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: THEME_COLORS.light },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLORS.dark },
+  ],
 };
-
-/** El toast aparece debajo de la barra superior (48 px de chips + 24 px de padding) y respeta el notch. */
-const TOAST_OFFSET = { top: "calc(var(--safe-top) + 76px)" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${raleway.variable} ${geistMono.variable} h-full antialiased`}>
+    // suppressHydrationWarning: el script del <head> pone la clase `dark` antes de hidratar.
+    <html
+      lang="es"
+      className={`${raleway.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Aplica el tema guardado o el del dispositivo antes del primer pintado (sin parpadeo). */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col">
         {children}
-        <Toaster
-          position="top-center"
-          offset={TOAST_OFFSET}
-          mobileOffset={TOAST_OFFSET}
-          containerAriaLabel="Notificaciones"
-        />
+        <AppToaster />
       </body>
     </html>
   );

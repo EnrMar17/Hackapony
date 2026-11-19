@@ -26,7 +26,7 @@ export function PanelMessage({
       role={tone === "error" ? "alert" : undefined}
       className={
         tone === "error"
-          ? "flex min-h-12 items-center gap-2 rounded-2xl bg-peligro/10 px-3 text-sm font-medium text-peligro"
+          ? "flex min-h-12 items-center gap-2 rounded-2xl bg-peligro/10 px-3 text-sm font-medium text-peligro-ink"
           : "flex min-h-12 items-center gap-2 rounded-2xl bg-foreground/5 px-3 text-sm text-muted-foreground"
       }
     >
