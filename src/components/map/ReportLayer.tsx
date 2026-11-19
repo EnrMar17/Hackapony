@@ -2,18 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { FeatureCollection } from "geojson";
-import { CONFIRMED_MIN_CONFIRMS, REPORT_TTL_MS } from "@/lib/constants";
+import { CONFIRMED_MIN_CONFIRMS, REPORT_COLORS, REPORT_TTL_MS } from "@/lib/constants";
 import { isActive } from "@/lib/geo";
 import type { Report } from "@/lib/types";
 import { Layer, Source } from "./engine";
 import { clusterColors } from "./palette";
-import { REPORT_ICON_IMAGES } from "./reportIcons";
 
 export const REPORT_LAYER = "reports";
 export const REPORT_CLUSTER_LAYER = "reports-cluster";
 
 const PULSE_WINDOW_MS = 8_000;
 const PULSE_PERIOD_MS = 1_500;
+
+const TYPE_COLOR = ["match", ["get", "type"], "full", REPORT_COLORS.full, "passing", REPORT_COLORS.passing, REPORT_COLORS.incident];
 
 function reducedMotion(): boolean {
   return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -91,7 +92,7 @@ export function ReportLayer({ reports, iconsReady, dark }: { reports: Report[]; 
           type="circle"
           paint={{
             "circle-radius": 10 + 22 * phase,
-            "circle-color": ["match", ["get", "type"], "full", "#7c3aed", "passing", "#2563eb", "#dc2626"],
+            "circle-color": TYPE_COLOR as unknown as string,
             "circle-opacity": 0.5 * (1 - phase),
           }}
         />
@@ -121,50 +122,19 @@ export function ReportLayer({ reports, iconsReady, dark }: { reports: Report[]; 
           }}
           paint={{ "text-color": cluster.text }}
         />
-        <Layer
-          id={REPORT_LAYER}
-          type="circle"
-          filter={["!", ["has", "point_count"]]}
-          paint={{
-            "circle-radius": ["case", ["get", "confirmed"], 11, 8],
-            "circle-color": ["match", ["get", "type"], "full", "#7c3aed", "passing", "#2563eb", "#dc2626"],
-            "circle-opacity": ["case", ["get", "confirmed"], ["get", "opacity"], 0.25],
-            "circle-stroke-color": [
-              "case",
-              ["get", "confirmed"],
-              "#ffffff",
-              ["match", ["get", "type"], "full", "#7c3aed", "passing", "#2563eb", "#dc2626"],
-            ],
-            "circle-stroke-width": 2.5,
-          }}
-        />
         {iconsReady && (
           <Layer
-            id="reports-icon"
+            id={REPORT_LAYER}
             type="symbol"
             filter={["!", ["has", "point_count"]]}
             layout={{
-              "icon-image": [
-                "match",
-                ["get", "type"],
-                "full",
-                REPORT_ICON_IMAGES.full,
-                "passing",
-                REPORT_ICON_IMAGES.passing,
-                REPORT_ICON_IMAGES.incident,
-              ],
-              "icon-size": ["case", ["get", "confirmed"], 0.26, 0.2],
+              "icon-image": ["concat", "report-pin-", ["get", "type"], "-", ["case", ["get", "confirmed"], "c", "u"]],
+              "icon-anchor": "bottom",
+              "icon-size": ["case", ["get", "confirmed"], 1.1, 0.9],
               "icon-allow-overlap": true,
               "icon-ignore-placement": true,
             }}
-            paint={{
-              "icon-color": [
-                "case",
-                ["get", "confirmed"],
-                "#ffffff",
-                ["match", ["get", "type"], "full", "#7c3aed", "passing", "#2563eb", "#dc2626"],
-              ],
-            }}
+            paint={{ "icon-opacity": ["case", ["get", "confirmed"], ["get", "opacity"], 0.85] }}
           />
         )}
       </Source>

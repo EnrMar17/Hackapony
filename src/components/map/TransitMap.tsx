@@ -12,10 +12,12 @@ import type { MapMouseEvent, MapRef } from "./engine";
 import { ensureMapImages } from "./mapImages";
 import { REPORT_CLUSTER_LAYER, REPORT_LAYER, ReportLayer } from "./ReportLayer";
 import { ReportPopup } from "./ReportPopup";
+import { SelectedStopMarker } from "./SelectedStopMarker";
 import { ROUTE_LINE_LAYER, RouteLayers } from "./RouteLayers";
 import { STOP_LAYERS, StopLayer } from "./StopLayer";
 import { StopEtaChip } from "./StopEtaChip";
 import { UserLocation } from "./UserLocation";
+import { useSelectedStop } from "./useSelectedStop";
 import { useIsDark } from "./useIsDark";
 import { VehicleLayer } from "./VehicleLayer";
 
@@ -28,6 +30,8 @@ export interface TransitMapProps {
   onLocateRequest: () => void;
   /** Multiplicador del simulador (1, 2 o 5), para el ETA de la parada. */
   simSpeed?: number;
+  /** Precisión del GPS en metros (para el círculo alrededor de tu punto). */
+  userAccuracyM?: number | null;
 }
 
 const INTERACTIVE = [...STOP_LAYERS, REPORT_LAYER, REPORT_CLUSTER_LAYER, ROUTE_LINE_LAYER];
@@ -47,7 +51,15 @@ const BUTTON =
   "glass pointer-events-auto flex items-center justify-center rounded-full text-foreground shadow-md " +
   "transition-transform duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring";
 
-export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRequest, simSpeed = 1 }: TransitMapProps) {
+export function TransitMap({
+  bundle,
+  vehicles,
+  reports,
+  userPosition,
+  onLocateRequest,
+  simSpeed = 1,
+  userAccuracyM = null,
+}: TransitMapProps) {
   // Abre la conexión a Mapbox antes de que el mapa la pida: acorta la espera inicial.
   if (MAP_READY) {
     preconnect("https://api.mapbox.com");
@@ -55,6 +67,7 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
   }
 
   const mapRef = useRef<MapRef>(null);
+  const selectedStop = useSelectedStop(bundle, vehicles, simSpeed);
   const [loaded, setLoaded] = useState(false);
   const [imagesReady, setImagesReady] = useState(false);
   const [failed, setFailed] = useState(!MAP_READY);
@@ -154,11 +167,13 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
         style={{ width: "100%", height: "100%" }}
       >
         <RouteLayers routes={bundle.routes} selected={selectedRoute} dense={dense} dark={dark} />
-        <StopLayer stops={bundle.stops} reports={reports} dense={dense} />
-        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} />
+        <StopLayer stops={bundle.stops} reports={reports} dense={dense} dark={dark} />
+        <SelectedStopMarker selected={selectedStop} dark={dark} />
         <ReportLayer reports={reports} iconsReady={imagesReady} dark={dark} />
-        <UserLocation position={userPosition} />
-        <StopEtaChip bundle={bundle} vehicles={vehicles} speed={simSpeed} />
+        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} />
+        {/* Tu ubicación al final: queda encima de todo. Orden: tú > unidades > reportes > paradas > rutas. */}
+        <UserLocation position={userPosition} accuracyM={userAccuracyM} dark={dark} />
+        <StopEtaChip selected={selectedStop} />
         {selectedReport && <ReportPopup report={selectedReport} onClose={() => selectReport(null)} />}
       </MapView>
 

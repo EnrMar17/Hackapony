@@ -12,14 +12,26 @@ export const STOP_OK_LAYER = "stops-ok";
 export const STOP_LAYERS = [STOP_LAYER, STOP_OK_LAYER];
 
 /**
- * Paradas con color de semáforo. Las que no tienen novedades (verde) son pequeñas y solo se ven al acercar:
- * lo que llama la atención son las que tienen un problema. Con una ruta seleccionada solo se ven sus paradas.
+ * Paradas como ANILLOS huecos (fondo del tema, borde con el color del semáforo): no se confunden con tu punto
+ * ni con los reportes. Las que no tienen novedades (verde) son pequeñas y solo se ven al acercar.
+ * Con una ruta seleccionada solo se ven sus paradas.
  */
-export function StopLayer({ stops, reports, dense }: { stops: Stop[]; reports: Report[]; dense: boolean }) {
+export function StopLayer({
+  stops,
+  reports,
+  dense,
+  dark,
+}: {
+  stops: Stop[];
+  reports: Report[];
+  dense: boolean;
+  dark: boolean;
+}) {
   const selectedRoute = useUi((s) => s.selectedRoute);
   const onlyAccessible = useUi((s) => s.onlyAccessible);
   // Con muchas rutas y ninguna elegida, las paradas solo aparecen muy de cerca.
   const far = dense && !selectedRoute;
+  const fill = dark ? "#0b1220" : "#ffffff";
 
   const data = useMemo<FeatureCollection>(
     () => ({
@@ -44,10 +56,10 @@ export function StopLayer({ stops, reports, dense }: { stops: Stop[]; reports: R
         minzoom={far ? 14.5 : 13.5}
         filter={["==", ["get", "level"], "green"]}
         paint={{
-          "circle-radius": ["interpolate", ["linear"], ["zoom"], 13.5, 3, 16, 6],
-          "circle-color": "#86c5a1",
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 1.5,
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 13.5, 3, 16, 5],
+          "circle-color": fill,
+          "circle-stroke-color": "#16a34a",
+          "circle-stroke-width": 2,
         }}
       />
       <Layer
@@ -63,11 +75,11 @@ export function StopLayer({ stops, reports, dense }: { stops: Stop[]; reports: R
             10.5,
             ["match", ["get", "level"], "red", 4, 3],
             15,
-            ["match", ["get", "level"], "red", 10, 8],
+            ["match", ["get", "level"], "red", 8, 6],
           ],
-          "circle-color": ["match", ["get", "level"], "yellow", "#eab308", "#dc2626"],
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 2,
+          "circle-color": fill,
+          "circle-stroke-color": ["match", ["get", "level"], "yellow", "#eab308", "#dc2626"],
+          "circle-stroke-width": 3,
         }}
       />
     </Source>
