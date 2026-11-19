@@ -1,8 +1,9 @@
 "use client";
 
 import { Accessibility, Clock, Lightbulb, LightbulbOff, Share2, Umbrella, type LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { etaToStop, isActive, stopSafety, timeAgo } from "@/lib/geo";
+import { etaRange, isActive, stopSafety, timeAgo, type EtaRange } from "@/lib/geo";
 import type { CityBundle, Report, Stop, Vehicle } from "@/lib/types";
 import { ConfidenceBadge } from "./ConfidenceBadge";
 import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
@@ -16,14 +17,22 @@ export interface StopDetailProps {
   vehicles?: Vehicle[];
   /** Velocidad del simulador; sin ella se asume 1x. */
   simSpeed?: number;
+  /** Contexto arriba del nombre: "Tu parada más cercana", "Parada del Tec", "Parada seleccionada". */
+  label?: ReactNode;
+  /** Distancia del usuario a la parada (m), si se conoce. */
+  distanceM?: number | null;
+  /** Nota bajo el detalle, p. ej. "Activa tu ubicación…". */
+  hint?: string;
   loading?: boolean;
   error?: string | null;
 }
 
-/** etaToStop da segundos o null → "~N min" (mínimo 1) o "Sin datos". */
-function formatEta(seconds: number | null): string {
-  if (seconds === null) return "Sin datos";
-  return `~${Math.max(1, Math.round(seconds / 60))} min`;
+/** Rango de llegada ("4 a 7 min" o "~3 min"): un número exacto sería falsa precisión. */
+function formatEta(range: EtaRange | null): string {
+  if (!range) return "Sin datos";
+  const min = Math.max(1, Math.round(range.minSec / 60));
+  const max = Math.max(min, Math.round(range.maxSec / 60));
+  return min === max ? `~${min} min` : `${min} a ${max} min`;
 }
 
 function Attribute({ ok, icon: Icon, yes, no }: { ok: boolean; icon: LucideIcon; yes: string; no: string }) {
@@ -46,7 +55,18 @@ function shareText(city: string, stop: Stop, routeName: string, routeId: string)
   return `Parada ${stop.name} · ${routeName} · ${url}`;
 }
 
-export function StopDetail({ bundle, stopId, reports, vehicles, simSpeed = 1, loading, error }: StopDetailProps) {
+export function StopDetail({
+  bundle,
+  stopId,
+  reports,
+  vehicles,
+  simSpeed = 1,
+  label,
+  distanceM,
+  hint,
+  loading,
+  error,
+}: StopDetailProps) {
   if (loading) return <PanelLoading rows={3} />;
   if (error) return <PanelError text="No pudimos cargar la parada." />;
 
@@ -59,12 +79,14 @@ export function StopDetail({ bundle, stopId, reports, vehicles, simSpeed = 1, lo
   const stopReports = reports
     .filter((r) => r.stop_id === stop.id && isActive(r))
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
-  const eta = formatEta(route && vehicles ? etaToStop(route, stop, vehicles, simSpeed) : null);
+  const range = route && vehicles ? etaRange(route, stop, vehicles, simSpeed, reports) : null;
+  const eta = formatEta(range);
 
   return (
     <section aria-labelledby="stop-title" className="space-y-3">
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
+          {label && <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-info-ink">{label}</p>}
           <h2 id="stop-title" className="text-lg leading-tight font-bold">
             {stop.name}
           </h2>
@@ -72,6 +94,7 @@ export function StopDetail({ bundle, stopId, reports, vehicles, simSpeed = 1, lo
             <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
               <span aria-hidden className="size-2.5 rounded-full" style={{ backgroundColor: route.color }} />
               {route.name}
+              {distanceM != null && <span className="tabular-nums"> · a {Math.round(distanceM)} m</span>}
             </p>
           )}
         </div>
@@ -91,8 +114,16 @@ export function StopDetail({ bundle, stopId, reports, vehicles, simSpeed = 1, lo
           <Clock aria-hidden className="size-5 shrink-0" />
           Próxima unidad
         </span>
-        <span className="text-base font-bold tabular-nums">{eta}</span>
+        <span className="text-right">
+          <span className="block text-base font-bold tabular-nums">{eta}</span>
+          {range && (
+            <span className="block text-xs text-muted-foreground">
+              {range.basis === "reporte" ? "según un aviso reciente" : "estimado"}
+            </span>
+          )}
+        </span>
       </p>
+      {hint && <p className="px-1 text-xs text-muted-foreground">{hint}</p>}
 
       {safety.reasons.length > 0 && (
         <p className="text-sm text-muted-foreground">{safety.reasons.join(" · ")}</p>
