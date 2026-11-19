@@ -17,18 +17,15 @@ const truncate = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}
 
 /**
  * El viaje elegido: el tramo que harás resaltado con el color de la ruta (con su tiempo aproximado encima),
- * "Subes aquí" y "Bajas aquí", la caminata punteada y el destino. Va encima de las rutas y debajo de las paradas.
+ * "Subes aquí" y "Bajas aquí", y el destino. La caminata va aparte (TripWalk). Va encima de las rutas y debajo de las paradas.
  */
 export function TripLayer({
   trip,
   destination,
-  from,
   dark,
 }: {
   trip: TripOption | null;
   destination: Destination | null;
-  /** Desde dónde sales (tu ubicación o el punto de partida elegido). */
-  from: LngLat | null;
   dark: boolean;
 }) {
   const color = trip ? routeColor(ROUTE_COLORS[trip.route_id], dark) : "#475569";
@@ -42,17 +39,6 @@ export function TripLayer({
     }),
     [trip],
   );
-
-  const walk = useMemo<FeatureCollection>(() => {
-    const features: Feature[] = [];
-    if (trip && from) {
-      features.push({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: [from, trip.board.point] } });
-    }
-    if (trip && destination) {
-      features.push({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: [trip.alight.point, destination.point] } });
-    }
-    return { type: "FeatureCollection", features };
-  }, [trip, destination, from]);
 
   const points = useMemo<FeatureCollection>(() => {
     const features: Feature[] = [];
@@ -85,13 +71,6 @@ export function TripLayer({
           type="line"
           layout={{ "line-cap": "round", "line-join": "round" }}
           paint={{ "line-color": color, "line-width": 13 }}
-        />
-      </Source>
-      <Source id="trip-walk" type="geojson" data={walk}>
-        <Layer
-          id="trip-walk-line"
-          type="line"
-          paint={{ "line-color": dark ? "#e2e8f0" : "#334155", "line-width": 3, "line-dasharray": [1.5, 1.5] }}
         />
       </Source>
       <Source id="trip-points" type="geojson" data={points}>

@@ -16,7 +16,9 @@ import { ReportPopup } from "./ReportPopup";
 import { ROUTE_LINE_LAYER, RouteLayers } from "./RouteLayers";
 import { STOP_LAYERS, StopLayer } from "./StopLayer";
 import { StopEtaChip } from "./StopEtaChip";
+import { DestinationBar } from "./DestinationBar";
 import { TripLayer } from "./TripLayer";
+import { TripWalk } from "./TripWalk";
 import { UserLocation } from "./UserLocation";
 import { useIsDark } from "./useIsDark";
 import { VehicleLayer } from "./VehicleLayer";
@@ -251,7 +253,8 @@ export function TransitMap({
       >
         {/* De abajo hacia arriba: rutas, paradas, reportes, unidades y, encima de todo, tú. */}
         <RouteLayers routes={routesToDraw} selected={focusRoute} dense={dense && routesToDraw.length > 3} dark={dark} iconsReady={imagesReady} />
-        <TripLayer trip={trip} destination={destination} from={tripFrom} dark={dark} />
+        <TripWalk trip={trip} from={tripFrom} destination={destination} dark={dark} />
+        <TripLayer trip={trip} destination={destination} dark={dark} />
         <StopLayer stops={bundle.stops} reports={reports} dense={dense} dark={dark} />
         <ReportLayer reports={mapReports} iconsReady={imagesReady} dark={dark} />
         <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} dark={dark} highlightId={incoming?.vehicleId ?? null} />
@@ -260,21 +263,12 @@ export function TransitMap({
         {selectedReport && <ReportPopup report={selectedReport} onClose={() => selectReport(null)} />}
       </MapView>
 
-      {pickingDestination && (
-        <div
-          role="status"
-          className="glass absolute top-20 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full py-1 pr-1 pl-4 text-sm font-semibold shadow-md"
-        >
-          Toca el mapa para marcar {pickingLabel}
-          <button
-            type="button"
-            onClick={() => useUi.getState().setPickingDestination(false)}
-            className="min-h-12 rounded-full px-3 underline"
-          >
-            Cancelar
-          </button>
-        </div>
-      )}
+      <DestinationBar
+        picking={pickingDestination}
+        target={pickingLabel}
+        desktop={desktop}
+        onCancel={() => useUi.getState().setPickingDestination(false)}
+      />
 
       {!loaded && (
         <div role="status" className="absolute inset-0 flex items-center justify-center bg-muted">
