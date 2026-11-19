@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Check, CircleHelp, Users, WifiOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
+import { ALL_ROUTES_ENABLED } from "@/lib/constants";
 import type { Route } from "@/lib/types";
 import { useDeviceOnline } from "./connection";
 import { formatSince, useLastReportsUpdate } from "./liveSync";
@@ -12,6 +13,7 @@ import { Onboarding } from "./Onboarding";
 import { ThemePicker } from "./ThemePicker";
 import { RoutePicker } from "./RoutePicker";
 import { MAX_INLINE_ROUTES, readableText } from "./routeMeta";
+import { DESKTOP_QUERY } from "./useIsDesktop";
 
 export interface TopBarProps {
   routes: Route[];
@@ -29,6 +31,12 @@ export function TopBar({ routes, online, connected }: TopBarProps) {
   useEffect(() => {
     if (selectedTrip) selectRoute(selectedTrip);
   }, [selectedTrip, selectRoute]);
+
+  // En teléfono la app arranca mostrando todas las rutas; el botón del mapa cambia a solo Gris 1 y Naranja 1.
+  // Una sola vez al abrir: después manda lo que elija el usuario. (El valor por defecto del store es de Tony.)
+  useEffect(() => {
+    if (ALL_ROUTES_ENABLED && !window.matchMedia(DESKTOP_QUERY).matches) useUi.getState().setShowAllRoutes(true);
+  }, []);
   const deviceOnline = useDeviceOnline();
   const [helpOpen, setHelpOpen] = useState(false);
   // Sin red del dispositivo no hay conexión; con red, manda lo que diga useReports si CityApp lo pasa.
