@@ -1,9 +1,9 @@
 "use client";
 
-import { Accessibility, Lightbulb, LightbulbOff, Umbrella, type LucideIcon } from "lucide-react";
+import { Accessibility, Clock, Lightbulb, LightbulbOff, Umbrella, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { stopSafety } from "@/lib/geo";
-import type { CityBundle, Report, Stop } from "@/lib/types";
+import { etaToStop, stopSafety } from "@/lib/geo";
+import type { CityBundle, Report, Stop, Vehicle } from "@/lib/types";
 import { PanelError, PanelLoading } from "./PanelState";
 import { SAFETY_LOOK } from "./reportMeta";
 
@@ -11,8 +11,16 @@ export interface StopDetailProps {
   bundle: CityBundle;
   stopId: string;
   reports: Report[];
+  /** Sin vehículos (CityApp aún no los pasa) el ETA dice "Sin datos". */
+  vehicles?: Vehicle[];
   loading?: boolean;
   error?: string | null;
+}
+
+/** etaToStop da segundos o null → "~N min" (mínimo 1) o "Sin datos". */
+function formatEta(seconds: number | null): string {
+  if (seconds === null) return "Sin datos";
+  return `~${Math.max(1, Math.round(seconds / 60))} min`;
 }
 
 function Attribute({ ok, icon: Icon, yes, no }: { ok: boolean; icon: LucideIcon; yes: string; no: string }) {
@@ -29,7 +37,7 @@ function Attribute({ ok, icon: Icon, yes, no }: { ok: boolean; icon: LucideIcon;
   );
 }
 
-export function StopDetail({ bundle, stopId, reports, loading, error }: StopDetailProps) {
+export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }: StopDetailProps) {
   if (loading) return <PanelLoading rows={3} />;
   if (error) return <PanelError text="No pudimos cargar la parada." />;
 
@@ -39,6 +47,7 @@ export function StopDetail({ bundle, stopId, reports, loading, error }: StopDeta
   const route = bundle.routes.find((r) => r.id === stop.route_id);
   const safety = stopSafety(stop, reports);
   const look = SAFETY_LOOK[safety.level];
+  const eta = formatEta(route && vehicles ? etaToStop(route, stop, vehicles) : null);
 
   return (
     <section aria-labelledby="stop-title" className="space-y-3">
@@ -64,6 +73,14 @@ export function StopDetail({ bundle, stopId, reports, loading, error }: StopDeta
           {look.text}
         </span>
       </header>
+
+      <p className="flex min-h-12 items-center justify-between gap-2 rounded-2xl bg-info/10 px-3">
+        <span className="flex items-center gap-2 text-sm font-medium text-info">
+          <Clock aria-hidden className="size-5 shrink-0" />
+          Próxima unidad
+        </span>
+        <span className="text-base font-bold tabular-nums">{eta}</span>
+      </p>
 
       {safety.reasons.length > 0 && (
         <p className="text-sm text-muted-foreground">{safety.reasons.join(" · ")}</p>

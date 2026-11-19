@@ -20,7 +20,7 @@ export interface BottomSheetProps {
 
 const CLOCK_MS = 30_000;
 
-export function BottomSheet({ bundle, reports }: BottomSheetProps) {
+export function BottomSheet({ bundle, reports, vehicles }: BottomSheetProps) {
   const open = useUi((s) => s.sheetOpen);
   const setOpen = useUi((s) => s.setSheetOpen);
   const selectedStop = useUi((s) => s.selectedStop);
@@ -102,6 +102,7 @@ export function BottomSheet({ bundle, reports }: BottomSheetProps) {
                   bundle={bundle}
                   stopId={selectedStop}
                   reports={reports}
+                  vehicles={vehicles}
                   loading={loading}
                   error={error}
                 />
