@@ -3,6 +3,17 @@ import type { CityBundle, LngLat, Route, RouteId, Stop } from "@/lib/types";
 import routesGeo from "./routes.json";
 import stopsData from "./stops.json";
 
+/**
+ * Origen y límites de los datos (para no presentarlos como oficiales):
+ * - Los trazados vienen de OpenStreetMap (relaciones de "Urbano Morelia"); Gris 1 no está en OSM y se trazó
+ *   con OSRM sobre el Periférico, en los dos sentidos. Los huecos entre tramos los unió OSRM; el mayor es
+ *   el de ~450 m del extremo norte de Naranja 1. Las líneas con un solo sentido en OSM se cerraron con OSRM.
+ * - Los nombres de las paradas salen de geocodificación inversa de OSM; no son las paradas oficiales.
+ * - Luz, rampa y techo de cada parada son DATOS DE DEMOSTRACIÓN: no están medidos en campo.
+ */
+export const DEMO_DATA_NOTICE =
+  "Datos de demostración: la luz, la rampa y el techo de las paradas no están medidos en campo, y parte de los reportes son simulados.";
+
 type RawStop = Omit<Stop, "route_id"> & { route_id: string };
 
 /**
