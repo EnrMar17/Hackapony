@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { CircleCheck, ThumbsUp, UserRound } from "lucide-react";
+import { CircleCheck, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { timeAgo } from "@/lib/geo";
+import { burstForVote, reportEmoji, STATE_EMOJI, VOTE_EMOJI } from "@/lib/emoji";
+import { fireReaction } from "@/components/report/ReactionBurst";
 import type { Report, Route, VoteKind } from "@/lib/types";
 import { ConfidenceBadge } from "./ConfidenceBadge";
 import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
@@ -39,6 +41,7 @@ export function ReportDetail({ reportId, reports, routes, now, onVote, userId, l
     if (!onVote || voted.includes(kind)) return;
     onVote(reportId, kind);
     setVoted((v) => [...v, kind]);
+    fireReaction(burstForVote(kind), 6);
   }
 
   return (
@@ -49,6 +52,7 @@ export function ReportDetail({ reportId, reports, routes, now, onVote, userId, l
         </span>
         <div className="min-w-0">
           <h2 id="report-title" className="text-lg leading-tight font-bold">
+            <span aria-hidden>{reportEmoji(report)} </span>
             {reportTitle(report)}
           </h2>
           <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-muted-foreground">
@@ -93,7 +97,9 @@ export function ReportDetail({ reportId, reports, routes, now, onVote, userId, l
                 "disabled:opacity-60",
               )}
             >
-              <ThumbsUp aria-hidden className="size-5 shrink-0" />
+              <span aria-hidden className="text-xl leading-none">
+                {voted.includes("confirm") ? STATE_EMOJI.thanks : VOTE_EMOJI.confirm}
+              </span>
               {voted.includes("confirm") ? "¡Gracias!" : "Confirmo (+1)"}
             </button>
             <button
@@ -107,7 +113,9 @@ export function ReportDetail({ reportId, reports, routes, now, onVote, userId, l
                 "disabled:opacity-60",
               )}
             >
-              <CircleCheck aria-hidden className="size-4 shrink-0 text-seguro-ink" />
+              <span aria-hidden className="text-lg leading-none">
+                {voted.includes("resolved") ? STATE_EMOJI.thanks : VOTE_EMOJI.resolved}
+              </span>
               {voted.includes("resolved") ? "¡Gracias!" : "Ya se resolvió"}
             </button>
           </div>

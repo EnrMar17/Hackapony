@@ -6,6 +6,7 @@ import { ROUTE_COLORS } from "@/lib/constants";
 import type { RouteId, Vehicle } from "@/lib/types";
 import { ARROW_IMAGE } from "./arrowIcon";
 import { Layer, Source, useMap } from "./engine";
+import { EMOJI_FULL_IMAGE, EMOJI_PASSING_IMAGE } from "./emojiIcons";
 import { ensureMapImages } from "./mapImages";
 import { REPORT_COLORS, routeColor } from "./palette";
 import { wantVehicleRoutes } from "./vehicleIcons";
@@ -242,6 +243,35 @@ export function VehicleLayer({
         }}
         paint={{ "text-color": "#ffffff", "text-halo-color": REPORT_COLORS.passing, "text-halo-width": 4 }}
       />
+      {/* Insignia con el emoji del caso, encima de la etiqueta: se ve de lejos y sigue a la unidad. */}
+      {capsulesReady && (
+        <Layer
+          id="vehicles-full-emoji"
+          type="symbol"
+          filter={["in", ["get", "id"], ["literal", fullIds]]}
+          layout={{
+            "icon-image": EMOJI_FULL_IMAGE,
+            "icon-anchor": "bottom",
+            "icon-offset": [0, -42],
+            "icon-allow-overlap": true,
+            "icon-ignore-placement": true,
+          }}
+        />
+      )}
+      {capsulesReady && (
+        <Layer
+          id="vehicles-passing-emoji"
+          type="symbol"
+          filter={["in", ["get", "id"], ["literal", passingIds]]}
+          layout={{
+            "icon-image": EMOJI_PASSING_IMAGE,
+            "icon-anchor": "bottom",
+            "icon-offset": [0, -42],
+            "icon-allow-overlap": true,
+            "icon-ignore-placement": true,
+          }}
+        />
+      )}
     </Source>
   );
 }

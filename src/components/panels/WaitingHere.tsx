@@ -1,7 +1,8 @@
 "use client";
 
-import { Users } from "lucide-react";
 import type { StopWaitingState } from "@/hooks/useStopWaiting";
+import { fireReaction } from "@/components/report/ReactionBurst";
+import { STATE_EMOJI } from "@/lib/emoji";
 import { cn } from "@/lib/utils";
 
 /**
@@ -14,7 +15,9 @@ export function WaitingHere({ stopId, waiting }: { stopId: string; waiting: Stop
   return (
     <div className="flex min-h-12 items-center justify-between gap-3 rounded-2xl bg-foreground/5 px-3 py-1.5">
       <p className="flex min-w-0 items-center gap-2 text-sm">
-        <Users aria-hidden className="size-5 shrink-0 text-info-ink" />
+        <span aria-hidden className="text-xl leading-none">
+          {STATE_EMOJI.waiting}
+        </span>
         <span aria-live="polite">
           {count === 0
             ? "Nadie ha marcado que espera aquí"
@@ -26,7 +29,10 @@ export function WaitingHere({ stopId, waiting }: { stopId: string; waiting: Stop
       <button
         type="button"
         aria-pressed={here}
-        onClick={() => waiting.setWaiting(here ? null : stopId)}
+        onClick={() => {
+          if (!here) fireReaction([STATE_EMOJI.waiting, "⏳", "🚌"], 5);
+          waiting.setWaiting(here ? null : stopId);
+        }}
         className={cn(
           "min-h-12 shrink-0 rounded-xl px-3 text-sm font-semibold transition-colors duration-300 ease-out",
           "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",

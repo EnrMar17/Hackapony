@@ -1,6 +1,7 @@
 import { CircleCheck, CircleDashed } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CONFIRMED_MIN_CONFIRMS } from "@/lib/constants";
+import { STATE_EMOJI } from "@/lib/emoji";
 import type { Report } from "@/lib/types";
 
 /**
@@ -24,6 +25,7 @@ export function ConfidenceBadge({ report, className }: { report: Report; classNa
       )}
     >
       <Icon aria-hidden className="size-3.5 shrink-0" />
+      <span aria-hidden>{confirmed ? STATE_EMOJI.confirmed : STATE_EMOJI.unconfirmed}</span>
       {confirmed
         ? `Confirmado (${report.confirms} ${report.confirms === 1 ? "persona" : "personas"})`
         : "Informado por 1 persona · sin confirmar"}
