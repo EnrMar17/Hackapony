@@ -23,7 +23,5 @@ export const clusterColors = (dark: boolean) => ({
   text: dark ? "#0f172a" : "#ffffff",
 });
 
-/** Clases para que los globos del mapa (popups) usen el mismo estilo que el resto de la interfaz. */
-export const POPUP_CLASS =
-  "[&_.mapboxgl-popup-content]:rounded-2xl [&_.mapboxgl-popup-content]:bg-popover [&_.mapboxgl-popup-content]:p-2 " +
-  "[&_.mapboxgl-popup-content]:text-popover-foreground [&_.mapboxgl-popup-content]:shadow-lg [&_.mapboxgl-popup-tip]:hidden";
+/** Clase de los globos del mapa. Sus colores por tema viven en globals.css (`.map-popup`), sin @layer. */
+export const POPUP_CLASS = "map-popup";
