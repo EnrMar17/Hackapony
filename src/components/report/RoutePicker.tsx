@@ -60,7 +60,8 @@ export function RoutePicker({ id, type, choices, onSelect, onClose, disabled }: 
           <span className="sr-only">Cerrar sin enviar</span>
         </button>
       </div>
-      <div className="grid gap-2">
+      {/* Con dos rutas (caso ambiguo) van lado a lado, grandes, para elegir de un toque con el pulgar. */}
+      <div className={cn("grid gap-2", choices.length === 2 && "grid-cols-2")}>
         {choices.map((c, i) => (
           <button
             key={c.id}
@@ -69,7 +70,7 @@ export function RoutePicker({ id, type, choices, onSelect, onClose, disabled }: 
             disabled={disabled}
             onClick={() => onSelect(c.id)}
             className={cn(
-              "flex min-h-12 items-center gap-3 rounded-2xl border bg-card px-3 text-left shadow-sm",
+              "flex min-h-14 items-center gap-3 rounded-2xl border bg-card px-3 py-2 text-left shadow-sm",
               "transition-[transform,opacity] duration-300 ease-out active:scale-[0.98]",
               "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-60",
             )}
@@ -80,7 +81,7 @@ export function RoutePicker({ id, type, choices, onSelect, onClose, disabled }: 
               style={{ backgroundColor: ROUTE_COLORS[c.id] }}
             />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold">{c.name}</span>
+              <span className="line-clamp-2 block text-sm leading-tight font-semibold break-words">{c.name}</span>
               {c.distanceM !== undefined && (
                 <span className="block text-xs text-muted-foreground">{fmt(c.distanceM)}</span>
               )}
