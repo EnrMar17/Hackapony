@@ -1,18 +1,22 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { preconnect } from "react-dom";
+import { Layers, LocateFixed } from "lucide-react";
+import { useIsDesktop } from "@/components/panels/useIsDesktop";
 import { ALL_ROUTES_ENABLED, DEFAULT_ROUTE_IDS, ROUTE_IDS } from "@/lib/constants";
 import type { CityBundle, LngLat, Report, Route, RouteId, Vehicle } from "@/lib/types";
 import { useUi } from "@/store/ui";
-import { addArrowImage } from "./arrowIcon";
-import { MAP_READY, MAP_STYLE, MapView, engineProps } from "./engine";
+import { MAP_READY, MAP_STYLE, MAP_STYLE_DARK, MapView, engineProps } from "./engine";
 import type { MapMouseEvent, MapRef } from "./engine";
+import { ensureMapImages } from "./mapImages";
 import { REPORT_CLUSTER_LAYER, REPORT_LAYER, ReportLayer } from "./ReportLayer";
 import { ReportPopup } from "./ReportPopup";
 import { ROUTE_LINE_LAYER, RouteLayers } from "./RouteLayers";
 import { STOP_LAYERS, StopLayer } from "./StopLayer";
 import { StopEtaChip } from "./StopEtaChip";
 import { UserLocation } from "./UserLocation";
+import { useIsDark } from "./useIsDark";
 import { VehicleLayer } from "./VehicleLayer";
 
 export interface TransitMapProps {
@@ -39,15 +43,28 @@ function routesBounds(routes: Route[]): [LngLat, LngLat] {
   ];
 }
 
+const BUTTON =
+  "glass pointer-events-auto flex items-center justify-center rounded-full text-foreground shadow-md " +
+  "transition-transform duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring";
+
 export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRequest, simSpeed = 1 }: TransitMapProps) {
+  // Abre la conexión a Mapbox antes de que el mapa la pida: acorta la espera inicial.
+  if (MAP_READY) {
+    preconnect("https://api.mapbox.com");
+    preconnect("https://events.mapbox.com");
+  }
+
   const mapRef = useRef<MapRef>(null);
   const [loaded, setLoaded] = useState(false);
-  const [arrowReady, setArrowReady] = useState(false);
+  const [imagesReady, setImagesReady] = useState(false);
   const [failed, setFailed] = useState(!MAP_READY);
+  const dark = useIsDark();
+  const desktop = useIsDesktop();
   const selectedRoute = useUi((s) => s.selectedRoute);
   const selectRoute = useUi((s) => s.selectRoute);
   const selectStop = useUi((s) => s.selectStop);
   const selectReport = useUi((s) => s.selectReport);
+  const setMapReady = useUi((s) => s.setMapReady);
   const selectedReportId = useUi((s) => s.selectedReport);
   const selectedReport = reports.find((r) => r.id === selectedReportId) ?? null;
   const selectedStopId = useUi((s) => s.selectedStop);
@@ -61,22 +78,30 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
   );
 
   // Se vuelve a encuadrar cuando cambia el conjunto de rutas (por ejemplo al pulsar "Ver todas").
+  // En escritorio el panel izquierdo (416 px) y la barra de reporte tapan parte del mapa.
   useEffect(() => {
     if (!loaded) return;
     mapRef.current?.fitBounds(routesBounds(bundle.routes), {
-      padding: { top: 96, bottom: 260, left: 28, right: 28 },
+      padding: desktop
+        ? { top: 96, bottom: 200, left: 456, right: 40 }
+        : { top: 96, bottom: 260, left: 28, right: 28 },
       maxZoom: 14,
       duration: 600,
     });
-  }, [loaded, bundle.routes]);
+  }, [loaded, bundle.routes, desktop]);
 
-  // Al elegir una parada, el mapa la acerca (por encima del panel inferior).
+  // Al elegir una parada, el mapa la acerca fuera de la zona que tapan los paneles.
   useEffect(() => {
     const map = mapRef.current;
     const stop = bundle.stops.find((s) => s.id === selectedStopId);
     if (!loaded || !map || !stop) return;
-    map.flyTo({ center: [stop.lng, stop.lat], zoom: Math.max(map.getZoom(), 15), offset: [0, -90], duration: 700 });
-  }, [selectedStopId, loaded, bundle.stops]);
+    map.flyTo({
+      center: [stop.lng, stop.lat],
+      zoom: Math.max(map.getZoom(), 15),
+      offset: desktop ? [208, 0] : [0, -90],
+      duration: 700,
+    });
+  }, [selectedStopId, loaded, bundle.stops, desktop]);
 
   function onClick(e: MapMouseEvent) {
     const feature = e.features?.[0];
@@ -97,9 +122,14 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
     mapRef.current?.flyTo({ center: userPosition, zoom: 15, duration: 800 });
   }
 
+  // Los cambios de estilo (modo oscuro) borran las imágenes: se vuelven a registrar.
+  function syncImages() {
+    if (mapRef.current) setImagesReady(ensureMapImages(mapRef.current));
+  }
+
   if (failed) {
     return (
-      <div role="alert" className="flex h-full w-full items-center justify-center bg-slate-100 p-6 text-center text-sm text-slate-700">
+      <div role="alert" className="flex h-full w-full items-center justify-center bg-muted p-6 text-center text-sm text-muted-foreground">
         No se pudo cargar el mapa. Revisa tu conexión e intenta de nuevo.
       </div>
     );
@@ -110,54 +140,57 @@ export function TransitMap({ bundle, vehicles, reports, userPosition, onLocateRe
       <MapView
         ref={mapRef}
         {...engineProps}
-        mapStyle={MAP_STYLE}
+        mapStyle={dark ? MAP_STYLE_DARK : MAP_STYLE}
         initialViewState={{ longitude: bundle.center[0], latitude: bundle.center[1], zoom: bundle.zoom }}
         interactiveLayerIds={INTERACTIVE}
         onClick={onClick}
         onLoad={() => {
-          if (mapRef.current) {
-            setArrowReady(addArrowImage(mapRef.current));
-          }
+          syncImages();
           setLoaded(true);
+          setMapReady(true);
         }}
+        onStyleData={syncImages}
         onError={() => setFailed(true)}
         style={{ width: "100%", height: "100%" }}
       >
-        <RouteLayers routes={bundle.routes} selected={selectedRoute} dense={dense} />
+        <RouteLayers routes={bundle.routes} selected={selectedRoute} dense={dense} dark={dark} />
         <StopLayer stops={bundle.stops} reports={reports} dense={dense} />
-        <VehicleLayer vehicles={mapVehicles} arrowReady={arrowReady} />
-        <ReportLayer reports={reports} />
+        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} />
+        <ReportLayer reports={reports} iconsReady={imagesReady} dark={dark} />
         <UserLocation position={userPosition} />
         <StopEtaChip bundle={bundle} vehicles={vehicles} speed={simSpeed} />
-        {selectedReport && (
-          <ReportPopup report={selectedReport} onClose={() => selectReport(null)} />
-        )}
+        {selectedReport && <ReportPopup report={selectedReport} onClose={() => selectReport(null)} />}
       </MapView>
+
       {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-100 text-sm text-slate-600">
-          Cargando mapa…
+        <div role="status" className="absolute inset-0 flex items-center justify-center bg-muted">
+          <div className="glass flex items-center gap-3 rounded-full px-5 py-3 text-sm font-medium shadow-md">
+            <span
+              aria-hidden
+              className="size-4 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground motion-reduce:animate-none"
+            />
+            Cargando el mapa…
+          </div>
         </div>
       )}
-      <button
-        type="button"
-        onClick={locate}
-        aria-label="Centrar en mi ubicación"
-        className="absolute right-3 top-20 flex size-12 items-center justify-center rounded-full bg-white text-xl shadow"
-      >
-        ◎
+
+      <button type="button" onClick={locate} aria-label="Centrar en mi ubicación" className={`${BUTTON} absolute right-3 top-20 size-12`}>
+        <LocateFixed aria-hidden className="size-5" />
       </button>
+
       {ALL_ROUTES_ENABLED && (
-        <div className="absolute right-3 top-36 flex max-w-56 flex-col items-end gap-2">
+        <div className="absolute right-3 top-36 flex max-w-60 flex-col items-end gap-2">
           <button
             type="button"
             onClick={() => setShowAll(!showAll)}
             aria-pressed={showAll}
-            className="min-h-12 rounded-full bg-white px-4 text-sm font-semibold shadow"
+            className={`${BUTTON} min-h-12 gap-2 px-4 text-sm font-semibold`}
           >
+            <Layers aria-hidden className="size-4" />
             {showAll ? "Solo Gris 1 y Naranja 1" : `Ver todas las rutas (${ROUTE_IDS.length})`}
           </button>
           {dense && !selectedRoute && (
-            <p className="rounded-xl bg-white/95 px-3 py-2 text-xs text-slate-700 shadow">
+            <p className="glass rounded-xl px-3 py-2 text-xs text-muted-foreground shadow-md">
               Toca una línea para ver sus paradas y unidades.
             </p>
           )}

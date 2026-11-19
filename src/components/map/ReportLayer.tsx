@@ -6,6 +6,8 @@ import { CONFIRMED_MIN_CONFIRMS, REPORT_TTL_MS } from "@/lib/constants";
 import { isActive } from "@/lib/geo";
 import type { Report } from "@/lib/types";
 import { Layer, Source } from "./engine";
+import { clusterColors } from "./palette";
+import { REPORT_ICON_IMAGES } from "./reportIcons";
 
 export const REPORT_LAYER = "reports";
 export const REPORT_CLUSTER_LAYER = "reports-cluster";
@@ -21,7 +23,8 @@ function reducedMotion(): boolean {
  * Reportes vigentes. Confirmados (autor + 1 persona): sólidos y grandes. Sin confirmar: anillo tenue.
  * Los que están cerca se agrupan con un contador; los recién llegados pulsan unos segundos.
  */
-export function ReportLayer({ reports }: { reports: Report[] }) {
+export function ReportLayer({ reports, iconsReady, dark }: { reports: Report[]; iconsReady: boolean; dark: boolean }) {
+  const cluster = clusterColors(dark);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30_000);
@@ -100,7 +103,7 @@ export function ReportLayer({ reports }: { reports: Report[] }) {
           filter={["has", "point_count"]}
           paint={{
             "circle-radius": ["step", ["get", "point_count"], 14, 5, 18, 10, 22],
-            "circle-color": "#1e293b",
+            "circle-color": cluster.fill,
             "circle-opacity": 0.92,
             "circle-stroke-color": "#ffffff",
             "circle-stroke-width": 2,
@@ -116,7 +119,7 @@ export function ReportLayer({ reports }: { reports: Report[] }) {
             "text-size": 13,
             "text-allow-overlap": true,
           }}
-          paint={{ "text-color": "#ffffff" }}
+          paint={{ "text-color": cluster.text }}
         />
         <Layer
           id={REPORT_LAYER}
@@ -135,6 +138,35 @@ export function ReportLayer({ reports }: { reports: Report[] }) {
             "circle-stroke-width": 2.5,
           }}
         />
+        {iconsReady && (
+          <Layer
+            id="reports-icon"
+            type="symbol"
+            filter={["!", ["has", "point_count"]]}
+            layout={{
+              "icon-image": [
+                "match",
+                ["get", "type"],
+                "full",
+                REPORT_ICON_IMAGES.full,
+                "passing",
+                REPORT_ICON_IMAGES.passing,
+                REPORT_ICON_IMAGES.incident,
+              ],
+              "icon-size": ["case", ["get", "confirmed"], 0.26, 0.2],
+              "icon-allow-overlap": true,
+              "icon-ignore-placement": true,
+            }}
+            paint={{
+              "icon-color": [
+                "case",
+                ["get", "confirmed"],
+                "#ffffff",
+                ["match", ["get", "type"], "full", "#7c3aed", "passing", "#2563eb", "#dc2626"],
+              ],
+            }}
+          />
+        )}
       </Source>
     </>
   );
