@@ -1,10 +1,10 @@
 "use client";
 
-import { Check, Users } from "lucide-react";
+import { Check, CircleHelp, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import type { Route } from "@/lib/types";
-import { Onboarding } from "./Onboarding";
+import { Onboarding, openOnboarding } from "./Onboarding";
 import { RoutePicker } from "./RoutePicker";
 import { MAX_INLINE_ROUTES, readableText } from "./routeMeta";
 
@@ -38,7 +38,7 @@ export function TopBar({ routes, online }: TopBarProps) {
                 onClick={() => selectRoute(pressed ? null : r.id)}
                 style={pressed ? { backgroundColor: r.color, color: readableText(r.color) } : undefined}
                 className={cn(
-                  "flex min-h-12 shrink-0 snap-start items-center gap-2 rounded-full px-4 text-sm font-semibold whitespace-nowrap shadow-md",
+                  "flex min-h-12 shrink-0 snap-start items-center gap-1.5 rounded-full px-3 text-sm font-semibold whitespace-nowrap shadow-md lg:gap-2 lg:px-4",
                   "transition-[background-color,color,transform] duration-300 ease-out active:scale-95",
                   "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-offset-2",
                   !pressed && "glass text-foreground",
@@ -60,7 +60,16 @@ export function TopBar({ routes, online }: TopBarProps) {
         </div>
       )}
 
-      <p className="glass pointer-events-auto ml-auto flex min-h-12 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-medium shadow-md">
+      <button
+        type="button"
+        onClick={openOnboarding}
+        className="glass pointer-events-auto ml-auto flex size-12 shrink-0 items-center justify-center rounded-full shadow-md transition-transform duration-300 ease-out active:scale-95 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
+      >
+        <CircleHelp aria-hidden className="size-5" />
+        <span className="sr-only">Cómo funciona</span>
+      </button>
+
+      <p className="glass pointer-events-auto flex min-h-12 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-medium shadow-md">
         <Users aria-hidden className="size-4 text-seguro-ink" />
         <span className="tabular-nums">{online}</span> en línea
       </p>
