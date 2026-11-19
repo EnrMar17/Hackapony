@@ -7,20 +7,20 @@ import type { LngLat, Route, SimConfig, Vehicle } from "@/lib/types";
 import { BEARING_LOOKAHEAD_M, TICK_MS, VEHICLES_PER_ROUTE, VEHICLE_SPEED_MS } from "./config";
 
 /**
- * Reloj del simulador. Con ancla en 0 y 1x vale Date.now(), así todos los dispositivos
- * coinciden sin servidor. Pausa y velocidad lo re-anclan (ver `setSimClock`).
+ * Reloj del simulador. Es función de la configuración compartida (con su anclaje), así todos los
+ * dispositivos coinciden: con ancla en 0 y 1x vale Date.now(). El anclaje lo fija quien cambia
+ * play/pausa o velocidad (ver `SimConfig`); aquí NO se reancla con la hora local.
  */
-let clock = { realAnchor: 0, simAnchor: 0, playing: true, speed: 1 as number };
+let clock: SimConfig = { playing: true, speed: 1, anchorWallMs: 0, anchorSimMs: 0 };
 
 export function simTimeMs(): number {
-  if (!clock.playing) return clock.simAnchor;
-  return clock.simAnchor + (Date.now() - clock.realAnchor) * clock.speed;
+  if (!clock.playing) return clock.anchorSimMs;
+  return clock.anchorSimMs + (Date.now() - clock.anchorWallMs) * clock.speed;
 }
 
-/** Aplica play/pausa y velocidad sin saltos en la posición de las unidades. */
+/** Aplica la configuración compartida del simulador. */
 export function setSimClock(config: SimConfig): void {
-  if (config.playing === clock.playing && config.speed === clock.speed) return;
-  clock = { realAnchor: Date.now(), simAnchor: simTimeMs(), playing: config.playing, speed: config.speed };
+  clock = config;
 }
 
 function bearingDeg(from: LngLat, to: LngLat): number {
@@ -55,11 +55,13 @@ export function vehiclesAt(routes: Route[], t: number): Vehicle[] {
 export function useVehicles(routes: Route[], sim?: SimConfig): Vehicle[] {
   const playing = sim?.playing ?? true;
   const speed = sim?.speed ?? 1;
+  const anchorWallMs = sim?.anchorWallMs ?? 0;
+  const anchorSimMs = sim?.anchorSimMs ?? 0;
   const [vehicles, setVehicles] = useState<Vehicle[]>(() => vehiclesAt(routes, simTimeMs()));
   useEffect(() => {
-    setSimClock({ playing, speed });
+    setSimClock({ playing, speed, anchorWallMs, anchorSimMs });
     const id = setInterval(() => setVehicles(vehiclesAt(routes, simTimeMs())), TICK_MS);
     return () => clearInterval(id);
-  }, [routes, playing, speed]);
+  }, [routes, playing, speed, anchorWallMs, anchorSimMs]);
   return vehicles;
 }

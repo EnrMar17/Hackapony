@@ -18,11 +18,11 @@ import { SimulatorPanel } from "@/components/simulator/SimulatorPanel";
 
 export function CityApp({ city, admin }: { city: string; admin: boolean }) {
   const bundle = useMemo(() => getCityBundle(city), [city]);
-  const vehicles = useVehicles(bundle.routes);
+  const sim = useSimConfig();
+  const vehicles = useVehicles(bundle.routes, sim);
   const { reports, sendReport } = useReports();
   const geo = useGeolocation();
   const online = usePresenceCount();
-  const sim = useSimConfig();
 
   async function onReport(type: ReportType, incident_kind?: IncidentKind) {
     const [lng, lat] = geo.position ?? bundle.center;
@@ -49,7 +49,7 @@ export function CityApp({ city, admin }: { city: string; admin: boolean }) {
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-0 *:pointer-events-auto">
         <TopBar routes={bundle.routes} online={online} />
-        {admin && <SimulatorPanel sim={sim} />}
+        {admin && <SimulatorPanel sim={sim} stops={bundle.stops} sendReport={sendReport} />}
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 *:pointer-events-auto">
         <BottomSheet bundle={bundle} reports={reports} />
