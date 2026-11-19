@@ -5,10 +5,10 @@
 //   2. MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty"
 //   3. engineProps = {} y MAP_READY = true
 import "mapbox-gl/dist/mapbox-gl.css";
-import MapView, { Source, Layer } from "react-map-gl/mapbox";
+import MapView, { Source, Layer, Popup } from "react-map-gl/mapbox";
 export type { LayerProps, MapMouseEvent, MapRef } from "react-map-gl/mapbox";
 
-export { MapView, Source, Layer };
+export { MapView, Source, Layer, Popup };
 
 const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
