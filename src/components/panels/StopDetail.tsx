@@ -2,10 +2,11 @@
 
 import { Accessibility, Clock, Lightbulb, LightbulbOff, Share2, Umbrella, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { etaToStop, stopSafety } from "@/lib/geo";
+import { etaToStop, isActive, stopSafety, timeAgo } from "@/lib/geo";
 import type { CityBundle, Report, Stop, Vehicle } from "@/lib/types";
-import { PanelError, PanelLoading } from "./PanelState";
-import { SAFETY_LOOK } from "./reportMeta";
+import { ConfidenceBadge } from "./ConfidenceBadge";
+import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
+import { reportLook, reportTitle, SAFETY_LOOK } from "./reportMeta";
 
 export interface StopDetailProps {
   bundle: CityBundle;
@@ -53,6 +54,9 @@ export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }
   const route = bundle.routes.find((r) => r.id === stop.route_id);
   const safety = stopSafety(stop, reports);
   const look = SAFETY_LOOK[safety.level];
+  const stopReports = reports
+    .filter((r) => r.stop_id === stop.id && isActive(r))
+    .sort((a, b) => b.created_at.localeCompare(a.created_at));
   const eta = formatEta(route && vehicles ? etaToStop(route, stop, vehicles) : null);
 
   return (
@@ -91,6 +95,34 @@ export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }
       {safety.reasons.length > 0 && (
         <p className="text-sm text-muted-foreground">{safety.reasons.join(" · ")}</p>
       )}
+
+      {/* Reportes vigentes de esta parada; si no hay, se dice en lugar de dejar un hueco. */}
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold text-muted-foreground">En esta parada</h3>
+        {stopReports.length === 0 ? (
+          <PanelMessage text="Sin reportes recientes en esta parada." />
+        ) : (
+          <ul className="space-y-2">
+            {stopReports.slice(0, 5).map((r) => {
+              const look = reportLook(r);
+              return (
+                <li key={r.id} className="flex min-h-12 items-center gap-3 rounded-2xl bg-foreground/5 px-3 py-2">
+                  <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full", look.className)}>
+                    <look.icon aria-hidden className="size-4" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm leading-snug font-semibold break-words">{reportTitle(r)}</span>
+                    <span className="block text-xs text-muted-foreground">
+                      <time dateTime={r.created_at}>{timeAgo(r.created_at)}</time>
+                    </span>
+                    <ConfidenceBadge report={r} className="mt-0.5" />
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
 
       <ul className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-3">
         <Attribute ok={stop.has_light} icon={stop.has_light ? Lightbulb : LightbulbOff} yes="Con luz" no="Sin luz" />
