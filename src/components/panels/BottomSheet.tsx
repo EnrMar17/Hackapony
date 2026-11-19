@@ -174,8 +174,9 @@ export function BottomSheet({
             inert={!visible}
             className="glass pointer-events-auto mx-2 mb-2 flex max-h-[55dvh] flex-col rounded-3xl shadow-[0_-8px_24px_rgb(15_23_42/0.12)] lg:m-0 lg:h-full lg:max-h-none lg:shadow-xl"
           >
-            {/* En celular un solo control centrado (la flecha para cerrar); en escritorio, logo y X a la derecha. */}
-            <div className="flex min-h-12 items-center justify-center px-4 pt-1 lg:min-h-14 lg:justify-between lg:pt-3">
+            {/* En celular un solo control centrado (la flecha para cerrar); en escritorio, logo y X a la derecha.
+                shrink-0: con mucho contenido abajo, el encabezado no se encoge (si no, la fecha se sale y flota sobre la lista). */}
+            <div className="flex min-h-12 shrink-0 items-center justify-center px-4 pt-1 lg:min-h-14 lg:justify-between lg:pt-3">
               <div className="hidden items-center gap-3 lg:flex">
                 <SplashLogo className="size-10 shrink-0" />
                 <div>
