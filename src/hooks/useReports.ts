@@ -9,7 +9,7 @@ export function useReports(): ReportsState {
   const [reports, setReports] = useState<Report[]>([]);
   const lastSent = useRef(0);
 
-  const sendReport = useCallback(async (input: NewReport) => {
+  const sendReport = useCallback(async (input: NewReport): Promise<Report> => {
     if (Date.now() - lastSent.current < RATE_LIMIT_MS) throw new Error("RATE_LIMIT");
     lastSent.current = Date.now();
     const report: Report = {
@@ -28,6 +28,7 @@ export function useReports(): ReportsState {
       created_at: new Date().toISOString(),
     };
     setReports((prev) => [report, ...prev]);
+    return report;
   }, []);
 
   const vote = useCallback(async (reportId: string, kind: VoteKind) => {

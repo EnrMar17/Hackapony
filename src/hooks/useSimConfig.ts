@@ -5,7 +5,24 @@ import { useState } from "react";
 import type { SimConfig, SimControls } from "@/lib/types";
 
 export function useSimConfig(): SimControls {
-  const [playing, setPlaying] = useState<boolean>(true);
-  const [speed, setSpeed] = useState<SimConfig["speed"]>(1);
-  return { playing, speed, setPlaying, setSpeed };
+  const [config, setConfig] = useState<SimConfig>(() => ({
+    playing: true,
+    speed: 1,
+    anchorWallMs: Date.now(),
+    anchorSimMs: 0,
+  }));
+
+  function update(patch: Partial<Pick<SimConfig, "playing" | "speed">>) {
+    const now = Date.now();
+    setConfig((c) => {
+      const simNow = c.playing ? c.anchorSimMs + (now - c.anchorWallMs) * c.speed : c.anchorSimMs;
+      return { ...c, ...patch, anchorWallMs: now, anchorSimMs: simNow };
+    });
+  }
+
+  return {
+    ...config,
+    setPlaying: (playing) => update({ playing }),
+    setSpeed: (speed) => update({ speed }),
+  };
 }
