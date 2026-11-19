@@ -16,6 +16,7 @@ const MAX_ALERTS = 4;
 const DEFAULT_WAIT_MIN = 10; // si no hay unidades, se supone una espera larga
 const STATUS_PENALTY_MIN = { green: 0, yellow: 4, red: 10 } as const;
 const CROWDED_PENALTY_MIN = 3;
+const MAX_VIA = 4;
 
 export interface PlanTripInput {
   routes: Route[];
@@ -93,6 +94,19 @@ function findings(route: Route, routeStops: Stop[], reports: Report[], boardP: n
     .map((f) => f.text);
 }
 
+/** Calles por las que pasa el tramo, en orden y sin repetir (el nombre de la parada es "Calle · colonia"). */
+function roadsAlong(routeStops: Stop[], boardP: number, span: number): string[] {
+  const roads: string[] = [];
+  const inSegment = routeStops
+    .filter((s) => typeof s.progress === "number" && positiveMod(s.progress - boardP, 1) <= span)
+    .sort((a, b) => positiveMod(a.progress! - boardP, 1) - positiveMod(b.progress! - boardP, 1));
+  for (const s of inSegment) {
+    const road = s.name.split(" · ")[0].trim();
+    if (road && road !== "Parada" && !roads.includes(road)) roads.push(road);
+  }
+  return roads.slice(0, MAX_VIA);
+}
+
 /**
  * Rutas que te sirven para ir de `from` a `to`, sin transbordos, de la mejor a la peor (máximo
  * `TRIP_MAX_OPTIONS`). El puntaje suma caminata, espera de la próxima unidad, viaje y una penalización
@@ -154,6 +168,7 @@ export function planTrip({ routes, stops, reports, vehicles, from, to, now = Dat
         alerts: alerts.slice(0, MAX_ALERTS),
         nextUnitSec,
         segment: sliceRoute(route, best.b, best.a),
+        via: roadsAlong(routeStops, best.b, best.span),
       },
     });
   }
