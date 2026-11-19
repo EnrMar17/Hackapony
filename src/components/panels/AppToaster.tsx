@@ -1,0 +1,30 @@
+"use client";
+
+import { useEffect } from "react";
+import { Toaster } from "sonner";
+import { applyTheme, useResolvedTheme } from "./theme";
+
+/** El toast aparece debajo de la barra superior (48 px de chips + 24 px de padding) y respeta el notch. */
+const TOAST_OFFSET = { top: "calc(var(--safe-top) + 76px)" };
+
+/**
+ * Toaster de sonner con el tema elegido. También mantiene la clase `.dark` del <html> al día
+ * cuando el usuario cambia de tema o el dispositivo cambia (el script del <head> cubre la primera carga).
+ */
+export function AppToaster() {
+  const theme = useResolvedTheme();
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  return (
+    <Toaster
+      theme={theme}
+      position="top-center"
+      offset={TOAST_OFFSET}
+      mobileOffset={TOAST_OFFSET}
+      containerAriaLabel="Notificaciones"
+    />
+  );
+}
