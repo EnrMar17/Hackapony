@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { isActive, timeAgo } from "@/lib/geo";
 import type { Report, Route } from "@/lib/types";
 import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
+import { ConfidenceBadge } from "./ConfidenceBadge";
 import { reportLook, reportTitle } from "./reportMeta";
 
 export interface ReportFeedProps {
@@ -65,6 +66,7 @@ function FeedItem({ report: r, routes, now, selected, onSelect, past }: ItemProp
             {route ? `${route.name} · ` : ""}
             <time dateTime={r.created_at}>{timeAgo(r.created_at, now)}</time>
           </span>
+          {!past && <ConfidenceBadge report={r} className="mt-0.5" />}
         </span>
         {r.resolved && (
           <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-seguro-ink">
