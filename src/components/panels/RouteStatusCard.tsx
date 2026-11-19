@@ -1,13 +1,12 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { routeStatus } from "@/lib/geo";
+import { isActive, routeStatus } from "@/lib/geo";
 import { useUi } from "@/store/ui";
 import type { Report, Route, RouteStatus } from "@/lib/types";
 import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
 import { SAFETY_LOOK } from "./reportMeta";
-import { groupByFamily, MAX_INLINE_ROUTES } from "./routeMeta";
+import { MAX_INLINE_ROUTES } from "./routeMeta";
 
 export interface RouteStatusCardProps {
   routes: Route[];
@@ -45,8 +44,12 @@ export function RouteStatusCard({ routes, reports, loading, error }: RouteStatus
 
   const withStatus: RouteWithStatus[] = routes.map((route) => ({ route, status: routeStatus(route.id, reports) }));
   const many = routes.length > MAX_INLINE_ROUTES;
-  // Con muchas rutas: arriba las que tienen avisos y la elegida; el resto, por familia.
-  const highlighted = withStatus.filter((r) => r.status.level !== "green" || r.route.id === selectedRoute);
+  // Con muchas rutas solo se listan las activas: con reportes vigentes, con avisos o la elegida. Nunca las 23.
+  const withReports = new Set(reports.filter((r) => isActive(r)).map((r) => r.route_id));
+  const activeRoutes = withStatus.filter(
+    (r) => withReports.has(r.route.id) || r.status.level !== "green" || r.route.id === selectedRoute,
+  );
+  const quiet = routes.length - activeRoutes.length;
   const issues = withStatus.filter((r) => r.status.level !== "green").length;
 
   return (
@@ -74,44 +77,20 @@ export function RouteStatusCard({ routes, reports, loading, error }: RouteStatus
         </ul>
       ) : (
         <>
-          {highlighted.length > 0 && (
+          {activeRoutes.length === 0 ? (
+            <PanelMessage text="Ninguna ruta tiene reportes ahora." />
+          ) : (
             <ul className="space-y-2">
-              {highlighted.map((r) => (
+              {activeRoutes.map((r) => (
                 <RouteRow key={r.route.id} {...r} />
               ))}
             </ul>
           )}
-
-          <div className="space-y-2">
-            {groupByFamily(routes).map((family) => {
-              const rows = withStatus.filter((r) => family.routes.includes(r.route));
-              const familyIssues = rows.filter((r) => r.status.level !== "green").length;
-              return (
-                <details
-                  key={family.label}
-                  className="group rounded-2xl bg-foreground/5 [&::-webkit-details-marker]:hidden"
-                >
-                  <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-2xl px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
-                    <span aria-hidden className="size-3 shrink-0 rounded-full" style={{ backgroundColor: family.color }} />
-                    <span className="font-semibold">{family.label}</span>
-                    <span className="min-w-0 flex-1 text-xs text-muted-foreground tabular-nums">
-                      {rows.length} {rows.length === 1 ? "ruta" : "rutas"} ·{" "}
-                      {familyIssues === 0 ? "sin avisos" : `${familyIssues} con avisos`}
-                    </span>
-                    <ChevronDown
-                      aria-hidden
-                      className="size-4 shrink-0 transition-transform duration-300 ease-out group-open:rotate-180"
-                    />
-                  </summary>
-                  <ul className="space-y-2 px-2 pb-2">
-                    {rows.map((r) => (
-                      <RouteRow key={r.route.id} {...r} />
-                    ))}
-                  </ul>
-                </details>
-              );
-            })}
-          </div>
+          {quiet > 0 && (
+            <p className="px-1 text-xs text-muted-foreground tabular-nums">
+              {quiet} {quiet === 1 ? "ruta más" : "rutas más"} sin reportes
+            </p>
+          )}
         </>
       )}
     </section>
