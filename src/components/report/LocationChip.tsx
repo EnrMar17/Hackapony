@@ -18,8 +18,8 @@ export function LocationChip({ geo, nearestStop, onOpenStop }: LocationChipProps
   // Sin geo (CityApp aún no la pasa) o sin permiso: estado seguro.
   if (!geo || geo.status === "denied" || geo.status === "unavailable") {
     return (
-      <p className={cn(BASE, "bg-foreground/5 text-muted-foreground")}>
-        <MapPinOff aria-hidden className="size-5 shrink-0" />
+      <p className="flex min-h-9 w-full items-center gap-2 px-1 text-left text-xs text-muted-foreground">
+        <MapPinOff aria-hidden className="size-4 shrink-0" />
         <span>Ubicación no disponible · usando el ITM</span>
       </p>
     );
@@ -30,14 +30,15 @@ export function LocationChip({ geo, nearestStop, onOpenStop }: LocationChipProps
       <button
         type="button"
         onClick={geo.request}
+        // Secundario: contorno y sin relleno, para que los 3 botones de reporte dominen.
         className={cn(
           BASE,
-          "bg-info/10 text-info-ink transition-colors duration-300 ease-out hover:bg-info/15 active:bg-info/20",
+          "border border-foreground/15 bg-transparent text-foreground transition-colors duration-300 ease-out hover:bg-foreground/5 active:bg-foreground/10",
           "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
         )}
       >
-        <LocateFixed aria-hidden className="size-5 shrink-0" />
-        <span className="font-semibold">Activar ubicación</span>
+        <LocateFixed aria-hidden className="size-5 shrink-0 text-info-ink" />
+        <span>Activar ubicación</span>
       </button>
     );
   }

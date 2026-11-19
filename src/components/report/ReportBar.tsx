@@ -44,6 +44,22 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
   const closePicker = useCallback(() => setPickerOpen(false), []);
   const selectStop = useUi((s) => s.selectStop);
 
+  // Publica el alto de la barra (--report-bar-h) para que el panel lateral de escritorio termine justo arriba.
+  const barRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = barRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const root = document.documentElement;
+    const ro = new ResizeObserver(([entry]) => {
+      root.style.setProperty("--report-bar-h", `${Math.ceil(entry.borderBoxSize?.[0]?.blockSize ?? el.offsetHeight)}px`);
+    });
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty("--report-bar-h");
+    };
+  }, []);
+
   // Al tener GPS, abre una sola vez la parada más cercana, sin pisar lo que el usuario ya eligió.
   const nearestId = geo?.status === "granted" ? (nearestStop?.stop.id ?? null) : null;
   const autoOpened = useRef(false);
@@ -96,10 +112,11 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
 
   return (
     <div
+      ref={barRef}
       className={cn(
         "glass relative rounded-t-3xl px-safe pt-3 pb-safe shadow-[0_-8px_24px_rgb(15_23_42/0.12)]",
-        // Escritorio: barra flotante centrada en el área del mapa (a la derecha del panel de 400 px + márgenes).
-        "lg:fixed lg:bottom-4 lg:left-[calc(50%+216px)] lg:w-[min(560px,calc(100vw-464px))] lg:-translate-x-1/2 lg:rounded-3xl lg:px-4 lg:pb-4 lg:shadow-xl",
+        // Escritorio: va en la columna izquierda, debajo del panel lateral, para no tapar las rutas del mapa.
+        "lg:fixed lg:bottom-4 lg:left-4 lg:w-[400px] lg:rounded-3xl lg:px-4 lg:pb-4 lg:shadow-xl",
       )}
     >
       {/* Barra de cooldown: se vacía en RATE_LIMIT_MS */}

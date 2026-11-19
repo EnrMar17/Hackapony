@@ -60,7 +60,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
   }
 
   return (
-    <div className="pointer-events-none! flex flex-col items-end lg:fixed lg:inset-y-4 lg:left-4 lg:w-[400px] lg:items-stretch">
+    <div className="pointer-events-none! flex flex-col items-end lg:fixed lg:top-4 lg:bottom-[calc(var(--report-bar-h,9rem)+1.75rem)] lg:left-4 lg:w-[400px] lg:items-stretch">
       {!open && (
         <button
           type="button"
