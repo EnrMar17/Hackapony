@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, CircleCheck } from "lucide-react";
+import { ChevronDown, CircleCheck, Route as RouteIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import { isActive, timeAgo } from "@/lib/geo";
@@ -145,7 +145,7 @@ export function ReportFeed({ reports, routes, now, selectedId, onSelect, loading
   return (
     <section aria-labelledby="feed-title" className="space-y-2">
       <h2 id="feed-title" className="text-sm font-semibold text-muted-foreground">
-        Qué está pasando{!loading && !error && <span className="tabular-nums"> ({active.length})</span>}
+        Qué está pasando{!loading && !error && route && <span className="tabular-nums"> ({active.length})</span>}
       </h2>
       {route && (
         <div className="flex min-h-12 items-center gap-2 rounded-full bg-foreground/5 pl-4 text-sm">
@@ -166,6 +166,9 @@ export function ReportFeed({ reports, routes, now, selectedId, onSelect, loading
         <PanelLoading rows={3} />
       ) : error ? (
         <PanelError text="No pudimos cargar los reportes. Revisa tu conexión." />
+      ) : !route ? (
+        // Sin ruta elegida no se listan reportes: mezclar todas las rutas solo hace ruido.
+        <PanelMessage icon={RouteIcon} text="Elige una ruta arriba para ver qué está pasando en ella." />
       ) : (
         <>
           {reports.length > 0 && (
