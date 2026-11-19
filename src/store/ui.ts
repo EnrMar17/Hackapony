@@ -45,7 +45,7 @@ export const useUi = create<UiState>((set) => ({
   sheetOpen: false,
   simAdmin: false,
   onlyAccessible: false,
-  showAllRoutes: false,
+  showAllRoutes: true,
   mapReady: false,
   origin: null,
   destination: null,

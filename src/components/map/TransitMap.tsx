@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { preconnect } from "react-dom";
-import { Layers, LocateFixed } from "lucide-react";
+import { LocateFixed, Map as MapIcon } from "lucide-react";
 import { useIsDesktop } from "@/components/panels/useIsDesktop";
 import { ALL_ROUTES_ENABLED, DEFAULT_ROUTE_IDS, ROUTE_IDS } from "@/lib/constants";
 import type { CityBundle, Destination, LngLat, Report, Route, RouteId, TripOption, Vehicle } from "@/lib/types";
@@ -300,7 +300,7 @@ export function TransitMap({
             aria-pressed={showAll}
             className={`${BUTTON} min-h-12 min-w-12 gap-2 px-3 text-sm font-semibold sm:px-4`}
           >
-            <Layers aria-hidden className="size-4" />
+            <MapIcon aria-hidden className="size-4" />
             {/* En móvil solo ícono y contador (~48 px); el texto completo desde 640 px. Sigue leyéndose para lectores de pantalla. */}
             <span className="sr-only sm:not-sr-only">
               {showAll ? "Solo Gris 1 y Naranja 1" : `Ver todas las rutas (${ROUTE_IDS.length})`}

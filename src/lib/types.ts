@@ -112,6 +112,8 @@ export interface SimConfig {
   playing: boolean;
   /** Multiplicador de la velocidad base (1 = BASE_SPEED_KMH). Se elige en km/h desde el panel. */
   speed: number;
+  /** Segundos entre una unidad y la siguiente en cada ruta (menos = más unidades). Se cambia desde el panel. */
+  headwayS: number;
   /** Date.now() en el momento del último cambio. */
   anchorWallMs: number;
   /** Tiempo del simulador (ms) en ese momento. */
@@ -155,6 +157,7 @@ export interface ReportsState {
 export interface SimControls extends SimConfig {
   setPlaying: (playing: boolean) => void;
   setSpeed: (speed: SimConfig["speed"]) => void;
+  setHeadwayS: (headwayS: number) => void;
 }
 
 export type GeoStatus = "idle" | "granted" | "denied" | "unavailable";
