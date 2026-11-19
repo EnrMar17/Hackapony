@@ -5,6 +5,7 @@ import { MapPinned, Megaphone, Route } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { REPORT_BUTTONS, ROUTE_COLORS, ROUTE_IDS, ROUTE_NAMES } from "@/lib/constants";
 import { SAFETY_LOOK, TYPE_LOOK } from "./reportMeta";
+import { groupByFamily } from "./routeMeta";
 
 // ---- "Ya lo vio": localStorage con respaldo en memoria (modo privado o storage bloqueado) ----
 
@@ -45,6 +46,9 @@ const getServerSeen = () => true;
 
 // ---- Pasos ----
 
+// Con muchas rutas se muestran las familias (Gris, Naranja, Roja…), no cada ruta.
+const ROUTE_FAMILIES = groupByFamily(ROUTE_IDS.map((id) => ({ name: ROUTE_NAMES[id], color: ROUTE_COLORS[id] })));
+
 function Pill({ className, children }: { className?: string; children: ReactNode }) {
   return (
     <li className={cn("flex min-h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold", className)}>
@@ -57,13 +61,13 @@ const STEPS: { icon: typeof Route; title: string; text: string; visual: ReactNod
   {
     icon: Route,
     title: "Rutas en vivo",
-    text: "Mira las unidades moverse en el mapa. Toca una ruta para ver solo esa.",
+    text: "Mira las unidades moverse en el mapa. Elige una ruta arriba para ver solo esa.",
     visual: (
       <ul className="flex flex-wrap gap-2">
-        {ROUTE_IDS.map((id) => (
-          <Pill key={id} className="bg-foreground/5">
-            <span aria-hidden className="size-3 rounded-full" style={{ backgroundColor: ROUTE_COLORS[id] }} />
-            {ROUTE_NAMES[id]}
+        {ROUTE_FAMILIES.map((family) => (
+          <Pill key={family.label} className="bg-foreground/5">
+            <span aria-hidden className="size-3 rounded-full" style={{ backgroundColor: family.color }} />
+            {family.routes.length === 1 ? family.routes[0].name : `${family.label} · ${family.routes.length} rutas`}
           </Pill>
         ))}
       </ul>
