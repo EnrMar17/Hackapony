@@ -13,6 +13,7 @@ import { StopDetail } from "./StopDetail";
 import { AccessibleFilter } from "./AccessibleFilter";
 import { Legend } from "./Legend";
 import { ThemePicker } from "./ThemePicker";
+import { markReportsUpdated } from "./liveSync";
 import { useIsDesktop } from "./useIsDesktop";
 
 export interface BottomSheetProps {
@@ -42,6 +43,11 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
 
   // Reloj para "hace N min"; solo corre con el panel visible.
   const [now, setNow] = useState(Date.now);
+
+  // Cada vez que llegan reportes nuevos (tiempo real o sondeo), TopBar muestra "Actualizado hace N s".
+  useEffect(() => {
+    if (!loading) markReportsUpdated(Date.now());
+  }, [reports, loading]);
   useEffect(() => {
     if (!visible) return;
     const id = window.setInterval(() => setNow(Date.now()), CLOCK_MS);
