@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { BusFront, TriangleAlert, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
@@ -8,7 +8,6 @@ import { RATE_LIMIT_MS, REPORT_BUTTONS } from "@/lib/constants";
 import type { GeolocationState, IncidentKind, NearestStopResult, ReportType, RouteId } from "@/lib/types";
 import { DESKTOP_QUERY } from "@/components/panels/useIsDesktop";
 import { onReportCooldownReset } from "./cooldown";
-import { IncidentPicker } from "./IncidentPicker";
 import { LocationChip } from "./LocationChip";
 import { RoutePicker, type RouteChoice } from "./RoutePicker";
 
@@ -32,6 +31,9 @@ const BUTTON_STYLE: Record<ReportType, { icon: LucideIcon; className: string }> 
 
 const TICK_MS = 250;
 
+/** "Incidencia / Accesibilidad" se envía en un toque con este tipo; el toast ofrece afinarlo después. */
+const GENERIC_INCIDENT: IncidentKind = "other";
+
 function vibrate() {
   if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
     navigator.vibrate(30);
@@ -43,10 +45,8 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
   // `round` cambia en cada reporte y reinicia el reloj del efecto.
   const [round, setRound] = useState(0);
   const [remainingMs, setRemainingMs] = useState(0);
-  const [pickerOpen, setPickerOpen] = useState(false);
   const [routePicker, setRoutePicker] = useState<"full" | "passing" | null>(null);
   const pickerId = useId();
-  const closePicker = useCallback(() => setPickerOpen(false), []);
   const selectStop = useUi((s) => s.selectStop);
 
   // Publica el alto de la barra (--report-bar-h) para que el panel lateral de escritorio termine justo arriba.
@@ -106,7 +106,6 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
   function send(type: ReportType, incidentKind?: IncidentKind, routeId?: RouteId) {
     if (blocked) return;
     vibrate();
-    setPickerOpen(false);
     setRoutePicker(null);
     setRemainingMs(RATE_LIMIT_MS);
     setRound((r) => r + 1);
@@ -114,13 +113,10 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
   }
 
   function handleTap(type: ReportType) {
-    // "Incidencia / Accesibilidad" primero pide el tipo; los otros envían en un toque.
-    if (type === "incident") {
-      setRoutePicker(null);
-      setPickerOpen((open) => !open);
-    } else if (routeChoices.length > 0) {
+    // Un toque: la incidencia se envía con tipo genérico y se afina en el toast.
+    if (type === "incident") send("incident", GENERIC_INCIDENT);
+    else if (routeChoices.length > 0) {
       // "Llena" y "pasando" primero preguntan en qué ruta: así el aviso no queda a la deriva.
-      setPickerOpen(false);
       setRoutePicker((open) => (open === type ? null : type));
     } else send(type);
   }
@@ -166,27 +162,18 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
         />
       )}
 
-      {pickerOpen && !blocked && (
-        <IncidentPicker
-          id={pickerId}
-          onSelect={(kind) => send("incident", kind)}
-          onClose={closePicker}
-          disabled={blocked}
-        />
-      )}
-
       <div className="grid grid-cols-3 gap-2">
         {REPORT_BUTTONS.map((b) => {
           const { icon: Icon, className } = BUTTON_STYLE[b.type];
-          const isPicker = b.type === "incident";
+          const asksRoute = b.type !== "incident";
           return (
             <button
               key={b.type}
               type="button"
               disabled={blocked}
               onClick={() => handleTap(b.type)}
-              aria-expanded={isPicker ? pickerOpen : routePicker === b.type}
-              aria-controls={isPicker && pickerOpen ? pickerId : undefined}
+              aria-expanded={asksRoute ? routePicker === b.type : undefined}
+              aria-controls={asksRoute && routePicker === b.type ? `${pickerId}-route` : undefined}
               className={cn(
                 "flex h-14 flex-col items-center justify-center gap-0.5 rounded-2xl px-1.5 text-center text-[13px] leading-tight font-semibold shadow-sm",
                 "transition-[transform,opacity,filter] duration-300 ease-out active:scale-95",
