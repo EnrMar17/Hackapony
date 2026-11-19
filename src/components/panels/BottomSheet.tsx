@@ -12,6 +12,7 @@ import { LiveClock } from "./LiveClock";
 import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
+import type { StopWaitingState } from "@/hooks/useStopWaiting";
 import { StopDetail } from "./StopDetail";
 import { AccessibleFilter } from "./AccessibleFilter";
 import { markReportsUpdated } from "./liveSync";
@@ -34,6 +35,10 @@ export interface BottomSheetProps {
   userId?: string | null;
   /** Panel "¿A dónde vas?" (lo arma CityApp). Va arriba del contenido de la hoja. */
   tripSlot?: ReactNode;
+  /** Avisos oficiales (lo arma CityApp). Van arriba de todo. */
+  noticesSlot?: ReactNode;
+  /** "Esperando aquí" (useStopWaiting). Sin él, el detalle de la parada no lo muestra. */
+  waiting?: StopWaitingState;
 }
 
 const CLOCK_MS = 30_000;
@@ -49,6 +54,8 @@ export function BottomSheet({
   userPosition,
   userId,
   tripSlot,
+  noticesSlot,
+  waiting,
 }: BottomSheetProps) {
   const open = useUi((s) => s.sheetOpen);
   const setOpen = useUi((s) => s.setSheetOpen);
@@ -186,7 +193,10 @@ export function BottomSheet({
 
             <div className="space-y-5 overflow-y-auto overscroll-contain px-4 pb-4">
               <LiveClock className="block text-xs text-muted-foreground lg:hidden" />
-              <div className="pt-3">{tripSlot}</div>
+              <div className="pt-3">
+                {noticesSlot}
+                {tripSlot}
+              </div>
               {selectedReport && (
                 <ReportDetail
                   key={selectedReport}
@@ -212,6 +222,7 @@ export function BottomSheet({
                   label={featured.label}
                   distanceM={featured.distanceM}
                   hint={featured.hint}
+                  waiting={waiting}
                   loading={loading}
                   error={error}
                 />

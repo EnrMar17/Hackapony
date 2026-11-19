@@ -17,6 +17,10 @@ import type { IncidentKind, LngLat, ReportType, RouteId, VoteKind } from "@/lib/
 import { useUi } from "@/store/ui";
 import { TransitMap } from "@/components/map/TransitMap";
 import { BottomSheet } from "@/components/panels/BottomSheet";
+import { NoticeBanner } from "@/components/panels/NoticeBanner";
+import { useLiveVehicles } from "@/hooks/useLiveVehicles";
+import { useNotices } from "@/hooks/useNotices";
+import { useStopWaiting } from "@/hooks/useStopWaiting";
 import { TopBar } from "@/components/panels/TopBar";
 import { TripPanel } from "@/components/trip/TripPanel";
 import { ReportBar } from "@/components/report/ReportBar";
@@ -63,7 +67,11 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
     if (stop && (!hidden || ALL_ROUTES_ENABLED)) selectStop(stop.id);
   }, [fullBundle.stops, initialRoute, initialStop]);
   const sim = useSimConfig();
-  const vehicles = useVehicles(bundle.routes, sim);
+  const simulated = useVehicles(bundle.routes, sim);
+  // Con una posición real reciente ("Voy en esta unidad") se usa esa; si no, la simulada.
+  const vehicles = useLiveVehicles(simulated);
+  const waiting = useStopWaiting();
+  const notices = useNotices();
   const { reports: allReports, loading, error, online: connected, sendReport, vote, undo, refine } = useReports();
   const { userId } = useSession();
   const reports = useMemo(
@@ -190,6 +198,8 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
           userPosition={geo.position}
           simSpeed={sim.speed}
           userId={userId}
+          waiting={waiting}
+          noticesSlot={<NoticeBanner notices={notices} routes={fullBundle.routes} />}
           tripSlot={<TripPanel stops={tripStops} options={tripOptions} geo={geo} connected={connected} />}
         />
         <ReportBar onReport={onReport} geo={geo} nearestStop={nearest} />

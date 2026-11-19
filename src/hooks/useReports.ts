@@ -267,6 +267,9 @@ export function useReports(): ReportsStateLive {
     if (insertError || !data) {
       setReports((prev) => prev.filter((r) => r.id !== optimisticId));
       if (insertError?.message.includes("RATE_LIMIT")) throw new Error("RATE_LIMIT");
+      for (const code of ["STOP_DUPLICATE", "STOP_LIMIT"]) {
+        if (insertError?.message.includes(code)) throw new Error(code);
+      }
       lastSent.current = 0;
       throw new Error("SEND_FAILED");
     }
