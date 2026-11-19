@@ -100,7 +100,7 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
   return (
     <main className="relative h-dvh w-full overflow-hidden">
       <div className="absolute inset-0">
-        <TransitMap bundle={bundle} vehicles={vehicles} reports={reports} userPosition={geo.position} onLocateRequest={geo.request} simSpeed={sim.speed} />
+        <TransitMap bundle={bundle} vehicles={vehicles} reports={reports} userPosition={geo.position} onLocateRequest={geo.request} simSpeed={sim.speed} userAccuracyM={geo.accuracyM} />
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-0 *:pointer-events-auto">
         <TopBar routes={bundle.routes} online={online} />
