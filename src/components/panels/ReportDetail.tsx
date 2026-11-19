@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CircleCheck, ThumbsUp } from "lucide-react";
+import { CircleCheck, ThumbsUp, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { timeAgo } from "@/lib/geo";
 import type { Report, Route, VoteKind } from "@/lib/types";
@@ -16,12 +16,14 @@ export interface ReportDetailProps {
   now: number;
   /** Sin onVote (CityApp aún no lo pasa) los botones quedan deshabilitados. */
   onVote?: (reportId: string, kind: VoteKind) => void;
+  /** Id del usuario actual: en sus propios reportes no se muestran los votos. */
+  userId?: string | null;
   loading?: boolean;
   error?: string | null;
 }
 
 /** Montar con key={reportId} para que el "¡Gracias!" no pase de un reporte a otro. */
-export function ReportDetail({ reportId, reports, routes, now, onVote, loading, error }: ReportDetailProps) {
+export function ReportDetail({ reportId, reports, routes, now, onVote, userId, loading, error }: ReportDetailProps) {
   const [voted, setVoted] = useState<VoteKind[]>([]);
 
   if (loading) return <PanelLoading rows={3} />;
@@ -67,6 +69,14 @@ export function ReportDetail({ reportId, reports, routes, now, onVote, loading, 
         <p className="flex min-h-12 items-center gap-2 rounded-2xl bg-seguro/10 px-3 text-sm font-semibold text-seguro-ink">
           <CircleCheck aria-hidden className="size-5 shrink-0" />
           Resuelto
+        </p>
+      ) : userId && report.user_id === userId ? (
+        // Votar el propio reporte falla con OWN_REPORT: en lugar de botones que fallan, se explica.
+        <p className="flex min-h-12 items-center gap-2 rounded-2xl bg-info/10 px-3 py-2 text-sm text-info-ink">
+          <UserRound aria-hidden className="size-5 shrink-0" />
+          <span>
+            <span className="font-semibold">Es tu reporte.</span> Otras personas pueden confirmarlo.
+          </span>
         </p>
       ) : (
         <>

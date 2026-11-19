@@ -28,6 +28,8 @@ export interface BottomSheetProps {
   error?: string | null;
   /** Para ordenar el estado de rutas: primero las que pasan cerca de ti. */
   userPosition?: LngLat | null;
+  /** Id del usuario (useSession). Con él, en sus propios reportes no se ofrece votar (el servidor responde OWN_REPORT). */
+  userId?: string | null;
 }
 
 const CLOCK_MS = 30_000;
@@ -40,6 +42,7 @@ export function BottomSheet({
   loading = false,
   error = null,
   userPosition,
+  userId,
 }: BottomSheetProps) {
   const open = useUi((s) => s.sheetOpen);
   const setOpen = useUi((s) => s.setSheetOpen);
@@ -144,6 +147,7 @@ export function BottomSheet({
                   routes={bundle.routes}
                   now={now}
                   onVote={onVote}
+                  userId={userId}
                   loading={loading}
                   error={error}
                 />
