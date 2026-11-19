@@ -689,7 +689,8 @@
     "lat": 19.73254,
     "has_light": true,
     "has_ramp": true,
-    "has_roof": true
+    "has_roof": true,
+    "progress": 0.0407
   },
   {
     "id": "naranja-2-02",
@@ -699,7 +700,8 @@
     "lat": 19.7315,
     "has_light": true,
     "has_ramp": false,
-    "has_roof": false
+    "has_roof": false,
+    "progress": 0.1221
   },
   {
     "id": "naranja-2-03",
@@ -709,7 +711,8 @@
     "lat": 19.71295,
     "has_light": false,
     "has_ramp": true,
-    "has_roof": true
+    "has_roof": true,
+    "progress": 0.2036
   },
   {
     "id": "naranja-2-04",
@@ -719,7 +722,8 @@
     "lat": 19.69321,
     "has_light": true,
     "has_ramp": true,
-    "has_roof": true
+    "has_roof": true,
+    "progress": 0.285
   },
   {
     "id": "naranja-2-05",
@@ -729,7 +733,8 @@
     "lat": 19.69161,
     "has_light": false,
     "has_ramp": false,
-    "has_roof": false
+    "has_roof": false,
+    "progress": 0.5392
   },
   {
     "id": "naranja-2-06",
@@ -739,7 +744,8 @@
     "lat": 19.6807,
     "has_light": true,
     "has_ramp": false,
-    "has_roof": true
+    "has_roof": true,
+    "progress": 0.4586
   },
   {
     "id": "naranja-2-07",
@@ -749,7 +755,8 @@
     "lat": 19.69266,
     "has_light": true,
     "has_ramp": true,
-    "has_roof": true
+    "has_roof": true,
+    "progress": 0.5593
   },
   {
     "id": "naranja-2-08",
@@ -759,7 +766,8 @@
     "lat": 19.69226,
     "has_light": false,
     "has_ramp": true,
-    "has_roof": false
+    "has_roof": false,
+    "progress": 0.6336
   },
   {
     "id": "naranja-2-09",
@@ -769,7 +777,8 @@
     "lat": 19.69889,
     "has_light": true,
     "has_ramp": true,
-    "has_roof": true
+    "has_roof": true,
+    "progress": 0.715
   },
   {
     "id": "naranja-2-10",
@@ -779,7 +788,8 @@
     "lat": 19.71988,
     "has_light": true,
     "has_ramp": false,
-    "has_roof": true
+    "has_roof": true,
+    "progress": 0.8179
   },
   {
     "id": "naranja-2-11",
@@ -789,7 +799,8 @@
     "lat": 19.73338,
     "has_light": true,
     "has_ramp": true,
-    "has_roof": false
+    "has_roof": false,
+    "progress": 0.8922
   },
   {
     "id": "naranja-2-12",
@@ -799,7 +810,8 @@
     "lat": 19.73266,
     "has_light": false,
     "has_ramp": false,
-    "has_roof": true
+    "has_roof": true,
+    "progress": 0.9736
   },
   {
     "id": "naranja-3-directo-01",

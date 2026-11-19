@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { isActive } from "@/lib/geo";
 import { useUi } from "@/store/ui";
 import type { CityBundle, LngLat, Report, Vehicle, VoteKind } from "@/lib/types";
+import { SplashLogo } from "@/components/splash/SplashLogo";
 import { LiveClock } from "./LiveClock";
 import { NearestStopCard } from "./NearestStopCard";
 import { ReportDetail } from "./ReportDetail";
@@ -140,9 +141,12 @@ export function BottomSheet({
           >
             <div className="flex min-h-14 items-center justify-between px-4 pt-2 lg:pt-3">
               <span aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/15 lg:hidden" />
-              <div className="hidden lg:block">
-                <p className="text-base font-bold">Ruta Segura · en vivo</p>
-                <LiveClock className="text-xs text-muted-foreground" />
+              <div className="hidden items-center gap-3 lg:flex">
+                <SplashLogo className="size-10 shrink-0" />
+                <div>
+                  <p className="text-base font-bold">Ruta Segura · en vivo</p>
+                  <LiveClock className="text-xs text-muted-foreground" />
+                </div>
               </div>
               {/* En escritorio el panel no se cierra: el botón solo limpia la parada o el reporte elegido. */}
               <button
