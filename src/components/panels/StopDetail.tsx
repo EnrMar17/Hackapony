@@ -1,6 +1,6 @@
 "use client";
 
-import { Accessibility, Clock, Lightbulb, LightbulbOff, Umbrella, type LucideIcon } from "lucide-react";
+import { Accessibility, Clock, Lightbulb, LightbulbOff, Share2, Umbrella, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { etaToStop, stopSafety } from "@/lib/geo";
 import type { CityBundle, Report, Stop, Vehicle } from "@/lib/types";
@@ -35,6 +35,12 @@ function Attribute({ ok, icon: Icon, yes, no }: { ok: boolean; icon: LucideIcon;
       {ok ? yes : no}
     </li>
   );
+}
+
+/** Texto para WhatsApp: "Parada <nombre> · <ruta> · <origen>/<ciudad>?ruta=<id>&parada=<id>". CityApp abre ese enlace. */
+function shareText(city: string, stop: Stop, routeName: string, routeId: string): string {
+  const url = `${window.location.origin}/${city}?ruta=${encodeURIComponent(routeId)}&parada=${encodeURIComponent(stop.id)}`;
+  return `Parada ${stop.name} · ${routeName} · ${url}`;
 }
 
 export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }: StopDetailProps) {
@@ -91,6 +97,25 @@ export function StopDetail({ bundle, stopId, reports, vehicles, loading, error }
         <Attribute ok={stop.has_ramp} icon={Accessibility} yes="Con rampa" no="Sin rampa" />
         <Attribute ok={stop.has_roof} icon={Umbrella} yes="Con techo" no="Sin techo" />
       </ul>
+
+      {route && (
+        <button
+          type="button"
+          onClick={() => {
+            const text = shareText(bundle.city, stop, route.name, route.id);
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+          }}
+          className={cn(
+            "flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-foreground/15 px-3 text-sm font-semibold",
+            "transition-colors duration-300 ease-out hover:bg-foreground/5 active:bg-foreground/10",
+            "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+          )}
+        >
+          <Share2 aria-hidden className="size-4 shrink-0 text-seguro-ink" />
+          Compartir esta parada
+          <span className="sr-only"> por WhatsApp (se abre en otra pestaña)</span>
+        </button>
+      )}
     </section>
   );
 }
