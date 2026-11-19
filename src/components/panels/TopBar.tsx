@@ -14,12 +14,16 @@ import { MAX_INLINE_ROUTES, readableText } from "./routeMeta";
 export interface TopBarProps {
   routes: Route[];
   online: number;
+  /** `online` de useReports (si llega a Supabase). Opcional: sin él se usa la red del dispositivo. */
+  connected?: boolean;
 }
 
-export function TopBar({ routes, online }: TopBarProps) {
+export function TopBar({ routes, online, connected }: TopBarProps) {
   const selected = useUi((s) => s.selectedRoute);
   const selectRoute = useUi((s) => s.selectRoute);
   const deviceOnline = useDeviceOnline();
+  // Sin red del dispositivo no hay conexión; con red, manda lo que diga useReports si CityApp lo pasa.
+  const isOnline = deviceOnline && (connected ?? true);
   const lastUpdate = useLastReportsUpdate();
 
   // Reloj de "Actualizado hace N s"; avanza cada 5 s.
@@ -28,7 +32,7 @@ export function TopBar({ routes, online }: TopBarProps) {
     const id = window.setInterval(() => setNow(Date.now()), 5_000);
     return () => window.clearInterval(id);
   }, []);
-  const freshness = !deviceOnline
+  const freshness = !isOnline
     ? "Sin conexión"
     : lastUpdate > 0
       ? `Actualizado ${formatSince(Math.max(0, now - lastUpdate))}`
@@ -96,7 +100,7 @@ export function TopBar({ routes, online }: TopBarProps) {
           <span
             className={cn(
               "text-[11px] leading-tight font-normal tabular-nums",
-              deviceOnline ? "text-muted-foreground" : "font-semibold text-peligro-ink",
+              isOnline ? "text-muted-foreground" : "font-semibold text-peligro-ink",
             )}
           >
             {freshness}
@@ -105,7 +109,7 @@ export function TopBar({ routes, online }: TopBarProps) {
       </p>
 
       {/* Sin red no se puede reportar (useReports no guarda una cola), así que se avisa claro. */}
-      {!deviceOnline && (
+      {!isOnline && (
         <p
           role="status"
           className="pointer-events-auto flex min-h-10 basis-full items-center gap-2 rounded-2xl bg-precaucion px-3 py-2 text-sm font-semibold text-precaucion-foreground shadow-md animate-in fade-in slide-in-from-top-1 duration-300"
