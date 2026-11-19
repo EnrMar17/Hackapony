@@ -12,7 +12,7 @@ const OSRM = 'https://router.project-osrm.org/route/v1/driving';
 const NEAREST = 'https://router.project-osrm.org/nearest/v1/driving';
 const SPUR_MAX_M = 150; // espigón: ida y vuelta corta sobre el mismo punto
 const SPUR_NEAR_M = 12;
-const GAP_M = 100; // hueco que se une con OSRM en modo path
+const GAP_M = 500; // hueco que se une con OSRM en modo path (los tramos rectos de OSM pueden medir 100-300 m)
 const input = process.argv[2] ?? 'scripts/waypoints.json';
 const output = process.argv[3] ?? 'src/data/routes.json';
 

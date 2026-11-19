@@ -142,9 +142,9 @@
   {
     "id": "n1-01",
     "route_id": "NARANJA-1",
-    "name": "Circuito Uacúsecha · Xangari",
-    "lng": -101.21956,
-    "lat": 19.67415,
+    "name": "Periférico Independencia · Josefa Ortiz De Domínguez",
+    "lng": -101.2162,
+    "lat": 19.67508,
     "has_light": true,
     "has_ramp": true,
     "has_roof": true
@@ -152,9 +152,9 @@
   {
     "id": "n1-02",
     "route_id": "NARANJA-1",
-    "name": "Periférico Independencia · Josefa Ortiz De Domínguez",
-    "lng": -101.21191,
-    "lat": 19.67301,
+    "name": "Periférico Independencia · Balcones De Morelia",
+    "lng": -101.20358,
+    "lat": 19.67492,
     "has_light": true,
     "has_ramp": false,
     "has_roof": false
@@ -162,9 +162,9 @@
   {
     "id": "n1-03",
     "route_id": "NARANJA-1",
-    "name": "Periférico Independencia · Josefa Ortiz De Domínguez 2",
-    "lng": -101.20673,
-    "lat": 19.67305,
+    "name": "Periférico Independencia",
+    "lng": -101.19574,
+    "lat": 19.68143,
     "has_light": false,
     "has_ramp": true,
     "has_roof": true
@@ -172,9 +172,9 @@
   {
     "id": "n1-04",
     "route_id": "NARANJA-1",
-    "name": "Periférico Independencia · Balcones De Morelia",
-    "lng": -101.20298,
-    "lat": 19.67534,
+    "name": "Calle Rey Tariácuri · Félix Ireta",
+    "lng": -101.19065,
+    "lat": 19.69006,
     "has_light": true,
     "has_ramp": true,
     "has_roof": true
@@ -182,9 +182,9 @@
   {
     "id": "n1-05",
     "route_id": "NARANJA-1",
-    "name": "Periférico Independencia · Vista Bella",
-    "lng": -101.20123,
-    "lat": 19.68011,
+    "name": "Calle Antonio de Virrey de Mendoza · Centro Histórico",
+    "lng": -101.19039,
+    "lat": 19.70283,
     "has_light": false,
     "has_ramp": false,
     "has_roof": false
@@ -192,9 +192,9 @@
   {
     "id": "n1-06",
     "route_id": "NARANJA-1",
-    "name": "Periférico Independencia · Vista Bella 2",
-    "lng": -101.19627,
-    "lat": 19.68128,
+    "name": "Avenida Morelos Norte · Doctor Miguel Silva González",
+    "lng": -101.18837,
+    "lat": 19.713,
     "has_light": true,
     "has_ramp": false,
     "has_roof": true
@@ -202,9 +202,9 @@
   {
     "id": "n1-07",
     "route_id": "NARANJA-1",
-    "name": "Virrey Antonio de Mendoza · Félix Ireta",
-    "lng": -101.19132,
-    "lat": 19.68312,
+    "name": "Instituto Tecnológico de Morelia",
+    "lng": -101.18683,
+    "lat": 19.72263,
     "has_light": true,
     "has_ramp": true,
     "has_roof": true
@@ -212,9 +212,9 @@
   {
     "id": "n1-08",
     "route_id": "NARANJA-1",
-    "name": "Virrey Antonio de Mendoza · Félix Ireta 2",
-    "lng": -101.19068,
-    "lat": 19.68841,
+    "name": "Carretera Uriangato-Morelia",
+    "lng": -101.18422,
+    "lat": 19.72506,
     "has_light": false,
     "has_ramp": true,
     "has_roof": false
@@ -222,9 +222,9 @@
   {
     "id": "n1-09",
     "route_id": "NARANJA-1",
-    "name": "Virrey Antonio de Mendoza · Ventura Puente",
-    "lng": -101.19059,
-    "lat": 19.69295,
+    "name": "Calle Apóstol de la Raza Maya · Felipe Carrillo Puerto",
+    "lng": -101.17856,
+    "lat": 19.73153,
     "has_light": true,
     "has_ramp": true,
     "has_roof": true
@@ -232,9 +232,9 @@
   {
     "id": "n1-10",
     "route_id": "NARANJA-1",
-    "name": "Calle Antonio de Virrey de Mendoza · Centro Histórico",
-    "lng": -101.19046,
-    "lat": 19.69836,
+    "name": "Avenida Morelos Norte · Obrera",
+    "lng": -101.18891,
+    "lat": 19.71032,
     "has_light": true,
     "has_ramp": false,
     "has_roof": true
@@ -242,9 +242,9 @@
   {
     "id": "n1-11",
     "route_id": "NARANJA-1",
-    "name": "Calle Bartolomé de las Casas · Centro Histórico",
-    "lng": -101.18798,
-    "lat": 19.70196,
+    "name": "Calle Mariano Jiménez · Centro Histórico",
+    "lng": -101.19149,
+    "lat": 19.70004,
     "has_light": true,
     "has_ramp": true,
     "has_roof": false
@@ -252,9 +252,9 @@
   {
     "id": "n1-12",
     "route_id": "NARANJA-1",
-    "name": "Avenida Morelos Norte · Centro Histórico",
-    "lng": -101.19104,
-    "lat": 19.70636,
+    "name": "Calle Gonzalo Gómez · Félix Ireta",
+    "lng": -101.19193,
+    "lat": 19.68748,
     "has_light": false,
     "has_ramp": false,
     "has_roof": true
@@ -262,21 +262,11 @@
   {
     "id": "n1-13",
     "route_id": "NARANJA-1",
-    "name": "Avenida Héroes de Nocupétaro · Obrera",
-    "lng": -101.1884,
-    "lat": 19.71074,
+    "name": "Periférico Independencia · Residencial del Sur",
+    "lng": -101.20021,
+    "lat": 19.68099,
     "has_light": false,
     "has_ramp": true,
     "has_roof": true
-  },
-  {
-    "id": "n1-14",
-    "route_id": "NARANJA-1",
-    "name": "Instituto Tecnológico de Morelia",
-    "lng": -101.18683,
-    "lat": 19.72263,
-    "has_light": true,
-    "has_ramp": false,
-    "has_roof": false
   }
 ]
