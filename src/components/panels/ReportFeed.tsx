@@ -8,6 +8,7 @@ import { isActive, timeAgo } from "@/lib/geo";
 import type { Report, ReportType, Route, RouteId } from "@/lib/types";
 import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
 import { ConfidenceBadge } from "./ConfidenceBadge";
+import { reportEmoji } from "@/lib/emoji";
 import { reportLook, reportTitle } from "./reportMeta";
 
 export interface ReportFeedProps {
@@ -105,7 +106,8 @@ function FeedItem({ report: r, routes, now, selected, onSelect, past }: ItemProp
           <look.icon aria-hidden className="size-4.5" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-sm leading-snug font-semibold break-words">{reportTitle(r)}</span>
+          <span className="block text-sm leading-snug font-semibold break-words"><span aria-hidden>{reportEmoji(r)} </span>
+            {reportTitle(r)}</span>
           <span className="block text-xs leading-snug break-words text-muted-foreground">
             {route ? `${route.name} · ` : ""}
             <time dateTime={r.created_at}>{timeAgo(r.created_at, now)}</time>

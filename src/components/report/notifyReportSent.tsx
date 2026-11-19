@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CircleCheck } from "lucide-react";
 import { toast } from "sonner";
 import { INCIDENT_CHIPS, REPORT_BUTTONS } from "@/lib/constants";
+import { OCCUPANCY_EMOJI, reportEmoji, STATE_EMOJI, unitsEmoji } from "@/lib/emoji";
 import type { IncidentKind, Report, ReportRefinement, ReportType } from "@/lib/types";
 import { resetReportCooldown } from "./cooldown";
 import { INCIDENT_STYLE } from "./IncidentPicker";
@@ -17,7 +18,7 @@ const REFINE_WINDOW_MS = 9_000;
 function describe(report: Report): string {
   const type = REPORT_BUTTONS.find((b) => b.type === report.type)?.label ?? "";
   const kind = INCIDENT_CHIPS.find((c) => c.kind === report.incident_kind)?.label;
-  return kind ? `${type} · ${kind}` : type;
+  return `${reportEmoji(report)} ${kind ? `${type} · ${kind}` : type}`;
 }
 
 /** Solo el tipo ("Incidencia / Accesibilidad"), mientras el usuario aún puede elegir qué pasa. */
@@ -69,15 +70,15 @@ const REFINE_OPTIONS: Partial<Record<ReportType, { question: string; options: { 
   passing: {
     question: "¿Cuántas unidades?",
     options: [
-      { label: "1 unidad", patch: { units: 1 } },
-      { label: "2 o más", patch: { units: 2 } },
+      { label: `${unitsEmoji(1)} 1 unidad`, patch: { units: 1 } },
+      { label: `${unitsEmoji(2)} 2 o más`, patch: { units: 2 } },
     ],
   },
   full: {
     question: "¿Cuánto espacio queda?",
     options: [
-      { label: "Aún cabe alguien", patch: { occupancy: "medium" } },
-      { label: "No cabe nadie", patch: { occupancy: "full" } },
+      { label: `${OCCUPANCY_EMOJI.medium} Aún cabe alguien`, patch: { occupancy: "medium" } },
+      { label: `${OCCUPANCY_EMOJI.full} No cabe nadie`, patch: { occupancy: "full" } },
     ],
   },
 };
@@ -98,7 +99,7 @@ function RefineChips({
       <span className="block">{describe(report)}</span>
       {picked ? (
         <span role="status" className="mt-2 block font-semibold">
-          ¡Gracias! Agregamos «{picked}».
+          {STATE_EMOJI.thanks} ¡Gracias! Agregamos «{picked}».
         </span>
       ) : (
         <span className="mt-2 block">

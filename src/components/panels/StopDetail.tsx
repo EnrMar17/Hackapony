@@ -8,6 +8,7 @@ import type { CityBundle, Report, Stop, Vehicle } from "@/lib/types";
 import type { StopWaitingState } from "@/hooks/useStopWaiting";
 import { ConfidenceBadge } from "./ConfidenceBadge";
 import { PanelError, PanelLoading, PanelMessage } from "./PanelState";
+import { reportEmoji } from "@/lib/emoji";
 import { reportLook, reportTitle, SAFETY_LOOK } from "./reportMeta";
 import { WaitingHere } from "./WaitingHere";
 
@@ -175,7 +176,8 @@ export function StopDetail({
                     <look.icon aria-hidden className="size-4" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm leading-snug font-semibold break-words">{reportTitle(r)}</span>
+                    <span className="block text-sm leading-snug font-semibold break-words"><span aria-hidden>{reportEmoji(r)} </span>
+                      {reportTitle(r)}</span>
                     <span className="block text-xs text-muted-foreground">
                       <time dateTime={r.created_at}>{timeAgo(r.created_at)}</time>
                     </span>

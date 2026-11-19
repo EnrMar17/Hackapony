@@ -6,10 +6,12 @@ import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
 import { RATE_LIMIT_MS, REPORT_BUTTONS, ROUTE_AMBIGUITY_M } from "@/lib/constants";
 import { isActive, reportConfidence } from "@/lib/geo";
+import { burstFor, reportEmoji, TYPE_EMOJI } from "@/lib/emoji";
 import type { GeolocationState, IncidentKind, NearestStopResult, Report, ReportType, RouteId } from "@/lib/types";
 import { DESKTOP_QUERY } from "@/components/panels/useIsDesktop";
 import { onReportCooldownReset } from "./cooldown";
 import { LocationChip } from "./LocationChip";
+import { ReactionBurst, fireReaction } from "./ReactionBurst";
 import { RoutePicker, type RouteChoice } from "./RoutePicker";
 
 export interface ReportBarProps {
@@ -92,10 +94,31 @@ const SUMMARY_WORD: Record<ReportType, [string, string]> = {
 
 const SENT_MS = 1_600;
 
+/** Fuera del componente: las llamadas impuras no se permiten en el render (ni en funciones declaradas dentro). */
+const nowMs = () => Date.now();
+
 export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestStop, reports = [] }: ReportBarProps) {
   const heat = heatByType(reports);
   const totalPeople = heat.full.total + heat.passing.total + heat.incident.total;
   const worst = Math.max(heat.full.level, heat.passing.level, heat.incident.level);
+  // Aviso de otra persona que llega en vivo: sube su emoji (uno solo, discreto y como mucho cada 4 s).
+  const mountedAt = useRef(0);
+  const lastSendAt = useRef(0);
+  const lastBurstAt = useRef(0);
+  const seen = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const now = Date.now();
+    if (mountedAt.current === 0) mountedAt.current = now;
+    const calm = now - mountedAt.current < 6_000; // la carga inicial no cuenta como "llegó un aviso"
+    const fresh = reports.filter((r) => !seen.current.has(r.id));
+    for (const r of reports) seen.current.add(r.id);
+    if (calm || fresh.length === 0 || now - lastSendAt.current < 5_000 || now - lastBurstAt.current < 4_000) return;
+    const recent = fresh.find((r) => now - new Date(r.created_at).getTime() < 20_000 && isActive(r, now));
+    if (!recent) return;
+    lastBurstAt.current = now;
+    fireReaction([reportEmoji(recent)], 2);
+  }, [reports]);
+
   // Botón recién enviado: muestra "Enviado" un momento para que se note que el toque sí hizo algo.
   const [sentType, setSentType] = useState<ReportType | null>(null);
   useEffect(() => {
@@ -174,6 +197,8 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
     setRemainingMs(RATE_LIMIT_MS);
     setRound((r) => r + 1);
     setSentType(type);
+    lastSendAt.current = nowMs();
+    fireReaction(burstFor(type, incidentKind));
     onReport(type, incidentKind, routeId);
   }
 
@@ -195,6 +220,8 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
   }
 
   return (
+    <>
+    <ReactionBurst />
     <div
       ref={barRef}
       className={cn(
@@ -262,6 +289,7 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
               const [one, many] = SUMMARY_WORD[t];
               return (
                 <span key={t} className="tabular-nums">
+                  <span aria-hidden>{TYPE_EMOJI[t]} </span>
                   <span className="font-bold">{heat[t].total}</span> {heat[t].total === 1 ? one : many}
                   {heat[t].confirmed > 0 && <span className="text-muted-foreground"> ({heat[t].confirmed} confirmado{heat[t].confirmed === 1 ? "" : "s"})</span>}
                 </span>
@@ -348,5 +376,6 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
         })}
       </div>
     </div>
+    </>
   );
 }

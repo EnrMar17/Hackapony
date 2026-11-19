@@ -3,6 +3,7 @@
 import { Megaphone, TriangleAlert } from "lucide-react";
 import type { Notice } from "@/hooks/useNotices";
 import { cn } from "@/lib/utils";
+import { STATE_EMOJI } from "@/lib/emoji";
 import type { Route } from "@/lib/types";
 
 /**
@@ -28,7 +29,10 @@ export function NoticeBanner({ notices, routes }: { notices: Notice[]; routes: R
           >
             <Icon aria-hidden className="mt-0.5 size-5 shrink-0" />
             <div className="min-w-0 text-sm">
-              <p className="font-semibold break-words">{n.title}</p>
+              <p className="font-semibold break-words">
+                <span aria-hidden>{warning ? STATE_EMOJI.noticeWarning : STATE_EMOJI.notice} </span>
+                {n.title}
+              </p>
               {n.body && <p className="mt-0.5 break-words text-foreground/80">{n.body}</p>}
               <p className="mt-1 text-xs text-muted-foreground">
                 Aviso oficial · {route ? route.name : "todas las rutas"}

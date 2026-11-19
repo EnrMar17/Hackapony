@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { Accessibility, Ellipsis, LightbulbOff, ShieldAlert, X, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { INCIDENT_CHIPS } from "@/lib/constants";
+import { INCIDENT_EMOJI } from "@/lib/emoji";
 import type { IncidentKind } from "@/lib/types";
 
 export interface IncidentPickerProps {
@@ -58,7 +59,7 @@ export function IncidentPicker({ id, onSelect, onClose, disabled }: IncidentPick
 
       <div className="grid grid-cols-2 gap-2">
         {INCIDENT_CHIPS.map((chip, i) => {
-          const { icon: Icon, className } = INCIDENT_STYLE[chip.kind];
+          const { className } = INCIDENT_STYLE[chip.kind];
           return (
             <button
               key={chip.kind}
@@ -74,7 +75,9 @@ export function IncidentPicker({ id, onSelect, onClose, disabled }: IncidentPick
                 className,
               )}
             >
-              <Icon aria-hidden className="size-5 shrink-0" strokeWidth={2.25} />
+              <span aria-hidden className="text-xl leading-none">
+                {INCIDENT_EMOJI[chip.kind]}
+              </span>
               {chip.label}
             </button>
           );
