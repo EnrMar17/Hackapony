@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BusFront, TriangleAlert, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUi } from "@/store/ui";
-import { RATE_LIMIT_MS, REPORT_BUTTONS } from "@/lib/constants";
+import { RATE_LIMIT_MS, REPORT_BUTTONS, ROUTE_AMBIGUITY_M } from "@/lib/constants";
 import type { GeolocationState, IncidentKind, NearestStopResult, ReportType, RouteId } from "@/lib/types";
 import { DESKTOP_QUERY } from "@/components/panels/useIsDesktop";
 import { onReportCooldownReset } from "./cooldown";
@@ -34,6 +34,19 @@ const TICK_MS = 250;
 /** "Incidencia / Accesibilidad" se envía en un toque con este tipo; el toast ofrece afinarlo después. */
 const GENERIC_INCIDENT: IncidentKind = "other";
 
+/**
+ * Qué hacer con "llena" / "pasando": si solo una ruta pasa a menos de ROUTE_AMBIGUITY_M, se envía a esa en un toque;
+ * si pasan dos o más, se pregunta entre ellas. Sin ninguna tan cerca (o sin GPS), se pregunta entre las opciones de CityApp.
+ */
+function routeDecision(choices: RouteChoice[]): { send: RouteId } | { ask: RouteChoice[] } | null {
+  if (choices.length === 0) return null;
+  const close = choices
+    .filter((c) => c.distanceM !== undefined && c.distanceM <= ROUTE_AMBIGUITY_M)
+    .sort((a, b) => (a.distanceM ?? 0) - (b.distanceM ?? 0));
+  if (close.length === 1) return { send: close[0].id };
+  return { ask: close.length > 1 ? close : choices };
+}
+
 function vibrate() {
   if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
     navigator.vibrate(30);
@@ -45,8 +58,9 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
   // `round` cambia en cada reporte y reinicia el reloj del efecto.
   const [round, setRound] = useState(0);
   const [remainingMs, setRemainingMs] = useState(0);
-  const [routePicker, setRoutePicker] = useState<"full" | "passing" | null>(null);
+  const [routePicker, setRoutePicker] = useState<{ type: "full" | "passing"; choices: RouteChoice[] } | null>(null);
   const pickerId = useId();
+  const closeRoutePicker = useCallback(() => setRoutePicker(null), []);
   const selectStop = useUi((s) => s.selectStop);
 
   // Publica el alto de la barra (--report-bar-h) para que el panel lateral de escritorio termine justo arriba.
@@ -114,11 +128,19 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
 
   function handleTap(type: ReportType) {
     // Un toque: la incidencia se envía con tipo genérico y se afina en el toast.
-    if (type === "incident") send("incident", GENERIC_INCIDENT);
-    else if (routeChoices.length > 0) {
-      // "Llena" y "pasando" primero preguntan en qué ruta: así el aviso no queda a la deriva.
-      setRoutePicker((open) => (open === type ? null : type));
-    } else send(type);
+    if (type === "incident") {
+      send("incident", GENERIC_INCIDENT);
+      return;
+    }
+    if (routePicker?.type === type) {
+      setRoutePicker(null);
+      return;
+    }
+    // "Llena" y "pasando" solo preguntan la ruta cuando hay duda.
+    const decision = routeDecision(routeChoices);
+    if (!decision) send(type);
+    else if ("send" in decision) send(type, undefined, decision.send);
+    else setRoutePicker({ type, choices: decision.ask });
   }
 
   return (
@@ -154,11 +176,11 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
 
       {routePicker && !blocked && (
         <RoutePicker
-          id={`${pickerId}-route`}
-          type={routePicker}
-          choices={routeChoices}
-          onSelect={(routeId) => send(routePicker, undefined, routeId)}
-          onClose={() => setRoutePicker(null)}
+          id={pickerId}
+          type={routePicker.type}
+          choices={routePicker.choices}
+          onSelect={(routeId) => send(routePicker.type, undefined, routeId)}
+          onClose={closeRoutePicker}
         />
       )}
 
@@ -172,8 +194,8 @@ export function ReportBar({ onReport, routeChoices = [], disabled, geo, nearestS
               type="button"
               disabled={blocked}
               onClick={() => handleTap(b.type)}
-              aria-expanded={asksRoute ? routePicker === b.type : undefined}
-              aria-controls={asksRoute && routePicker === b.type ? `${pickerId}-route` : undefined}
+              aria-expanded={asksRoute ? routePicker?.type === b.type : undefined}
+              aria-controls={asksRoute && routePicker?.type === b.type ? pickerId : undefined}
               className={cn(
                 "flex h-14 flex-col items-center justify-center gap-0.5 rounded-2xl px-1.5 text-center text-[13px] leading-tight font-semibold shadow-sm",
                 "transition-[transform,opacity,filter] duration-300 ease-out active:scale-95",
