@@ -197,6 +197,8 @@ export interface TripOption {
   nextUnitSec: number | null;
   /** Tramo de la ruta entre subida y bajada, para dibujarlo. */
   segment: LngLat[];
+  /** Calles por las que pasas, en orden (de las paradas del tramo). Para "Pasas por…". */
+  via?: string[];
 }
 
 export interface NearRoute {

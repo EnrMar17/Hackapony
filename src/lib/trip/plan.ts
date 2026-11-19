@@ -11,11 +11,13 @@ const MIN_RIDE_M = 400; // menos que esto conviene caminarlo
 const MAX_SPAN = 0.95; // más de 95% del circuito = casi dar la vuelta completa
 const MIN_TRIP_M = 300; // origen y destino casi iguales: no hay viaje
 const STOP_MATCH = 0.05; // una parada "es de" ese punto si su sentido queda a menos de 5% del circuito
+const NAME_STOP_M = 400; // solo se nombra una parada si está a menos de esto del punto; si no, "este punto de la ruta"
 const REPORT_NEAR_M = 150;
 const MAX_ALERTS = 4;
 const DEFAULT_WAIT_MIN = 10; // si no hay unidades, se supone una espera larga
 const STATUS_PENALTY_MIN = { green: 0, yellow: 4, red: 10 } as const;
 const CROWDED_PENALTY_MIN = 3;
+const MAX_VIA = 4;
 
 export interface PlanTripInput {
   routes: Route[];
@@ -52,7 +54,7 @@ function leg(route: Route, routeStops: Stop[], progress: number, user: LngLat): 
       stop = s;
     }
   }
-  return { point, stop, walkM: Math.round(meters(user, point)) };
+  return { point, stop: best <= NAME_STOP_M ? stop : null, walkM: Math.round(meters(user, point)) };
 }
 
 /**
@@ -91,6 +93,19 @@ function findings(route: Route, routeStops: Stop[], reports: Report[], boardP: n
     .filter((f) => !seen.has(f.text) && seen.add(f.text))
     .slice(0, MAX_ALERTS)
     .map((f) => f.text);
+}
+
+/** Calles por las que pasa el tramo, en orden y sin repetir (el nombre de la parada es "Calle · colonia"). */
+function roadsAlong(routeStops: Stop[], boardP: number, span: number): string[] {
+  const roads: string[] = [];
+  const inSegment = routeStops
+    .filter((s) => typeof s.progress === "number" && positiveMod(s.progress - boardP, 1) <= span)
+    .sort((a, b) => positiveMod(a.progress! - boardP, 1) - positiveMod(b.progress! - boardP, 1));
+  for (const s of inSegment) {
+    const road = s.name.split(" · ")[0].trim();
+    if (road && road !== "Parada" && !roads.includes(road)) roads.push(road);
+  }
+  return roads.slice(0, MAX_VIA);
 }
 
 /**
@@ -154,6 +169,7 @@ export function planTrip({ routes, stops, reports, vehicles, from, to, now = Dat
         alerts: alerts.slice(0, MAX_ALERTS),
         nextUnitSec,
         segment: sliceRoute(route, best.b, best.a),
+        via: roadsAlong(routeStops, best.b, best.span),
       },
     });
   }

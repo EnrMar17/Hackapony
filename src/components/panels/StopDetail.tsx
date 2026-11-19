@@ -14,7 +14,7 @@ export interface StopDetailProps {
   reports: Report[];
   /** Sin vehículos (CityApp aún no los pasa) el ETA dice "Sin datos". */
   vehicles?: Vehicle[];
-  /** Multiplicador del simulador (1, 2 o 5): el ETA debe coincidir con el del globo del mapa. */
+  /** Velocidad del simulador; sin ella se asume 1x. */
   simSpeed?: number;
   loading?: boolean;
   error?: string | null;
