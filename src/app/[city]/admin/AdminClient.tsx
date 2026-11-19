@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Info, RefreshCw, ShieldAlert, TriangleAlert, type LucideIcon } from "lucide-react";
-import { DEMO_DATA_NOTICE, getCityBundle } from "@/data";
+import { ArrowLeft, RefreshCw, ShieldAlert, TriangleAlert, type LucideIcon } from "lucide-react";
+import { getCityBundle } from "@/data";
 import { useReportHistory } from "@/hooks/useReportHistory";
 import {
   runInsights,
@@ -115,11 +115,6 @@ export function AdminClient({ city }: { city: string }) {
           Actualizar
         </button>
       </header>
-
-      <p role="note" className="flex items-start gap-2 rounded-2xl bg-foreground/5 p-3 text-sm text-muted-foreground">
-        <Info aria-hidden className="mt-0.5 size-4 shrink-0" />
-        {DEMO_DATA_NOTICE}
-      </p>
 
       <section aria-labelledby="simulador" className="space-y-3 rounded-2xl bg-white p-4 text-slate-900 shadow-sm ring-1 ring-black/5">
         <h2 id="simulador" className="text-lg font-semibold">

@@ -78,7 +78,7 @@ export const ROUTE_AMBIGUITY_M = 80;
 /** Rutas a menos de esta distancia de ti se consideran "cerca de ti". */
 export const ROUTE_NEAR_M = 800;
 
-export const TRIP_WALK_MAX_M = 600;
+export const TRIP_WALK_MAX_M = 500;
 export const TRIP_MAX_OPTIONS = 5;
 
 /** Paleta única de los reportes: botones, lista y mapa. El azul queda solo para tu ubicación. */
