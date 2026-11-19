@@ -16,6 +16,8 @@ import type { SafetyLevel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useSimConfig } from "@/hooks/useSimConfig";
 import { SimSpeedControls } from "@/components/simulator/SimulatorPanel";
+import { logout } from "./actions";
+import { ADMIN_TITLE } from "./LoginForm";
 import { PanelError, PanelLoading, PanelMessage } from "@/components/panels/PanelState";
 
 /** Cuántas horas de historial se consultan: las incidencias duran horas (hasta el doble con confirmaciones). */
@@ -96,8 +98,14 @@ export function AdminClient({ city }: { city: string }) {
             <ArrowLeft aria-hidden className="size-4" />
             Volver al mapa
           </Link>
-          <h1 className="text-2xl font-semibold">Panel del operador</h1>
+          <h1 className="text-2xl font-semibold">{ADMIN_TITLE}</h1>
+          <p className="text-sm text-muted-foreground">Panel de sugerencias para la comisión organizadora</p>
         </div>
+        <form action={logout}>
+          <button type="submit" className="inline-flex min-h-12 items-center rounded-lg border px-4 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2">
+            Cerrar sesión
+          </button>
+        </form>
         <button
           type="button"
           onClick={history.refresh}
