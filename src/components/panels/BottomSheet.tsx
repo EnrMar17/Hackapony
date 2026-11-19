@@ -9,6 +9,7 @@ import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
 import { StopDetail } from "./StopDetail";
+import { ThemePicker } from "./ThemePicker";
 import { useIsDesktop } from "./useIsDesktop";
 
 export interface BottomSheetProps {
@@ -140,6 +141,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
                 loading={loading}
                 error={error}
               />
+              <ThemePicker />
             </div>
           </section>
         </div>
