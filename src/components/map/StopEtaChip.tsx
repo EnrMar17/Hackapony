@@ -1,43 +1,57 @@
 "use client";
 
-import { unitLabel } from "@/lib/geo";
-import { Popup } from "./engine";
-import { POPUP_CLASS } from "./palette";
-import type { SelectedStop } from "./useSelectedStop";
+import { Marker, Popup } from "./engine";
+import { formatDistance, type Incoming } from "./incoming";
+import { POPUP_CLASS, routeColor } from "./palette";
+import { useIsDark } from "./useIsDark";
 
 /**
- * Sobre la parada elegida: qué unidad viene, en cuánto llega y a cuántos metros va. La punta del globo
- * señala la parada exacta; sus colores cambian con el tema (ver `.map-popup` en globals.css).
+ * Sobre la parada seleccionada: un anillo pulsante con el color de su ruta (para saber de qué parada se habla)
+ * y un globo con cuándo llega la próxima unidad. La punta del globo señala la parada exacta.
  */
-export function StopEtaChip({ selected }: { selected: SelectedStop | null }) {
-  if (!selected) return null;
-  const { stop, route, next, distanceM } = selected;
+export function StopEtaChip({ incoming }: { incoming: Incoming | null }) {
+  const dark = useIsDark();
+  if (!incoming) return null;
+  const { stop, route, etaSec, distM } = incoming;
 
-  const when = !next
-    ? "Sin unidades por ahora"
-    : next.etaSec < 60
-      ? `${unitLabel(next.vehicle)} llega en menos de 1 min`
-      : `${unitLabel(next.vehicle)} llega en ~${Math.round(next.etaSec / 60)} min`;
+  const timeText =
+    etaSec === null
+      ? "Sin unidades por ahora"
+      : etaSec < 60
+        ? "Llega a esta parada en menos de 1 min"
+        : `Llega a esta parada en ~${Math.round(etaSec / 60)} min`;
+  const color = routeColor(route.color, dark);
 
   return (
-    <Popup
-      longitude={stop.lng}
-      latitude={stop.lat}
-      anchor="bottom"
-      offset={22}
-      closeButton={false}
-      closeOnClick={false}
-      maxWidth="230px"
-      className={POPUP_CLASS}
-    >
-      <div className="text-sm leading-snug">
-        <p className="flex items-center gap-1.5 font-semibold">
-          <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: route.color }} />
-          {route.name}
-        </p>
-        <p>{when}</p>
-        {next && distanceM !== null && <p className="text-xs opacity-70">a {distanceM} m de esta parada · estimado</p>}
-      </div>
-    </Popup>
+    <>
+      <Marker longitude={stop.lng} latitude={stop.lat} anchor="center" style={{ pointerEvents: "none" }}>
+        <span className="relative flex size-9 items-center justify-center">
+          <span
+            aria-hidden
+            className="absolute inset-0 animate-ping rounded-full border-[3px] opacity-70 motion-reduce:animate-none"
+            style={{ borderColor: color }}
+          />
+          <span aria-hidden className="size-9 rounded-full border-[3px]" style={{ borderColor: color }} />
+        </span>
+      </Marker>
+      <Popup
+        longitude={stop.lng}
+        latitude={stop.lat}
+        anchor="bottom"
+        offset={26}
+        closeButton={false}
+        closeOnClick={false}
+        maxWidth="240px"
+        className={POPUP_CLASS}
+      >
+        <div className="p-1 text-sm">
+          <p className="font-semibold">{route.name}</p>
+          <p>{timeText}</p>
+          <p className="text-xs text-muted-foreground">
+            {distM !== null ? `Unidad a ${formatDistance(distM)} · ` : ""}estimado
+          </p>
+        </div>
+      </Popup>
+    </>
   );
 }

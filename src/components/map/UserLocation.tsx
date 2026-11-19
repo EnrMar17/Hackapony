@@ -1,132 +1,101 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import type { FeatureCollection } from "geojson";
+import { useEffect, useState } from "react";
 import type { LngLat } from "@/lib/types";
-import { Layer, Source } from "./engine";
+import { Layer, Marker, Source } from "./engine";
+import { USER_COLOR } from "./palette";
 
-const BLUE = "#2563eb";
-const PULSE_MS = 2_000;
-const LABEL_MS = 7_000;
-/** El azul es SOLO tuyo: ningún reporte, parada ni unidad usa este color. */
-
-let labelShown = false;
-
-function reducedMotion(): boolean {
-  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
+const SEEN_KEY = "ruta-segura-estas-aqui";
+const LABEL_MS = 6000;
+/** Metros por píxel a latitud 0 y zoom 0 (teselas de 512 px). */
+const METERS_PER_PX_AT_Z0 = 78271.517;
+const MAX_ACCURACY_M = 500;
 
 /**
- * Tu ubicación: punto azul con borde blanco grueso, halo que pulsa y, si se conoce, el círculo de precisión.
- * "Estás aquí" aparece una sola vez por visita. Se monta al final para quedar encima de todo.
+ * "Tú": círculo azul con borde blanco y halo pulsante, por encima de todas las capas del mapa (es un elemento
+ * del DOM, no una capa) pero por debajo de los paneles. El azul es solo tuyo. Si el GPS informa su precisión, se dibuja su radio.
+ * Sin GPS no se dibuja nada.
  */
-export function UserLocation({
-  position,
-  accuracyM,
-  dark,
-}: {
-  position: LngLat | null;
-  accuracyM: number | null;
-  dark: boolean;
-}) {
-  const has = position !== null;
-  const [phase, setPhase] = useState(0);
-  const [label, setLabel] = useState(false);
+export function UserLocation({ position, accuracyM }: { position: LngLat | null; accuracyM?: number | null }) {
+  const [showLabel, setShowLabel] = useState(false);
+  const located = position !== null;
 
+  // La etiqueta "Estás aquí" sale solo la primera vez que se obtiene la ubicación.
   useEffect(() => {
-    if (!has || reducedMotion()) return;
-    const id = window.setInterval(() => setPhase((Date.now() % PULSE_MS) / PULSE_MS), 66);
-    return () => window.clearInterval(id);
-  }, [has]);
-
-  useEffect(() => {
-    if (!has || labelShown) return;
-    labelShown = true;
-    const on = window.setTimeout(() => setLabel(true), 0);
-    const off = window.setTimeout(() => setLabel(false), LABEL_MS);
+    if (!located) return;
+    let seen = false;
+    try {
+      seen = localStorage.getItem(SEEN_KEY) === "1";
+    } catch {
+      // sin almacenamiento: se muestra y no se recuerda
+    }
+    if (seen) return;
+    const show = setTimeout(() => setShowLabel(true), 0);
+    const hide = setTimeout(() => {
+      setShowLabel(false);
+      try {
+        localStorage.setItem(SEEN_KEY, "1");
+      } catch {
+        // ignorar
+      }
+    }, LABEL_MS);
     return () => {
-      window.clearTimeout(on);
-      window.clearTimeout(off);
+      clearTimeout(show);
+      clearTimeout(hide);
     };
-  }, [has]);
+  }, [located]);
 
-  const data = useMemo<FeatureCollection | null>(
-    () =>
-      position
-        ? {
-            type: "FeatureCollection",
-            features: [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: position } }],
-          }
-        : null,
-    [position],
-  );
+  if (!position) return null;
 
-  if (!position || !data) return null;
-
-  // Radio de precisión en píxeles: metros / (metros por píxel en zoom 20), escalado con el zoom (base 2).
-  const showAccuracy = accuracyM !== null && accuracyM > 15;
-  const radiusZ20 = showAccuracy ? Math.min(accuracyM, 300) / (0.075 * Math.cos((position[1] * Math.PI) / 180)) : 0;
+  const accuracy = accuracyM && accuracyM > 0 ? Math.min(accuracyM, MAX_ACCURACY_M) : null;
+  const radiusAtZ0 = accuracy ? accuracy / (METERS_PER_PX_AT_Z0 * Math.cos((position[1] * Math.PI) / 180)) : 0;
 
   return (
-    <Source id="user" type="geojson" data={data}>
-      {showAccuracy && (
-        <Layer
-          id="user-accuracy"
-          type="circle"
-          paint={{
-            "circle-pitch-alignment": "map",
-            "circle-radius": ["interpolate", ["exponential", 2], ["zoom"], 0, 0, 20, radiusZ20],
-            "circle-color": BLUE,
-            "circle-opacity": 0.12,
-            "circle-stroke-color": BLUE,
-            "circle-stroke-opacity": 0.35,
-            "circle-stroke-width": 1,
-          }}
-        />
+    <>
+      {accuracy && (
+        <Source
+          id="user"
+          type="geojson"
+          data={{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: position } }}
+        >
+          <Layer
+            id="user-accuracy"
+            type="circle"
+            paint={{
+              // Radio en metros: crece con el zoom (cada nivel duplica los píxeles por metro).
+              "circle-radius": ["interpolate", ["exponential", 2], ["zoom"], 0, radiusAtZ0, 22, radiusAtZ0 * 2 ** 22] as unknown as number,
+              "circle-color": USER_COLOR,
+              "circle-opacity": 0.12,
+              "circle-stroke-color": USER_COLOR,
+              "circle-stroke-width": 1,
+              "circle-stroke-opacity": 0.35,
+            }}
+          />
+        </Source>
       )}
-      <Layer
-        id="user-halo"
-        type="circle"
-        paint={{
-          "circle-radius": 14 + 14 * phase,
-          "circle-color": BLUE,
-          "circle-opacity": 0.4 * (1 - phase),
-        }}
-      />
-      <Layer
-        id="user-dot-shadow"
-        type="circle"
-        paint={{ "circle-radius": 13, "circle-color": "#0f172a", "circle-opacity": 0.28, "circle-blur": 0.7 }}
-      />
-      <Layer
-        id="user-dot"
-        type="circle"
-        paint={{
-          "circle-radius": 9,
-          "circle-color": BLUE,
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 3.5,
-        }}
-      />
-      {label && (
-        <Layer
-          id="user-label"
-          type="symbol"
-          layout={{
-            "text-field": "Estás aquí",
-            "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-            "text-size": 14,
-            "text-anchor": "bottom",
-            "text-offset": [0, -1.6],
-            "text-allow-overlap": true,
-          }}
-          paint={{
-            "text-color": dark ? "#ffffff" : "#1d4ed8",
-            "text-halo-color": dark ? "#0b1220" : "#ffffff",
-            "text-halo-width": 2,
-          }}
-        />
-      )}
-    </Source>
+      <Marker longitude={position[0]} latitude={position[1]} anchor="center" style={{ pointerEvents: "none" }}>
+        <div className="relative flex items-center justify-center">
+          <span
+            aria-hidden
+            className="absolute size-11 animate-ping rounded-full opacity-30 motion-reduce:animate-none"
+            style={{ backgroundColor: USER_COLOR }}
+          />
+          <span
+            aria-hidden
+            className="relative size-5 rounded-full border-[3px] border-white shadow-md"
+            style={{ backgroundColor: USER_COLOR }}
+          />
+          {showLabel && (
+            <span
+              role="status"
+              className="absolute bottom-full mb-2 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold text-white shadow-md"
+              style={{ backgroundColor: USER_COLOR }}
+            >
+              Estás aquí
+            </span>
+          )}
+        </div>
+      </Marker>
+    </>
   );
 }

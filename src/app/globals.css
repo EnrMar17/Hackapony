@@ -271,38 +271,3 @@
     scroll-behavior: auto !important;
   }
 }
-
-/* Globos del mapa (popups). Van fuera de @layer a propósito: el CSS de Mapbox no usa capas y, si éste sí,
-   Mapbox ganaría siempre (fondo y letra blancos en modo oscuro). Colores por tema con variables. */
-.map-popup {
-  --popup-bg: #ffffff;
-  --popup-fg: #0f172a;
-}
-.dark .map-popup {
-  --popup-bg: #1e293b;
-  --popup-fg: #f1f5f9;
-}
-.map-popup .mapboxgl-popup-content {
-  background: var(--popup-bg);
-  color: var(--popup-fg);
-  border-radius: 1rem;
-  padding: 0.5rem 0.75rem;
-  box-shadow: 0 8px 24px rgb(15 23 42 / 0.28);
-}
-/* La punta señala la parada o el reporte exacto, del color del globo. */
-.map-popup.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
-.map-popup.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
-.map-popup.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
-  border-top-color: var(--popup-bg);
-}
-.map-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
-.map-popup.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
-.map-popup.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
-  border-bottom-color: var(--popup-bg);
-}
-.map-popup.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
-  border-right-color: var(--popup-bg);
-}
-.map-popup.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
-  border-left-color: var(--popup-bg);
-}

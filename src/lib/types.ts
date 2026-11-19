@@ -141,6 +141,8 @@ export interface ReportsState {
   undo: (reportId: string) => Promise<void>;
   /** Opcional hasta que Cesar lo implemente: agrega unidades u ocupación al reporte propio (primeros 60 s). */
   refine?: (reportId: string, patch: ReportRefinement) => Promise<void>;
+  /** ms del último dato recibido (para "actualizado hace N s"). */
+  lastUpdateAt?: number;
 }
 
 export interface SimControls extends SimConfig {

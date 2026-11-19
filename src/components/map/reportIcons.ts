@@ -1,41 +1,29 @@
-import { REPORT_COLORS } from "@/lib/constants";
 import type { ReportType } from "@/lib/types";
 import type { MapRef } from "./engine";
+import { REPORT_COLORS } from "./palette";
 
-/** Nombre de la imagen del pin: por tipo y por confianza (c = confirmado, u = sin confirmar). */
-export function reportPinImage(type: ReportType, confirmed: boolean): string {
-  return `report-pin-${type}-${confirmed ? "c" : "u"}`;
+/** Nombre de la imagen del pin: sólido = confirmado, tenue (hueco con borde punteado) = sin confirmar. */
+export function pinImageName(type: ReportType, confirmed: boolean): string {
+  return `pin-${type}-${confirmed ? "solid" : "faint"}`;
 }
 
-const GLYPH = 64;
-const PIN_W = 64;
-const PIN_H = 80;
+// Pin de gota de 64 x 88 px (se muestra a la mitad: 32 x 44). El círculo de la cabeza está en (32, 31).
+const W = 64;
+const H = 88;
+const HEAD_X = 32;
+const HEAD_Y = 31;
 
-function glyph(paint: (ctx: CanvasRenderingContext2D) => void): HTMLCanvasElement | null {
-  const canvas = document.createElement("canvas");
-  canvas.width = GLYPH;
-  canvas.height = GLYPH;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
-  ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "#ffffff";
-  paint(ctx);
-  return canvas;
+function pinPath(ctx: CanvasRenderingContext2D) {
+  ctx.beginPath();
+  ctx.moveTo(32, 80);
+  ctx.bezierCurveTo(24, 66, 6, 52, 6, 31);
+  ctx.arc(HEAD_X, HEAD_Y, 26, Math.PI, 0);
+  ctx.bezierCurveTo(58, 52, 40, 66, 32, 80);
+  ctx.closePath();
 }
 
-/** Pinta el pictograma del color pedido, conservando los huecos. */
-function tint(src: HTMLCanvasElement, color: string): HTMLCanvasElement | null {
-  const canvas = document.createElement("canvas");
-  canvas.width = src.width;
-  canvas.height = src.height;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
-  ctx.drawImage(src, 0, 0);
-  ctx.globalCompositeOperation = "source-in";
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  return canvas;
-}
+// Pictogramas dibujados en una cuadrícula de 64 x 64. `fg` es el color del dibujo y `bg` el del fondo
+// del pin: los huecos (parabrisas, signo de exclamación) se pintan con `bg`.
 
 /** Dos personas: unidad llena. */
 function people(ctx: CanvasRenderingContext2D) {
@@ -59,7 +47,7 @@ function people(ctx: CanvasRenderingContext2D) {
 }
 
 /** Autobús de frente: unidad pasando. */
-function bus(ctx: CanvasRenderingContext2D) {
+function bus(ctx: CanvasRenderingContext2D, bg: string) {
   // Rectángulo redondeado con arcTo: `roundRect` no existe en Safari de iOS anteriores a 16.
   const [x, y, w, h, r] = [13, 10, 38, 38, 8];
   ctx.beginPath();
@@ -70,20 +58,21 @@ function bus(ctx: CanvasRenderingContext2D) {
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
   ctx.fill();
-  ctx.globalCompositeOperation = "destination-out";
+  const fg = ctx.fillStyle;
+  ctx.fillStyle = bg;
   ctx.fillRect(18, 16, 28, 13); // parabrisas
   for (const cx of [23, 41]) {
     ctx.beginPath();
     ctx.arc(cx, 39, 3.5, 0, Math.PI * 2); // faros
     ctx.fill();
   }
-  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = fg;
   ctx.fillRect(18, 48, 8, 8);
   ctx.fillRect(38, 48, 8, 8);
 }
 
 /** Triángulo de alerta: incidencia. */
-function alert(ctx: CanvasRenderingContext2D) {
+function alert(ctx: CanvasRenderingContext2D, bg: string) {
   ctx.lineJoin = "round";
   ctx.lineWidth = 6;
   ctx.beginPath();
@@ -93,63 +82,66 @@ function alert(ctx: CanvasRenderingContext2D) {
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
-  ctx.globalCompositeOperation = "destination-out";
+  ctx.fillStyle = bg;
   ctx.fillRect(29, 24, 6, 16);
   ctx.beginPath();
   ctx.arc(32, 46, 3.5, 0, Math.PI * 2);
   ctx.fill();
-  ctx.globalCompositeOperation = "source-over";
 }
 
-const PAINTERS = { full: people, passing: bus, incident: alert } as const;
+const PAINTERS: Record<ReportType, (ctx: CanvasRenderingContext2D, bg: string) => void> = {
+  full: (ctx) => people(ctx),
+  passing: bus,
+  incident: alert,
+};
 
-/**
- * Pin en forma de gota. Confirmado: relleno sólido con borde blanco y pictograma blanco.
- * Sin confirmar: relleno tenue con borde y pictograma del color del tipo.
- */
-function drawPin(type: ReportType, confirmed: boolean): ImageData | null {
+function drawPin(type: ReportType, solid: boolean): ImageData | null {
   const canvas = document.createElement("canvas");
-  canvas.width = PIN_W;
-  canvas.height = PIN_H;
+  canvas.width = W;
+  canvas.height = H;
   const ctx = canvas.getContext("2d");
-  const base = glyph(PAINTERS[type]);
-  if (!ctx || !base) return null;
+  if (!ctx) return null;
   const color = REPORT_COLORS[type];
 
-  ctx.beginPath();
-  ctx.moveTo(32, 77);
-  ctx.bezierCurveTo(32, 77, 6, 48, 6, 28);
-  ctx.arc(32, 28, 26, Math.PI, 0, false);
-  ctx.bezierCurveTo(58, 48, 32, 77, 32, 77);
-  ctx.closePath();
+  // Cuerpo con sombra suave. El sin confirmar va hueco para que se note que aún es una sospecha.
+  ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 2;
+  pinPath(ctx);
+  ctx.fillStyle = solid ? color : "#ffffff";
+  ctx.fill();
+
+  // Borde: blanco en el sólido; en el tenue, del color del tipo y punteado.
+  ctx.shadowColor = "transparent";
   ctx.lineJoin = "round";
   ctx.lineWidth = 4;
-  if (confirmed) {
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.strokeStyle = "#ffffff";
-    ctx.stroke();
-    ctx.drawImage(base, 16, 12, 32, 32);
-  } else {
-    ctx.globalAlpha = 0.3;
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = color;
-    ctx.stroke();
-    const colored = tint(base, color);
-    if (colored) ctx.drawImage(colored, 16, 12, 32, 32);
-  }
-  return ctx.getImageData(0, 0, PIN_W, PIN_H);
+  if (!solid) ctx.setLineDash([6, 5]);
+  ctx.strokeStyle = solid ? "#ffffff" : color;
+  pinPath(ctx);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Pictograma centrado en la cabeza.
+  const scale = 0.46;
+  const bg = solid ? color : "#ffffff";
+  ctx.save();
+  ctx.translate(HEAD_X - 32 * scale, HEAD_Y - 32 * scale);
+  ctx.scale(scale, scale);
+  ctx.fillStyle = solid ? "#ffffff" : color;
+  ctx.strokeStyle = solid ? "#ffffff" : color;
+  PAINTERS[type](ctx, bg);
+  ctx.restore();
+
+  return ctx.getImageData(0, 0, W, H);
 }
 
-/** Registra los pines que falten (6: 3 tipos × confirmado/sin confirmar). Devuelve false si no se pudieron dibujar. */
-export function addReportIcons(map: MapRef): boolean {
+/** Registra los pines que falten (3 tipos x sólido/tenue). Devuelve false si no se pudieron dibujar. */
+export function addReportPins(map: MapRef): boolean {
   for (const type of Object.keys(PAINTERS) as ReportType[]) {
-    for (const confirmed of [true, false]) {
-      const name = reportPinImage(type, confirmed);
+    for (const solid of [true, false]) {
+      const name = pinImageName(type, solid);
       if (map.hasImage(name)) continue;
-      const image = drawPin(type, confirmed);
+      const image = drawPin(type, solid);
       if (!image) return false;
       map.addImage(name, image, { pixelRatio: 2 });
     }

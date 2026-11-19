@@ -9,15 +9,14 @@ import type { CityBundle, LngLat, Report, Route, RouteId, Vehicle } from "@/lib/
 import { useUi } from "@/store/ui";
 import { MAP_READY, MAP_STYLE, MAP_STYLE_DARK, MapView, engineProps } from "./engine";
 import type { MapMouseEvent, MapRef } from "./engine";
+import { incomingUnit } from "./incoming";
 import { ensureMapImages } from "./mapImages";
 import { REPORT_CLUSTER_LAYER, REPORT_LAYER, ReportLayer } from "./ReportLayer";
 import { ReportPopup } from "./ReportPopup";
-import { SelectedStopMarker } from "./SelectedStopMarker";
 import { ROUTE_LINE_LAYER, RouteLayers } from "./RouteLayers";
 import { STOP_LAYERS, StopLayer } from "./StopLayer";
 import { StopEtaChip } from "./StopEtaChip";
 import { UserLocation } from "./UserLocation";
-import { useSelectedStop } from "./useSelectedStop";
 import { useIsDark } from "./useIsDark";
 import { VehicleLayer } from "./VehicleLayer";
 
@@ -30,7 +29,7 @@ export interface TransitMapProps {
   onLocateRequest: () => void;
   /** Multiplicador del simulador (1, 2 o 5), para el ETA de la parada. */
   simSpeed?: number;
-  /** Precisión del GPS en metros (para el círculo alrededor de tu punto). */
+  /** Precisión del GPS en metros: se dibuja como un halo alrededor de tu punto. */
   userAccuracyM?: number | null;
 }
 
@@ -67,7 +66,6 @@ export function TransitMap({
   }
 
   const mapRef = useRef<MapRef>(null);
-  const selectedStop = useSelectedStop(bundle, vehicles, simSpeed);
   const [loaded, setLoaded] = useState(false);
   const [imagesReady, setImagesReady] = useState(false);
   const [failed, setFailed] = useState(!MAP_READY);
@@ -85,9 +83,16 @@ export function TransitMap({
   const setShowAll = useUi((s) => s.setShowAllRoutes);
   // Modo denso: más rutas que las 2 del reto. Las unidades solo se ven de la ruta elegida.
   const dense = bundle.routes.length > DEFAULT_ROUTE_IDS.length;
+  // La unidad que viene hacia la parada elegida (para el globo de ETA y para resaltarla).
+  const incoming = useMemo(
+    () => incomingUnit(bundle, vehicles, selectedStopId, simSpeed),
+    [bundle, vehicles, selectedStopId, simSpeed],
+  );
+  // En modo denso solo se ven las unidades de la ruta elegida, o las de la ruta de la parada elegida.
+  const stopRouteId = incoming?.route.id ?? null;
   const mapVehicles = useMemo(
-    () => (dense ? vehicles.filter((v) => v.route_id === selectedRoute) : vehicles),
-    [dense, vehicles, selectedRoute],
+    () => (dense ? vehicles.filter((v) => v.route_id === selectedRoute || v.route_id === stopRouteId) : vehicles),
+    [dense, vehicles, selectedRoute, stopRouteId],
   );
 
   // Se vuelve a encuadrar cuando cambia el conjunto de rutas (por ejemplo al pulsar "Ver todas").
@@ -111,7 +116,9 @@ export function TransitMap({
     map.flyTo({
       center: [stop.lng, stop.lat],
       zoom: Math.max(map.getZoom(), 15),
-      offset: desktop ? [208, 0] : [0, -90],
+      // En móvil la hoja de la parada tapa buena parte del mapa y los botones se apilan a la derecha:
+      // la parada se sube y se corre a la izquierda para que ella, su anillo y su globo queden a la vista.
+      offset: desktop ? [208, 0] : [-Math.round(window.innerWidth * 0.18), -Math.round(window.innerHeight * 0.27)],
       duration: 700,
     });
   }, [selectedStopId, loaded, bundle.stops, desktop]);
@@ -166,14 +173,13 @@ export function TransitMap({
         onError={() => setFailed(true)}
         style={{ width: "100%", height: "100%" }}
       >
-        <RouteLayers routes={bundle.routes} selected={selectedRoute} dense={dense} dark={dark} />
+        {/* De abajo hacia arriba: rutas, paradas, reportes, unidades y, encima de todo, tú. */}
+        <RouteLayers routes={bundle.routes} selected={selectedRoute} dense={dense} dark={dark} iconsReady={imagesReady} />
         <StopLayer stops={bundle.stops} reports={reports} dense={dense} dark={dark} />
-        <SelectedStopMarker selected={selectedStop} dark={dark} />
         <ReportLayer reports={reports} iconsReady={imagesReady} dark={dark} />
-        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} />
-        {/* Tu ubicación al final: queda encima de todo. Orden: tú > unidades > reportes > paradas > rutas. */}
-        <UserLocation position={userPosition} accuracyM={userAccuracyM} dark={dark} />
-        <StopEtaChip selected={selectedStop} />
+        <VehicleLayer vehicles={mapVehicles} arrowReady={imagesReady} dark={dark} highlightId={incoming?.vehicleId ?? null} />
+        <StopEtaChip incoming={incoming} />
+        <UserLocation position={userPosition} accuracyM={userAccuracyM} />
         {selectedReport && <ReportPopup report={selectedReport} onClose={() => selectReport(null)} />}
       </MapView>
 
