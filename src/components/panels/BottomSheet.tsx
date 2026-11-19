@@ -157,8 +157,8 @@ export function BottomSheet({
             inert={!visible}
             className="glass pointer-events-auto mx-2 mb-2 flex max-h-[55dvh] flex-col rounded-3xl shadow-[0_-8px_24px_rgb(15_23_42/0.12)] lg:m-0 lg:h-full lg:max-h-none lg:shadow-xl"
           >
-            <div className="flex min-h-14 items-center justify-between px-4 pt-2 lg:pt-3">
-              <span aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/15 lg:hidden" />
+            {/* En celular un solo control centrado (la flecha para cerrar); en escritorio, logo y X a la derecha. */}
+            <div className="flex min-h-12 items-center justify-center px-4 pt-1 lg:min-h-14 lg:justify-between lg:pt-3">
               <div className="hidden items-center gap-3 lg:flex">
                 <SplashLogo className="size-10 shrink-0" />
                 <div>
@@ -171,11 +171,11 @@ export function BottomSheet({
                 type="button"
                 onClick={close}
                 className={cn(
-                  "-mr-2 flex size-12 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+                  "flex h-12 w-16 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring lg:-mr-2 lg:w-12",
                   !hasSelection && "lg:hidden",
                 )}
               >
-                <ChevronDown aria-hidden className="size-5 lg:hidden" />
+                <ChevronDown aria-hidden className="size-6 lg:hidden" />
                 <X aria-hidden className="hidden size-5 lg:block" />
                 <span className="sr-only">{desktop ? "Cerrar detalle" : "Cerrar panel"}</span>
               </button>
