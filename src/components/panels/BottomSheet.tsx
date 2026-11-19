@@ -10,6 +10,7 @@ import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
 import { StopDetail } from "./StopDetail";
+import { Legend } from "./Legend";
 import { ThemePicker } from "./ThemePicker";
 import { useIsDesktop } from "./useIsDesktop";
 
@@ -144,6 +145,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
                 loading={loading}
                 error={error}
               />
+              <Legend />
               <ThemePicker />
             </div>
           </section>
