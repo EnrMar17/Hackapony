@@ -14,16 +14,16 @@ function describe(report: Report): string {
 
 /**
  * Toast "Reporte enviado · Deshacer" durante 5 s.
- * Tony lo llama desde CityApp con el Report que devuelva sendReport y `undo` de useReports.
+ * CityApp lo llama con el Report que devuelve sendReport; onUndo ya sabe qué reporte deshacer.
  */
-export function notifyReportSent(report: Report, onUndo: (id: string) => void): string | number {
+export function notifyReportSent(report: Report, onUndo: () => void): string | number {
   return toast.success("Reporte enviado", {
     id: `report-${report.id}`,
     description: describe(report),
     duration: UNDO_WINDOW_MS,
     action: {
       label: "Deshacer",
-      onClick: () => onUndo(report.id),
+      onClick: () => onUndo(),
     },
   });
 }
