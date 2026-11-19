@@ -5,6 +5,7 @@ import { BusFront, TriangleAlert, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RATE_LIMIT_MS, REPORT_BUTTONS } from "@/lib/constants";
 import type { GeolocationState, IncidentKind, NearestStopResult, ReportType } from "@/lib/types";
+import { onReportCooldownReset } from "./cooldown";
 import { IncidentPicker } from "./IncidentPicker";
 import { LocationChip } from "./LocationChip";
 
@@ -40,6 +41,16 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerId = useId();
   const closePicker = useCallback(() => setPickerOpen(false), []);
+
+  // "Deshacer" borra el reporte: el servidor ya permite reportar, así que el cooldown se reinicia.
+  useEffect(
+    () =>
+      onReportCooldownReset(() => {
+        setRound(0);
+        setRemainingMs(0);
+      }),
+    [],
+  );
 
   useEffect(() => {
     if (round === 0) return;
