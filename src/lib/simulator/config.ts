@@ -1,6 +1,9 @@
 /** Velocidad de las unidades a 1x (≈43 km/h). Se comparte con el cálculo de ETA. */
 export const VEHICLE_SPEED_MS = 12;
 
+/** Velocidad base en km/h (el multiplicador 1x). */
+export const BASE_SPEED_KMH = VEHICLE_SPEED_MS * 3.6;
+
 /** Intervalo objetivo entre unidades de una misma ruta (s). Define cuántas unidades lleva cada una. */
 export const HEADWAY_S = 540;
 

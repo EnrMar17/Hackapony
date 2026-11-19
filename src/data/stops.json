@@ -330,6 +330,17 @@
     "progress": 0.5017
   },
   {
+    "id": "n1-14",
+    "route_id": "NARANJA-1",
+    "name": "Instituto Tecnológico de Morelia (sentido contrario)",
+    "lng": -101.18733,
+    "lat": 19.72264,
+    "has_light": true,
+    "has_ramp": true,
+    "has_roof": true,
+    "progress": 0.5863
+  },
+  {
     "id": "n1-10",
     "route_id": "NARANJA-1",
     "name": "Avenida Morelos Norte · Obrera",

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RATE_LIMIT_MS } from "@/lib/constants";
+import { BASE_SPEED_KMH } from "@/lib/simulator/config";
 import type { NewReport, Report, SimControls, Stop } from "@/lib/types";
 
 export interface SimulatorPanelProps {
@@ -14,6 +15,60 @@ export interface SimulatorPanelProps {
 }
 
 const SPEEDS = [1, 2, 5] as const;
+const MIN_KMH = 5;
+const MAX_KMH = 200;
+
+/** Pausa, velocidad en km/h (deslizador o atajos) y vuelta a lo normal. Se comparte con todos los dispositivos. */
+export function SimSpeedControls({ sim }: { sim: SimControls }) {
+  const kmh = Math.round(sim.speed * BASE_SPEED_KMH);
+  const [draft, setDraft] = useState<number | null>(null);
+  const shown = draft ?? kmh;
+  const commit = () => {
+    if (draft !== null) sim.setSpeed(draft / BASE_SPEED_KMH);
+    setDraft(null);
+  };
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={() => sim.setPlaying(!sim.playing)} className={`${BTN} min-w-28 bg-slate-900 text-white`}>
+          {sim.playing ? "Pausar" : "Reanudar"}
+        </button>
+        <div role="group" aria-label="Atajos de velocidad" className="flex gap-1">
+          {SPEEDS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => sim.setSpeed(s)}
+              aria-pressed={Math.abs(sim.speed - s) < 0.01}
+              className={`${BTN} min-w-12 ${Math.abs(sim.speed - s) < 0.01 ? "bg-slate-900 text-white" : "bg-slate-100"}`}
+            >
+              {s}x
+            </button>
+          ))}
+        </div>
+      </div>
+      <label className="block">
+        <span className="flex items-baseline justify-between text-xs font-medium text-slate-700">
+          Velocidad de las unidades
+          <span className="text-sm font-semibold tabular-nums text-slate-900">{shown} km/h</span>
+        </span>
+        <input
+          type="range"
+          min={MIN_KMH}
+          max={MAX_KMH}
+          step={1}
+          value={shown}
+          onChange={(e) => setDraft(Number(e.target.value))}
+          onPointerUp={commit}
+          onKeyUp={commit}
+          onBlur={commit}
+          className="mt-1 h-12 w-full accent-slate-900"
+        />
+      </label>
+      <p className="text-xs text-slate-700">Normal: {Math.round(BASE_SPEED_KMH)} km/h (1x). El cambio llega a todos los dispositivos al instante.</p>
+    </div>
+  );
+}
 
 type Placement = Pick<NewReport, "route_id" | "stop_id" | "lng" | "lat">;
 
@@ -112,28 +167,7 @@ export function SimulatorPanel({ sim, stops, sendReport }: SimulatorPanelProps) 
 
   return (
     <section aria-label="Simulador de unidades" className="m-3 rounded-xl bg-white p-3 text-sm text-slate-900 shadow">
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => sim.setPlaying(!sim.playing)}
-          className={`${BTN} min-w-28 bg-slate-900 text-white`}
-        >
-          {sim.playing ? "Pausar" : "Reanudar"}
-        </button>
-        <div role="group" aria-label="Velocidad" className="flex gap-1">
-          {SPEEDS.map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => sim.setSpeed(s)}
-              aria-pressed={sim.speed === s}
-              className={`${BTN} min-w-12 ${sim.speed === s ? "bg-slate-900 text-white" : "bg-slate-100"}`}
-            >
-              {s}x
-            </button>
-          ))}
-        </div>
-      </div>
+      <SimSpeedControls sim={sim} />
 
       <p className="mt-3 text-xs font-medium text-slate-700">Simular evento</p>
       {stops.length === 0 ? (
