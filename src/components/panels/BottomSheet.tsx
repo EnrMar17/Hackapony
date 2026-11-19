@@ -10,6 +10,7 @@ import { ReportDetail } from "./ReportDetail";
 import { ReportFeed } from "./ReportFeed";
 import { RouteStatusCard } from "./RouteStatusCard";
 import { StopDetail } from "./StopDetail";
+import { AccessibleFilter } from "./AccessibleFilter";
 import { Legend } from "./Legend";
 import { ThemePicker } from "./ThemePicker";
 import { useIsDesktop } from "./useIsDesktop";
@@ -135,6 +136,7 @@ export function BottomSheet({ bundle, reports, vehicles, onVote, loading = false
                   error={error}
                 />
               )}
+              <AccessibleFilter />
               <RouteStatusCard routes={bundle.routes} reports={reports} loading={loading} error={error} />
               <ReportFeed
                 reports={reports}
