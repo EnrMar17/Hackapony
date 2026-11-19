@@ -37,7 +37,7 @@ export function TopBar({ routes, online }: TopBarProps) {
   const selectRoute = useUi((s) => s.selectRoute);
 
   return (
-    <div className="flex items-center gap-2 px-safe pt-safe pb-2">
+    <div className="flex items-center gap-2 px-safe pt-safe pb-2 lg:pt-4 lg:pr-4 lg:pl-[432px]">
       <div role="group" aria-label="Filtrar por ruta" className="flex min-w-0 gap-2 overflow-x-auto">
         {routes.map((r) => {
           const pressed = selected === r.id;

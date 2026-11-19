@@ -95,7 +95,13 @@ export function ReportBar({ onReport, disabled, geo, nearestStop }: ReportBarPro
   }
 
   return (
-    <div className="glass relative rounded-t-3xl px-safe pt-3 pb-safe shadow-[0_-8px_24px_rgb(15_23_42/0.12)]">
+    <div
+      className={cn(
+        "glass relative rounded-t-3xl px-safe pt-3 pb-safe shadow-[0_-8px_24px_rgb(15_23_42/0.12)]",
+        // Escritorio: barra flotante centrada en el área del mapa (a la derecha del panel de 400 px + márgenes).
+        "lg:fixed lg:bottom-4 lg:left-[calc(50%+216px)] lg:w-[min(560px,calc(100vw-464px))] lg:-translate-x-1/2 lg:rounded-3xl lg:px-4 lg:pb-4 lg:shadow-xl",
+      )}
+    >
       {/* Barra de cooldown: se vacía en RATE_LIMIT_MS */}
       <div
         aria-hidden
