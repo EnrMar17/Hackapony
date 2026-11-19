@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase } from "@/lib/supabase/client";
-import { syncClock } from "@/lib/supabase/clock";
+import { correctedNowMs, syncClock } from "@/lib/supabase/clock";
 import type { Report } from "@/lib/types";
 import { fromRow, type ReportRow } from "./useReports";
 
@@ -23,7 +23,7 @@ const MAX_ROWS = 5000;
 async function fetchHistory(hours: number): Promise<Report[] | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
-  const since = new Date(Date.now() - hours * 3_600_000).toISOString();
+  const since = new Date(correctedNowMs() - hours * 3_600_000).toISOString();
   const rows: Report[] = [];
   for (let from = 0; from < MAX_ROWS; from += PAGE) {
     const { data, error } = await supabase

@@ -15,7 +15,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { getSupabase } from "@/lib/supabase/client";
-import { serverToLocalMs, syncClock } from "@/lib/supabase/clock";
+import { correctedNowMs, serverToLocalMs, syncClock } from "@/lib/supabase/clock";
 import { ensureSession } from "@/lib/supabase/session";
 import type { LngLat, Vehicle } from "@/lib/types";
 
@@ -73,7 +73,7 @@ export function useLiveVehicles(simulated: Vehicle[]): Vehicle[] {
 
     const load = async () => {
       try {
-        const since = new Date(Date.now() - 60_000).toISOString();
+        const since = new Date(correctedNowMs() - 60_000).toISOString();
         const { data, error } = await supabase
           .from("vehicle_positions")
           .select("vehicle_id, route_id, lat, lng, bearing, updated_at")
