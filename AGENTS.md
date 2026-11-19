@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Eres un agente de código en un equipo de 4 personas que hace vibecoding en un hackathon.
 Hoy hay un solo objetivo: un prototipo estable, con el flujo principal funcionando, antes de las 16:30.
-El reparto de roles y tareas está en `PLAN_MAESTRO.md`.
+El reparto de roles y tareas está en `PLAN_MAESTRO.md` (archivo local que Tony comparte por el grupo; no está en el repo).
 
 ## Reglas absolutas
 1. Solo editas archivos dentro de las carpetas que tu persona posee (ver `CLAUDE.local.md`).
