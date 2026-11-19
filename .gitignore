@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# editores y herramientas locales (no van a revision)
+.vscode/
+.idea/
+.claude/
+graphify-out/
+.semgrep/
+.impeccable/
+Thumbs.db
+
+# archivos locales de cada quien
+CLAUDE.local.md
+.env.local
