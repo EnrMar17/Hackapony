@@ -20,6 +20,7 @@ import { voteErrorMessage } from "@/components/report/messages";
 import { notifyReportFailed } from "@/components/report/notifyReportFailed";
 import { notifyReportSent } from "@/components/report/notifyReportSent";
 import { SimulatorPanel } from "@/components/simulator/SimulatorPanel";
+import { Splash } from "@/components/splash/Splash";
 
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
 
@@ -123,6 +124,7 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
         />
         <ReportBar onReport={onReport} geo={geo} nearestStop={nearest} />
       </div>
+      <Splash />
     </main>
   );
 }
