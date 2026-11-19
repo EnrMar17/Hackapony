@@ -14,8 +14,12 @@ interface UiState {
   /** true cuando el mapa terminó de cargar (para no abrir el onboarding sobre un mapa vacío). */
   mapReady: boolean;
   /** Modo "¿A dónde vas?" */
+  /** Punto de partida elegido; null = tu ubicación. */
+  origin: Destination | null;
   destination: Destination | null;
   pickingDestination: boolean;
+  /** Qué se está marcando en el mapa cuando `pickingDestination` es true. */
+  pickingTarget: "origin" | "destination";
   tripOpen: boolean;
   selectedTrip: RouteId | null;
   selectRoute: (id: RouteId | null) => void;
@@ -27,6 +31,8 @@ interface UiState {
   setShowAllRoutes: (on: boolean) => void;
   setMapReady: (ready: boolean) => void;
   setDestination: (destination: Destination | null) => void;
+  setOrigin: (origin: Destination | null) => void;
+  setPickingTarget: (target: "origin" | "destination") => void;
   setPickingDestination: (on: boolean) => void;
   setTripOpen: (open: boolean) => void;
   setSelectedTrip: (id: RouteId | null) => void;
@@ -41,8 +47,10 @@ export const useUi = create<UiState>((set) => ({
   onlyAccessible: false,
   showAllRoutes: false,
   mapReady: false,
+  origin: null,
   destination: null,
   pickingDestination: false,
+  pickingTarget: "destination",
   tripOpen: false,
   selectedTrip: null,
   selectRoute: (id) => set({ selectedRoute: id }),
@@ -55,6 +63,8 @@ export const useUi = create<UiState>((set) => ({
   setMapReady: (ready) => set({ mapReady: ready }),
   // Al cambiar o quitar el destino se descarta el viaje elegido.
   setDestination: (destination) => set({ destination, selectedTrip: null, pickingDestination: false }),
+  setOrigin: (origin) => set({ origin, selectedTrip: null, pickingDestination: false }),
+  setPickingTarget: (target) => set({ pickingTarget: target }),
   setPickingDestination: (on) => set({ pickingDestination: on }),
   setTripOpen: (open) => set({ tripOpen: open }),
   setSelectedTrip: (id) => set({ selectedTrip: id }),

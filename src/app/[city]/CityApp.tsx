@@ -11,11 +11,14 @@ import { useSimConfig } from "@/hooks/useSimConfig";
 import { ALL_ROUTES_ENABLED, DEFAULT_ROUTE_IDS, PRIVACY_SNAP_M, ROUTE_IDS } from "@/lib/constants";
 import { nearestStop } from "@/lib/geo";
 import { useVehicles } from "@/lib/simulator";
-import type { IncidentKind, ReportType, RouteId, VoteKind } from "@/lib/types";
+import { placeLabel } from "@/lib/trip/search";
+import { useTripOptions } from "@/lib/trip/useTripOptions";
+import type { IncidentKind, LngLat, ReportType, RouteId, VoteKind } from "@/lib/types";
 import { useUi } from "@/store/ui";
 import { TransitMap } from "@/components/map/TransitMap";
 import { BottomSheet } from "@/components/panels/BottomSheet";
 import { TopBar } from "@/components/panels/TopBar";
+import { TripPanel } from "@/components/trip/TripPanel";
 import { ReportBar } from "@/components/report/ReportBar";
 import { voteErrorMessage } from "@/components/report/messages";
 import { notifyReportFailed } from "@/components/report/notifyReportFailed";
@@ -75,6 +78,41 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
     [bundle.stops, geo.position],
   );
 
+  // "¿A dónde vas?": el viaje se calcula sobre todas las rutas si están habilitadas; si no, sobre las visibles.
+  const tripRoutes = ALL_ROUTES_ENABLED ? fullBundle.routes : bundle.routes;
+  const tripStops = ALL_ROUTES_ENABLED ? fullBundle.stops : bundle.stops;
+  const origin = useUi((s) => s.origin);
+  const destination = useUi((s) => s.destination);
+  const pickingTarget = useUi((s) => s.pickingTarget);
+  const pickingDestination = useUi((s) => s.pickingDestination);
+  const selectedTrip = useUi((s) => s.selectedTrip);
+  const tripOptions = useTripOptions({
+    routes: tripRoutes,
+    stops: tripStops,
+    reports: allReports,
+    from: origin?.point ?? geo.position,
+    to: destination?.point ?? null,
+    speed: sim.speed,
+  });
+  const trip = tripOptions?.find((o) => o.route_id === selectedTrip) ?? null;
+
+  // La mejor opción se elige sola; sin opciones no queda ninguna elegida.
+  useEffect(() => {
+    const { setSelectedTrip } = useUi.getState();
+    if (!tripOptions || tripOptions.length === 0) {
+      if (selectedTrip) setSelectedTrip(null);
+      return;
+    }
+    if (!tripOptions.some((o) => o.route_id === selectedTrip)) setSelectedTrip(tripOptions[0].route_id);
+  }, [tripOptions, selectedTrip]);
+
+  // Si la ruta elegida no es de las 2 que se muestran, se muestran todas para poder verla.
+  useEffect(() => {
+    if (selectedTrip && ALL_ROUTES_ENABLED && !DEFAULT_ROUTE_IDS.includes(selectedTrip)) {
+      useUi.getState().setShowAllRoutes(true);
+    }
+  }, [selectedTrip]);
+
   async function onReport(type: ReportType, incident_kind?: IncidentKind) {
     const [gx, gy] = geo.position ?? bundle.center;
     const near = nearestStop(bundle.stops, [gx, gy]);
@@ -112,10 +150,30 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
     vote(reportId, kind).catch((e: unknown) => toast.error(voteErrorMessage(e)));
   }
 
+  /** El mapa devuelve el punto que tocaste al marcar el destino. */
+  function onPickDestination(point: LngLat) {
+    const { pickingTarget: target, setDestination, setOrigin, setTripOpen, setSheetOpen } = useUi.getState();
+    const place = { point, label: placeLabel(point, tripStops) };
+    if (target === "origin") setOrigin(place);
+    else setDestination(place);
+    setTripOpen(true);
+    setSheetOpen(true);
+  }
+
+  // Props del viaje para el mapa. Van aparte: Cesar las añade a TransitMap y, mientras tanto, se ignoran.
+  const tripMapProps = {
+    destination,
+    pickingDestination,
+    pickingLabel: pickingTarget === "origin" ? "tu punto de partida" : "tu destino",
+    onPickDestination,
+    trip,
+    tripFrom: origin?.point ?? geo.position,
+  };
+
   return (
     <main className="relative h-dvh w-full overflow-hidden">
       <div className="absolute inset-0">
-        <TransitMap bundle={bundle} vehicles={vehicles} reports={reports} userPosition={geo.position} onLocateRequest={geo.request} simSpeed={sim.speed} userAccuracyM={geo.accuracyM} />
+        <TransitMap bundle={bundle} vehicles={vehicles} reports={reports} userPosition={geo.position} onLocateRequest={geo.request} simSpeed={sim.speed} userAccuracyM={geo.accuracyM} {...tripMapProps} />
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-0 *:pointer-events-auto">
         <TopBar routes={bundle.routes} online={online} connected={connected} />
@@ -132,6 +190,7 @@ export function CityApp({ city, admin, initialRoute, initialStop }: CityAppProps
           userPosition={geo.position}
           simSpeed={sim.speed}
           userId={userId}
+          tripSlot={<TripPanel stops={tripStops} options={tripOptions} geo={geo} connected={connected} />}
         />
         <ReportBar onReport={onReport} geo={geo} nearestStop={nearest} />
       </div>
