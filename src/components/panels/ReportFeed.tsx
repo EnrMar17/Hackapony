@@ -70,7 +70,7 @@ function FeedFilters({ type, onType, routeId, onRoute, counts, routes }: Filters
           <select
             value={routeId}
             onChange={(e) => onRoute(e.target.value as RouteId | "all")}
-            className="min-h-12 w-full rounded-2xl bg-foreground/5 px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
+            className="min-h-12 w-full rounded-2xl border border-foreground/15 bg-background px-3 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring [&>option]:bg-background [&>option]:text-foreground"
           >
             <option value="all">Todas las rutas</option>
             {routes.map((r) => (
