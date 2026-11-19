@@ -153,13 +153,16 @@ export function BottomSheet({
                 type="button"
                 onClick={close}
                 className={cn(
-                  "-mr-2 flex size-12 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring",
+                  "-mr-2 flex size-12 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring lg:w-auto lg:gap-1.5 lg:px-3",
                   !hasSelection && "lg:hidden",
                 )}
               >
                 <ChevronDown aria-hidden className="size-5 lg:hidden" />
-                <X aria-hidden className="hidden size-5 lg:block" />
-                <span className="sr-only">{desktop ? "Cerrar detalle" : "Cerrar panel"}</span>
+                {/* En escritorio dice qué cierra (la parada o el reporte elegido), para no confundirse con el del viaje. */}
+                <X aria-hidden className="hidden size-4 lg:block" />
+                <span className="sr-only lg:not-sr-only lg:text-sm lg:font-semibold">
+                  {desktop ? "Cerrar detalle" : "Cerrar panel"}
+                </span>
               </button>
             </div>
 

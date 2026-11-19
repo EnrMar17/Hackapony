@@ -119,19 +119,26 @@ export function TransitMap({
     tripRef.current = { trip, destination, tripFrom };
   });
 
+  // En modo "todas" el mapa NO dibuja las 13 rutas a la vez: solo las 2 principales y, si eliges una, esa.
+  const focusRoute = trip?.route_id ?? selectedRoute;
+  const routesToDraw = useMemo(
+    () => (dense ? bundle.routes.filter((r) => DEFAULT_ROUTE_IDS.includes(r.id) || r.id === focusRoute) : bundle.routes),
+    [dense, bundle.routes, focusRoute],
+  );
+
   // Se vuelve a encuadrar cuando cambia el conjunto de rutas (por ejemplo al pulsar "Ver todas").
   // En escritorio el panel izquierdo (416 px) y la barra de reporte tapan parte del mapa.
   useEffect(() => {
     // Con un viaje elegido manda su encuadre, no el de todas las rutas.
     if (!loaded || tripRef.current.trip) return;
-    mapRef.current?.fitBounds(routesBounds(bundle.routes), {
+    mapRef.current?.fitBounds(routesBounds(routesToDraw), {
       padding: desktop
         ? { top: 96, bottom: 200, left: 456, right: 40 }
         : { top: 96, bottom: 260, left: 28, right: 28 },
       maxZoom: 14,
       duration: 600,
     });
-  }, [loaded, bundle.routes, desktop]);
+  }, [loaded, routesToDraw, desktop]);
 
   // Al elegir un viaje, el mapa se encuadra al recorrido completo. No se repite cuando se refrescan las unidades.
   const tripKey = trip
@@ -234,7 +241,7 @@ export function TransitMap({
         style={{ width: "100%", height: "100%" }}
       >
         {/* De abajo hacia arriba: rutas, paradas, reportes, unidades y, encima de todo, tú. */}
-        <RouteLayers routes={bundle.routes} selected={trip?.route_id ?? selectedRoute} dense={dense} dark={dark} iconsReady={imagesReady} />
+        <RouteLayers routes={routesToDraw} selected={focusRoute} dense={dense && routesToDraw.length > 3} dark={dark} iconsReady={imagesReady} />
         <TripLayer trip={trip} destination={destination} from={tripFrom} dark={dark} />
         <StopLayer stops={bundle.stops} reports={reports} dense={dense} dark={dark} />
         <ReportLayer reports={reports} iconsReady={imagesReady} dark={dark} />
@@ -295,7 +302,7 @@ export function TransitMap({
           </button>
           {dense && !selectedRoute && (
             <p className="glass hidden rounded-xl px-3 py-2 text-xs text-muted-foreground shadow-md sm:block">
-              Toca una línea para ver sus paradas y unidades.
+              Elige una ruta de la lista de arriba para verla en el mapa.
             </p>
           )}
         </div>

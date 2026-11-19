@@ -18,6 +18,11 @@ const DEFAULT_WAIT_MIN = 10; // si no hay unidades, se supone una espera larga
 const STATUS_PENALTY_MIN = { green: 0, yellow: 4, red: 10 } as const;
 const CROWDED_PENALTY_MIN = 3;
 const MAX_VIA = 4;
+/** Radios de búsqueda a pie, de lo cercano a lo lejano. */
+const WALK_STEPS_M = [TRIP_WALK_MAX_M, 1000, 1500, 2500];
+
+/** "850 m" o "1.2 km". */
+const fmtM = (m: number) => (m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(1)} km`);
 
 export interface PlanTripInput {
   routes: Route[];
@@ -113,16 +118,26 @@ function roadsAlong(routeStops: Stop[], boardP: number, span: number): string[] 
  * `TRIP_MAX_OPTIONS`). El puntaje suma caminata, espera de la próxima unidad, viaje y una penalización
  * si la ruta tiene avisos. Devuelve [] si no hay ninguna ruta cerca de los dos puntos.
  */
-export function planTrip({ routes, stops, reports, vehicles, from, to, now = Date.now(), speed = 1 }: PlanTripInput): TripOption[] {
-  if (meters(from, to) < MIN_TRIP_M) return [];
+export function planTrip(input: PlanTripInput): TripOption[] {
+  if (meters(input.from, input.to) < MIN_TRIP_M) return [];
+  // Primero lo cercano (≤ 600 m a pie en cada extremo). Si no hay ninguna ruta así, se amplía poco a poco para
+  // ofrecer la que MÁS SE ACERQUE, avisando cuánto hay que caminar.
+  for (const walkMaxM of WALK_STEPS_M) {
+    const options = planWithin(input, walkMaxM);
+    if (options.length > 0) return options;
+  }
+  return [];
+}
+
+function planWithin({ routes, stops, reports, vehicles, from, to, now = Date.now(), speed = 1 }: PlanTripInput, walkMaxM: number): TripOption[] {
   const mps = VEHICLE_SPEED_MS * speed;
   const scored: { cost: number; option: TripOption }[] = [];
 
   for (const route of routes) {
     const { totalM } = routeGeometry(route);
     // Cada pasada del circuito cerca de ti y cerca del destino es una forma posible de subir y de bajar.
-    const boards = passProgresses(route, from, TRIP_WALK_MAX_M);
-    const alights = passProgresses(route, to, TRIP_WALK_MAX_M);
+    const boards = passProgresses(route, from, walkMaxM);
+    const alights = passProgresses(route, to, walkMaxM);
 
     let best: { b: number; a: number; span: number; rideM: number; cost: number } | null = null;
     for (const b of boards) {
@@ -145,6 +160,9 @@ export function planTrip({ routes, stops, reports, vehicles, from, to, now = Dat
     const crowded = board.stop !== null && loadAhead(route, routeStops, board.stop, reports, now);
     const alerts = findings(route, routeStops, reports, best.b, best.span, now);
     if (crowded) alerts.unshift("Probablemente llena al subir");
+    // Sin una ruta cercana a los dos puntos: se dice claro cuánto hay que caminar.
+    if (alight.walkM > TRIP_WALK_MAX_M) alerts.unshift(`Te deja a ${fmtM(alight.walkM)} de tu destino: el resto es a pie`);
+    if (board.walkM > TRIP_WALK_MAX_M) alerts.unshift(`Hay que caminar ${fmtM(board.walkM)} para subir`);
 
     const rideMin = best.rideM / mps / 60;
     const rideMinMin = Math.max(1, Math.round(rideMin * 0.8));

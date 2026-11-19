@@ -130,10 +130,10 @@ export function TripPanel({ stops, options, geo, connected = true }: TripPanelPr
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="-mr-1 flex size-12 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
+          className="-mr-1 flex min-h-12 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted-foreground hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring"
         >
-          <X aria-hidden className="size-5" />
-          <span className="sr-only">Cerrar</span>
+          <X aria-hidden className="size-4" />
+          Cerrar viaje
         </button>
       </header>
 
